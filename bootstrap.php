@@ -27,7 +27,7 @@ $dynamodb = new AmazonDynamoDB($options);
 
 $uri = new Uri();
 
-$user = new User();
+$user = new User($dynamodb);
 
 if (!$user->isAuthenticated()){
 	if ($uri->seg[0] != 'login') {
