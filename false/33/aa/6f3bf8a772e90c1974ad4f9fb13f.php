@@ -13,6 +13,7 @@ class __TwigTemplate_33aa6f3bf8a772e90c1974ad4f9fb13f extends Twig_Template
             'title' => array($this, 'block_title'),
             'stylesheets' => array($this, 'block_stylesheets'),
             'body' => array($this, 'block_body'),
+            'javascripts' => array($this, 'block_javascripts'),
         );
     }
 
@@ -37,7 +38,11 @@ class __TwigTemplate_33aa6f3bf8a772e90c1974ad4f9fb13f extends Twig_Template
         $this->displayBlock('body', $context, $blocks);
         // line 14
         echo "</div>
-</body>
+";
+        // line 15
+        $this->displayBlock('javascripts', $context, $blocks);
+        // line 21
+        echo "</body>
 </html>";
     }
 
@@ -64,6 +69,17 @@ class __TwigTemplate_33aa6f3bf8a772e90c1974ad4f9fb13f extends Twig_Template
 ";
     }
 
+    // line 15
+    public function block_javascripts($context, array $blocks = array())
+    {
+        // line 16
+        echo "    <script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js\"></script>
+\t<script src=\"https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js\"></script>
+    <script src=\"/assets/js/bootstrap.min.js\"></script>
+    <script src=\"/assets/js/main.js\"></script>
+";
+    }
+
     public function getTemplateName()
     {
         return "base.html.twig";
@@ -71,6 +87,6 @@ class __TwigTemplate_33aa6f3bf8a772e90c1974ad4f9fb13f extends Twig_Template
 
     public function getDebugInfo()
     {
-        return array (  61 => 12,  58 => 11,  52 => 5,  49 => 4,  43 => 3,  35 => 11,  30 => 8,  28 => 4,  24 => 3,  20 => 1,  37 => 14,  34 => 3,  27 => 2,);
+        return array (  74 => 16,  71 => 15,  66 => 12,  63 => 11,  57 => 5,  54 => 4,  48 => 3,  43 => 21,  41 => 15,  38 => 14,  36 => 11,  31 => 8,  29 => 4,  25 => 3,  21 => 1,);
     }
 }

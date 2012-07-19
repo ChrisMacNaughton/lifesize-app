@@ -3,9 +3,9 @@ error_reporting(E_ALL);
 session_start();
 define('START_TIME', microtime());
 require_once 'vendor/autoload.php';
+require_once 'classes/passwordHash.php';
 require_once 'classes/User.php';
 require_once 'classes/Uri.php';
-
 require_once 'common.php';
 
 if (get_cfg_var('aws.access_key') === false) {
