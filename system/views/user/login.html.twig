@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+{% block title %}Login{{parent()}}{% endblock %}
+{% block body %}
+<div class="span4 offset4">
+<form action="#" method="post">
+	<label>Username</label><input type="text" name="username" placeholder="Username" />
+	<label>Company ID</label><input type="text" name="companyid" placeholder="Company Id" />
+	<label>Password</label><input type="password" name="password" placeholder="Password" />
+	<label>
+		Remember Me: <input type="checkbox" name="remember_me">
+	</label>
+	<input type="submit" value="Submit">
+</form>
+</div>
+{% endblock %}

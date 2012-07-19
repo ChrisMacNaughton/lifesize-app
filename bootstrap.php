@@ -1,9 +1,12 @@
 <?php
 error_reporting(E_ALL);
+session_start();
 define('START_TIME', microtime());
 require_once 'vendor/autoload.php';
 require_once 'classes/User.php';
 require_once 'classes/Uri.php';
+
+require_once 'common.php';
 
 if (get_cfg_var('aws.access_key') === false) {
 $options = array(
@@ -22,19 +25,13 @@ $options = array(
 }
 $dynamodb = new AmazonDynamoDB($options);
 
-// Instantiate, configure, and register the session handler
-$session_handler = $dynamodb->register_session_handler(array(
-	'table_name'       => 'sessions',
-	'lifetime'         => 3600,
-));
 $uri = new Uri();
-// Open the session
-session_start();
-if (isset($_SESSION['user'])) {
-	$user = new User($_SESSION['user']);
-} else {
+
+$user = new User();
+
+if (!$user->isAuthenticated()){
 	if ($uri->seg[0] != 'login') {
-		header("Location: /login");
+		$_SESSION['flash'][] = "You must login first";
+		header("Location: login");
 	}
-	$user = new User();
 }

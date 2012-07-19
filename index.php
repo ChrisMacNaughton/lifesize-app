@@ -1,5 +1,11 @@
 <?php
 require_once 'bootstrap.php';
 
-echo "Hello World!";
-echo "<pre>"; var_dump($uri->seg); echo "</pre>";
+switch($uri->seg[0]) {
+	case "login":
+		require_once "system/controllers/user/login.php";
+		break;
+	case "logout":
+		$user->logout();
+		break;
+}
