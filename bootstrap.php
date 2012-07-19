@@ -3,7 +3,13 @@ define('START_TIME', microtime());
 require_once 'vendor/autoload.php';
 require_once 'classes/User.php';
 require_once 'classes/Uri.php';
-$dynamodb = new AmazonDynamoDB();
+$options = array(
+	'certificate_auithority'->get_cfg_var('aws.param1'),
+	'default_cache_config' => '',
+	'key' => get_cfg_var('aws.access_key'),
+	'secret' => get_cfg_var('aws.secret_key'),
+);
+$dynamodb = new AmazonDynamoDB($options);
 
 // Instantiate, configure, and register the session handler
 $session_handler = $dynamodb->register_session_handler(array(
