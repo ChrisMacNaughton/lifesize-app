@@ -33,5 +33,8 @@ session_start();
 if (isset($_SESSION['user'])) {
 	$user = new User($_SESSION['user']);
 } else {
+	if ($uri->seg[0] != 'login') {
+		header("Location: /login");
+	}
 	$user = new User();
 }
