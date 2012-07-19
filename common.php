@@ -6,6 +6,9 @@ function render($file, $data) {
 		'cache'=>'false',
 		'debug'=>true
 	));
-	
+	if (isset($_SESSION['flash'])) {
+		$data['flash'] = $_SESSION['flash'];
+		unset($_SESSION['flash']);
+	}
 	echo $twig->render($file, $data);
 }
