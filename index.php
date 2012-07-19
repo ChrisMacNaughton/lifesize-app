@@ -1,5 +1,4 @@
 <?php
+require_once 'bootstrap.php';
 
 echo "Hello World!";
-
-require_once 'vendor/autoload.php';
