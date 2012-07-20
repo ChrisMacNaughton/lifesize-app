@@ -55,9 +55,6 @@ class User {
 		);
 	}
 	public function login($email, $company, $password, $remember) {
-		$email = mysql_real_escape_string($email);
-		$company = mysql_real_escape_string($company);
-		$password = mysql_real_escape_string($password);
 		/*
 		if ($email == 'chmacnaughton@gmail.com') {
 			$this->register(array('email'=>$email, 'company'=>$company, 'password'=>$password, 'password2'=>$password, 'name'=>'chris'));
