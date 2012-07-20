@@ -48,21 +48,21 @@ class __TwigTemplate_33aa6f3bf8a772e90c1974ad4f9fb13f extends Twig_Template
             if ((($_page_ == "home") || ($_page_ == ""))) {
                 echo " class=\"active\"";
             }
-            echo "><a href=\"home\">Home</a></li>
+            echo "><a href=\"/home\">Home</a></li>
 \t\t<li";
             // line 17
             if (isset($context["page"])) { $_page_ = $context["page"]; } else { $_page_ = null; }
             if (($_page_ == "devices")) {
                 echo " class=\"active\"";
             }
-            echo "><a href=\"devices\">Devices</a></li>
+            echo "><a href=\"/devices\">Devices</a></li>
 \t\t<li";
             // line 18
             if (isset($context["page"])) { $_page_ = $context["page"]; } else { $_page_ = null; }
             if (($_page_ == "users")) {
                 echo " class=\"active\"";
             }
-            echo "><a href=\"users\">Users</a></li>
+            echo "><a href=\"/users\">Users</a></li>
 \t\t<li><a href=\"logout\">Logout</a></li>
 \t</ul>
 </div>
@@ -76,7 +76,7 @@ class __TwigTemplate_33aa6f3bf8a772e90c1974ad4f9fb13f extends Twig_Template
 ";
         }
         // line 28
-        echo "
+        echo "<div class=\"row\">
 ";
         // line 29
         if (isset($context["errors"])) { $_errors_ = $context["errors"]; } else { $_errors_ = null; }
@@ -84,7 +84,7 @@ class __TwigTemplate_33aa6f3bf8a772e90c1974ad4f9fb13f extends Twig_Template
         $context['_seq'] = twig_ensure_traversable($_errors_);
         foreach ($context['_seq'] as $context["_key"] => $context["error"]) {
             // line 30
-            echo "\t<div class=\"span8 offset2 error\">
+            echo "\t<div class=\" span8 offset2 error\">
 \t\t";
             // line 31
             if (isset($context["error"])) { $_error_ = $context["error"]; } else { $_error_ = null; }
@@ -97,13 +97,16 @@ class __TwigTemplate_33aa6f3bf8a772e90c1974ad4f9fb13f extends Twig_Template
         unset($context['_seq'], $context['_iterated'], $context['_key'], $context['error'], $context['_parent'], $context['loop']);
         $context = array_merge($_parent, array_intersect_key($context, $_parent));
         // line 34
-        $this->displayBlock('body', $context, $blocks);
-        // line 37
         echo "</div>
 ";
+        // line 35
+        $this->displayBlock('body', $context, $blocks);
         // line 38
+        echo "</div>
+";
+        // line 39
         $this->displayBlock('javascripts', $context, $blocks);
-        // line 44
+        // line 45
         echo "</body>
 </html>";
     }
@@ -131,18 +134,18 @@ class __TwigTemplate_33aa6f3bf8a772e90c1974ad4f9fb13f extends Twig_Template
         echo "\t";
     }
 
-    // line 34
+    // line 35
     public function block_body($context, array $blocks = array())
     {
-        // line 35
+        // line 36
         echo "
 ";
     }
 
-    // line 38
+    // line 39
     public function block_javascripts($context, array $blocks = array())
     {
-        // line 39
+        // line 40
         echo "    <script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js\"></script>
 \t<script src=\"https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js\"></script>
     <script src=\"/assets/js/bootstrap.min.js\"></script>
@@ -162,6 +165,6 @@ class __TwigTemplate_33aa6f3bf8a772e90c1974ad4f9fb13f extends Twig_Template
 
     public function getDebugInfo()
     {
-        return array (  144 => 39,  141 => 38,  136 => 35,  133 => 34,  129 => 24,  126 => 23,  119 => 5,  116 => 4,  110 => 3,  105 => 44,  103 => 38,  100 => 37,  98 => 34,  88 => 31,  85 => 30,  80 => 29,  77 => 28,  72 => 25,  70 => 23,  59 => 18,  52 => 17,  45 => 16,  40 => 13,  37 => 12,  32 => 9,  30 => 4,  26 => 3,  22 => 1,);
+        return array (  147 => 40,  144 => 39,  139 => 36,  136 => 35,  132 => 24,  129 => 23,  122 => 5,  119 => 4,  113 => 3,  108 => 45,  106 => 39,  103 => 38,  101 => 35,  98 => 34,  88 => 31,  85 => 30,  80 => 29,  77 => 28,  72 => 25,  70 => 23,  59 => 18,  52 => 17,  45 => 16,  40 => 13,  37 => 12,  32 => 9,  30 => 4,  26 => 3,  22 => 1,);
     }
 }

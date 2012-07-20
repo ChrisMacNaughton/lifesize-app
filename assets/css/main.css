@@ -5,3 +5,15 @@ div .error {
 	margin-bottom: 5px;
 	background-color: #ffc;
 }
+.online {
+	background-image: url('/assets/img/online.png');
+	background-repeat: no-repeat;
+}
+.offline {
+	background-image: url('/assets/img/offline.png');
+	background-repeat: no-repeat;
+}
+.calling {
+	background-image: url('/assets/img/camera.png');
+	background-repeat: no-repeat;
+}
