@@ -33,9 +33,7 @@ try {
 $uri = new Uri();
 
 $user = new User($db);
-
 if (!$user->isAuthenticated()){
-var_dump($uri->seg);
 	if ($uri->seg[0] != 'login') {
 		$_SESSION['flash'][] = "You must login first";
 		header("Location: login");

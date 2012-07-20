@@ -8,6 +8,7 @@ class User {
 	protected $db;
 	protected $authenticatedFully = false;
 	public function __construct($db) {
+		$this->authenticatedFully = false;
 		$this->db = $db;
 		$this->hasher = new PasswordHash(10, FALSE);
 		
@@ -16,12 +17,13 @@ class User {
 		
 		$stmt = $this->db->prepare("SELECT * FROM users WHERE email=:email AND sesshash=:sesshash LIMIT 1");
 		
-		if ($stmt->execute(array(
+		$login = $stmt->execute(array(
 				':email'=>$_COOKIE['vc-control_u'],
 				':sesshash'=>$_COOKIE['vc-control_h']
-			))
-		) {
-			$user = $stmt->fetch();
+			));
+			$user = $stmt->fetchAll();
+		if (count($user) > 0) {
+			$user = $user[0];
 			$this->userid = $user['id'];
 			$this->name = $user['name'];
 			$this->email = $user['email'];
@@ -114,6 +116,7 @@ class User {
 		setcookie('vc-control_u','',0,'/');
 		setcookie('vc-control_h','',0,'/');
 		setcookie('vc-control_remember',0,0,'/');
+		$this->authenticatedFully = false;
 	}
 	
 	public function register($data) {

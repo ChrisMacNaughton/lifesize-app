@@ -1,6 +1,5 @@
 <?php
 require_once 'bootstrap.php';
-
 switch($uri->seg[0]) {
 	case "":
 	case "home":
