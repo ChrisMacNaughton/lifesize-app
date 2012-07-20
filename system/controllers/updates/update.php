@@ -39,7 +39,11 @@ if (!isset($_GET['id'])) {
 		$result =  $result->fetch();
 		$system[':model'] = $result['id'];
 		//echo "<pre>";print_r($system); echo "</pre>";
-		$stmt->execute($system);
+		if ($stmt->execute($system)) {
+		 echo "Success!";
+		} else {
+			echo "Failure";
+		}
 	}
 	
 	//echo "$query";
