@@ -11,5 +11,6 @@ switch($uri->seg[0]) {
 		break;
 	case "logout":
 		$user->logout();
+		header("Location: /");
 		break;
 }
