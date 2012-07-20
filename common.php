@@ -1,6 +1,7 @@
 <?php
 
-function render($file, $data) {
+function render($file, $data = null) {
+	global $user;
 	$loader = new Twig_Loader_Filesystem('system/views');
 	$twig = new Twig_Environment($loader, array(
 		'cache'=>'false',
@@ -14,6 +15,7 @@ function render($file, $data) {
 		$data['errors'] = $_SESSION['errors'];
 		unset($_SESSION['errors']);
 	}
+	$data['user'] = $user->userinfo();
 	echo $twig->render($file, $data);
 }
 function l($string) {

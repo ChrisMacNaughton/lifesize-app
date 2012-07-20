@@ -34,10 +34,21 @@ class User {
 			$this->userid = 0;
 			$this->name = 'guest';
 			$this->level = 0;
+			$this->authenticatedFully = false;
 		}
 	}
+	
 	public function isAuthenticated() {
 		return $this->authenticatedFully;
+	}
+	public function userInfo() {
+		return array(
+			'name'=>$this->name,
+			'email'=>$this->email,
+			'level' => $this->level,
+			'id' => $this->userid,
+			'company_id' => $this->company_id
+		);
 	}
 	public function login($email, $company, $password, $remember) {
 		$email = mysql_real_escape_string($email);
@@ -96,29 +107,15 @@ class User {
 			$_SESSION['errors'][] = l('error_user_inactive');
 			return false;
 		}
-		/*
-		if ($login['active']) {
-		$db->query("UPDATE users SET sesshash='".$db->es(sha1($password.time().$username))."', `last_login` = '".time()."' WHERE username='".$db->es($username)."' LIMIT 1");
-		$this->userid = $login['id'];
-		// Set the cookies
-		if($remember) {
-			// Remember
-			setcookie('ls_u',$username,time()+9999999,'/');
-			setcookie('ls_h',sha1($password.time().$username),time()+9999999,'/');
-			setcookie('ls_remember',1,time()+9999999,'/');
-		} else {
-			// Session
-			setcookie('ls_u',$username,0,'/');
-			setcookie('ls_h',sha1($password.time().$username),0,'/');
-			setcookie('ls_remember',0,0,'/');
-		}
-		return true;
-		} else {
-			$this->errors[] = l('error_user_inactive');
-			return false;
-		}
-		*/
+		
 	}
+	
+	public function logout() {
+		setcookie('vc-control_u','',0,'/');
+		setcookie('vc-control_h','',0,'/');
+		setcookie('vc-control_remember',0,0,'/');
+	}
+	
 	public function register($data) {
 		$errors = array();
 		$stmt = $this->db->prepare("SELECT username FROM users WHERE email= :email LIMIT 1");
