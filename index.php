@@ -18,4 +18,10 @@ switch($uri->seg[0]) {
 	case 'devices':
 		require_once "system/controllers/device/index.php";
 		break;
+	case 'update':
+		require_once "system/controllers/updates/update.php";
+		break;
+	case 'ping':
+		require_once "system/controllers/updates/ping.php";
+		break;
 }

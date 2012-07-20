@@ -22,3 +22,12 @@ function render($file, $data = null) {
 function l($string) {
 	return $string;
 }
+function ping($host) {
+    exec(sprintf('ping -n 1 -w 1000 %s', escapeshellarg($host)), $res, $rval);
+	
+    return $rval === 0;
+}
+function lifesizeSplit($string) {
+	$string = explode(chr(0x0a), $string);
+	return $string;
+}
