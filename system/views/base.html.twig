@@ -4,10 +4,16 @@
 	{% block stylesheets %}
 	<link href="/assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="/assets/css/bootstrap-responsive.min.css" rel="stylesheet">
+	<link href="/assets/css/main.css" rel="stylesheet">
 	{% endblock %}
 </head>
 <body>
 <div class="container-fluid">
+{% for error in errors %}
+	<div class="span8 offset2 error">
+		{{error}}
+	</div>
+{% endfor %}
 {% block body %}
 
 {% endblock%}

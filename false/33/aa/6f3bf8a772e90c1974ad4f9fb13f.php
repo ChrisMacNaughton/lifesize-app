@@ -29,19 +29,37 @@ class __TwigTemplate_33aa6f3bf8a772e90c1974ad4f9fb13f extends Twig_Template
 \t";
         // line 4
         $this->displayBlock('stylesheets', $context, $blocks);
-        // line 8
+        // line 9
         echo "</head>
 <body>
 <div class=\"container-fluid\">
 ";
-        // line 11
+        // line 12
+        if (isset($context["errors"])) { $_errors_ = $context["errors"]; } else { $_errors_ = null; }
+        $context['_parent'] = (array) $context;
+        $context['_seq'] = twig_ensure_traversable($_errors_);
+        foreach ($context['_seq'] as $context["_key"] => $context["error"]) {
+            // line 13
+            echo "\t<div class=\"span8 offset2 error\">
+\t\t";
+            // line 14
+            if (isset($context["error"])) { $_error_ = $context["error"]; } else { $_error_ = null; }
+            echo twig_escape_filter($this->env, $_error_, "html", null, true);
+            echo "
+\t</div>
+";
+        }
+        $_parent = $context['_parent'];
+        unset($context['_seq'], $context['_iterated'], $context['_key'], $context['error'], $context['_parent'], $context['loop']);
+        $context = array_merge($_parent, array_intersect_key($context, $_parent));
+        // line 17
         $this->displayBlock('body', $context, $blocks);
-        // line 14
+        // line 20
         echo "</div>
 ";
-        // line 15
-        $this->displayBlock('javascripts', $context, $blocks);
         // line 21
+        $this->displayBlock('javascripts', $context, $blocks);
+        // line 27
         echo "</body>
 </html>";
     }
@@ -58,21 +76,22 @@ class __TwigTemplate_33aa6f3bf8a772e90c1974ad4f9fb13f extends Twig_Template
         // line 5
         echo "\t<link href=\"/assets/css/bootstrap.min.css\" rel=\"stylesheet\">
     <link href=\"/assets/css/bootstrap-responsive.min.css\" rel=\"stylesheet\">
+\t<link href=\"/assets/css/main.css\" rel=\"stylesheet\">
 \t";
     }
 
-    // line 11
+    // line 17
     public function block_body($context, array $blocks = array())
     {
-        // line 12
+        // line 18
         echo "
 ";
     }
 
-    // line 15
+    // line 21
     public function block_javascripts($context, array $blocks = array())
     {
-        // line 16
+        // line 22
         echo "    <script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js\"></script>
 \t<script src=\"https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js\"></script>
     <script src=\"/assets/js/bootstrap.min.js\"></script>
@@ -85,8 +104,13 @@ class __TwigTemplate_33aa6f3bf8a772e90c1974ad4f9fb13f extends Twig_Template
         return "base.html.twig";
     }
 
+    public function isTraitable()
+    {
+        return false;
+    }
+
     public function getDebugInfo()
     {
-        return array (  74 => 16,  71 => 15,  66 => 12,  63 => 11,  57 => 5,  54 => 4,  48 => 3,  43 => 21,  41 => 15,  38 => 14,  36 => 11,  31 => 8,  29 => 4,  25 => 3,  21 => 1,);
+        return array (  93 => 22,  90 => 21,  85 => 18,  82 => 17,  75 => 5,  72 => 4,  66 => 3,  61 => 27,  59 => 21,  56 => 20,  54 => 17,  44 => 14,  41 => 13,  36 => 12,  31 => 9,  29 => 4,  25 => 3,  21 => 1,);
     }
 }

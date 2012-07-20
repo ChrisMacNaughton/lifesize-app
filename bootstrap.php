@@ -2,6 +2,8 @@
 error_reporting(E_ALL);
 session_start();
 define('START_TIME', microtime());
+$_SESSION['errors'] = array();
+$_SESSION['flash'] = array();
 require_once 'vendor/autoload.php';
 require_once 'classes/PasswordHash.php';
 require_once 'classes/User.php';
@@ -30,7 +32,7 @@ try {
 
 $uri = new Uri();
 
-$user = new User($dynamodb);
+$user = new User($db);
 
 if (!$user->isAuthenticated()){
 	if ($uri->seg[0] != 'login') {

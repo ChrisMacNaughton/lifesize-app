@@ -38,7 +38,7 @@ class __TwigTemplate_21d422dce7926cfd7a2cbf565cbd800e extends Twig_Template
         // line 4
         echo "<div class=\"span4 offset4\">
 <form action=\"#\" method=\"post\">
-\t<label>Username</label><input type=\"text\" name=\"username\" placeholder=\"Username\" />
+\t<label>E-Mail</label><input type=\"text\" name=\"email\" placeholder=\"E-Mail\" />
 \t<label>Company ID</label><input type=\"text\" name=\"companyid\" placeholder=\"Company Id\" />
 \t<label>Password</label><input type=\"password\" name=\"password\" placeholder=\"Password\" />
 \t<input type=\"hidden\" name=\"action\" value=\"login\" />

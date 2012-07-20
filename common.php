@@ -10,5 +10,12 @@ function render($file, $data) {
 		$data['flash'] = $_SESSION['flash'];
 		unset($_SESSION['flash']);
 	}
+	if (isset($_SESSION['errors'])) {
+		$data['errors'] = $_SESSION['errors'];
+		unset($_SESSION['errors']);
+	}
 	echo $twig->render($file, $data);
+}
+function l($string) {
+	return $string;
 }
