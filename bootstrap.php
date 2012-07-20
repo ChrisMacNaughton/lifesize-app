@@ -7,14 +7,9 @@ require_once 'classes/PasswordHash.php';
 require_once 'classes/User.php';
 require_once 'classes/Uri.php';
 require_once 'common.php';
-
+$dsn = 'mysql:dbname=vcdb;host=vcawsdb.crwlsevgtlap.us-east-1.rds.amazonaws.com';
 if (get_cfg_var('aws.access_key') === false) {
-$options = array(
-	'certificate_authority'=>true,
-	'default_cache_config' => '',
-	'key' => 'AKIAIZCMBC2UFLIFHU2Q',
-	'secret' => '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',
-);
+include 'config.php';
 } else {
 $options = array(
 	'certificate_authority'=>get_cfg_var('aws.param1'),
@@ -22,8 +17,16 @@ $options = array(
 	'key' => get_cfg_var('aws.access_key'),
 	'secret' => get_cfg_var('aws.secret_key'),
 );
+$user = get_cfg_var('aws.param2');
+$password = get_cfg_var('aws.param3');
 }
 $dynamodb = new AmazonDynamoDB($options);
+
+try {
+    $db = new PDO($dsn, $user, $password);
+} catch (PDOException $e) {
+    $_SESSION['errors'][] = $e->getMessage();
+}
 
 $uri = new Uri();
 
