@@ -41,6 +41,7 @@ class Lifesize {
 		return $this->connected;
 	}
 	public function update() {
+		$calldata = $this->getCallData();
 		$device = array();
 		$device['name'] = $this->getName();
 		$device['calling'] = $this->getCalling();
@@ -48,6 +49,8 @@ class Lifesize {
 		$device['version'] = $this->getVersion('Software Version');
 		$device['make'] = $this->getMake();
 		$device['model'] = $this->getModel();
+		$device['calltime'] = $calldata['time'];
+		$device['callcount'] = $calldata['count'];
 		
 		return $device;
 	}
@@ -96,6 +99,32 @@ class Lifesize {
 			return false;
 		}
 	}
+	public function getCallData() {
+		$return = array();
+		$data = $this->getHistory();
+		if ($data === false) 
+			return false;
+		$calltime = 0;
+		$callcount = 0;
+		foreach ($data as $call) {
+			$callcount++;
+			//echo "<!-- " . $call[0] . ' - ' . $call[8] . '->' . time_to_seconds($call[8]) . '-->';
+			echo "<!--";print_r($call); echo "-->";
+			$calltime += time_to_seconds($call[8]);
+		}
+		$return['count'] = $callcount;
+		$return['time'] = $calltime;
+		return $return;
+	}
+	public function getHistory() {
+		$data = $this->status('call','history', array('X'));
+		if ($data['Status'] == "Success") {
+			$data = $data['Data'];
+			return $data;
+		} else {
+			return false;
+		}
+	}
 	/* basic lib functions */
 	private function get($object, $target, ARRAY $options = null, $debug = false) {
 		$func = 'get ' . $object . ' ' . $target;
@@ -121,7 +150,7 @@ class Lifesize {
 			}
 		}
 		if ($debug) { echo "<!-- $func -->"; }
-		$data = $this->seperateData($this->ssh->exec($func));
+		$data = $this->seperateData($this->ssh->exec($func . ' -D |'), '|');
 		//seperate out status and data to clean up data
 		$status = $data['Status'];
 		$data = $data['Data'];
@@ -130,11 +159,11 @@ class Lifesize {
 		}
 		if (is_array($data)) {
 			foreach ($data as $row) {
-				$final[] = explode(',', $row);
+				$final[] = explode('|', $row);
 			}
 			$data = $final;
 		} else if (is_string($data)) {
-			$data = explode(',',$data);
+			$data = explode('|',$data);
 		}
 		
 		//RECOMBINE!!!
@@ -145,14 +174,15 @@ class Lifesize {
 		return $data;
 	}
 	public function getCode($code) {
+	echo "<!-- $code -->";
 		return self::$errorCodes[$code];
 	}
-	private function seperateData($data){
+	private function seperateData($data, $del = ','){
 		$data = explode(chr(0x0a).chr(0x0a), $data);
 		//return $data;
 		if (isset($data[1])) {
 			$status = $data[1];
-			$status = $this->seperateCode($status);
+			$status = $this->seperateCode($status, $del);
 		$data = $data[0];
 		return array(
 			'Status'=>$this->getCode($status),
@@ -170,10 +200,11 @@ class Lifesize {
 		}
 		
 	}
-	private function seperateCode($status) {
+	private function seperateCode($status, $del = ',') {
+	echo "<!-- $status -->";
 		$status = explode(chr(0x0a), $status);
 		$status = $status[0];
-		$status = explode(',', $status);
+		$status = explode($del, $status);
 		$status = $status[1];
 		return $status;
 	}

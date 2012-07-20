@@ -22,6 +22,8 @@ if (!isset($_GET['id'])) {
 	$stmt = $db->prepare($query);
 	if ($ls->connected()) {
 		$lifesize = $ls->update();
+		echo "<pre>";
+		print_r($lifesize); echo "</pre>";
 		$system = array(
 			':device_id'=>$device['id'],
 			':name'=>$lifesize['name'],
@@ -32,6 +34,7 @@ if (!isset($_GET['id'])) {
 			':model'=>$lifesize['model'],
 			':updated'=>time()
 		);
+		echo "01:51:18 -> " . time_to_seconds("01:51:18");
 		$result = $db->query("SELECT id FROM makes WHERE name = '" . $system[':make'] . "'");
 		$result =  $result->fetch();
 		$system[':make'] = $result['id'];

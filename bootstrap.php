@@ -23,14 +23,14 @@ $options = array(
 	'key' => get_cfg_var('aws.access_key'),
 	'secret' => get_cfg_var('aws.secret_key'),
 );
-$user = get_cfg_var('aws.param2');
+$username = get_cfg_var('aws.param2');
 $password = get_cfg_var('aws.param3');
 define('PATH',get_cfg_var('aws.param4'));
 }
 //$dynamodb = new AmazonDynamoDB($options);
 
 try {
-    $db = new PDO($dsn, $user, $password);
+    $db = new PDO($dsn, $username, $password);
 } catch (PDOException $e) {
     $_SESSION['errors'][] = $e->getMessage();
 }

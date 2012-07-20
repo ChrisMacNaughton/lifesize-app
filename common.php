@@ -17,6 +17,7 @@ function render($file, $data = null) {
 		unset($_SESSION['errors']);
 	}
 	$data['user'] = $user->userinfo();
+	$twig->addExtension(new Twig_Extension_Debug());
 	echo $twig->render($file, $data);
 }
 function l($string) {
@@ -30,4 +31,11 @@ function ping($host) {
 function lifesizeSplit($string) {
 	$string = explode(chr(0x0a), $string);
 	return $string;
+}
+function time_to_seconds($start) {
+	$time = explode(':', $start);
+	$hours = $time[0];
+	$minutes = $time[1];
+	$seconds = $time[2] + ($minutes * 60) + ( $hours * 60 * 60);
+	return $seconds;
 }

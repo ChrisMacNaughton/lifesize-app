@@ -32,6 +32,12 @@ class __TwigTemplate_18e7b22f264a56befcfb9af5ea0bf14e extends Twig_Template
         if (isset($context["user"])) { $_user_ = $context["user"]; } else { $_user_ = null; }
         echo twig_escape_filter($this->env, $this->getAttribute($_user_, "name"), "html", null, true);
         echo "
+<pre>
+\t";
+        // line 5
+        echo twig_escape_filter($this->env, twig_var_dump($this->env, $context), "html", null, true);
+        echo "
+</pre>
 ";
     }
 
@@ -47,6 +53,6 @@ class __TwigTemplate_18e7b22f264a56befcfb9af5ea0bf14e extends Twig_Template
 
     public function getDebugInfo()
     {
-        return array (  29 => 3,  26 => 2,);
+        return array (  36 => 5,  29 => 3,  26 => 2,);
     }
 }
