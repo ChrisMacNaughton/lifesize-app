@@ -33,14 +33,23 @@ if(empty($uri->seg[1])) {
 			if (count($devs) > 0) {
 				$_SESSION['errors'][] = l('error_device_already_exists');
 			} else {
-				$stmt = $db->prepare("INSERT INTO devices (`ip`, `company_id`, `added`) VALUES (:ip, :id, :added)");
+				$stmt = $db->prepare("INSERT INTO devices (`ip`, `company_id`, `added`, `password`) VALUES (:ip, :id, :added, :password)");
 				$result = $stmt->execute(array(
 					':ip'=>$_POST['ip'],
 					':id'=>$company_id,
+					':password'=>$_POST['password'],
 					':added'=>time()
 				));
 				if ($result) {
 					$_SESSION['flash'][] = l("success_adding_device");
+					$ch = curl_init();
+					$url = 'http://' . PATH. '/ping?id=' . $db->lastInsertId();
+					curl_setopt($ch, CURLOPT_URL, $url);
+					curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
+					curl_setopt($ch, CURLOPT_TIMEOUT_MS, 1);
+
+					curl_exec($ch);
+					curl_close($ch);
 				} else {
 					$_SESSION['errors'][] = l("error_adding_device");
 				}

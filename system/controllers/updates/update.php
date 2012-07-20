@@ -1,6 +1,6 @@
 <?php
 if (!isset($_GET['id'])) {
-	$result = $db->query("SELECT * FROM devices");
+	$result = $db->query("SELECT * FROM devices WHERE online = 1");
 	$devices = $result->fetchAll();
 	foreach ($devices as $device) {
 		$ch = curl_init();
