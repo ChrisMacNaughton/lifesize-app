@@ -25,7 +25,7 @@ $options = array(
 );
 $user = get_cfg_var('aws.param2');
 $password = get_cfg_var('aws.param3');
-define('PATH', cfr_get_var('aws.param4'));
+define('PATH',get_cfg_var('aws.param4'));
 }
 //$dynamodb = new AmazonDynamoDB($options);
 
