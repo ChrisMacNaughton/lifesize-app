@@ -9,6 +9,23 @@
 </head>
 <body>
 <div class="container-fluid">
+{% if user.id != 0 %}
+<div class="row-fluid">
+<div class="span10">
+	<ul class="nav nav-pills">
+		<li{% if ( page == 'home' or page == '' ) %} class="active"{% endif %}><a href="home">Home</a></li>
+		<li{% if ( page == 'devices') %} class="active"{% endif %}><a href="devices">Devices</a></li>
+		<li{% if ( page == 'users') %} class="active"{% endif %}><a href="users">Users</a></li>
+		<li><a href="logout">Logout</a></li>
+	</ul>
+</div>
+	<div class="span2" style="padding-top: 5px;">
+	{% block afternav %}
+	{% endblock %}
+	</div>
+</div>
+{% endif %}
+
 {% for error in errors %}
 	<div class="span8 offset2 error">
 		{{error}}

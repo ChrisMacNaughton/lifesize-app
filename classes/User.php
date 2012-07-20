@@ -39,7 +39,9 @@ class User {
 			$this->authenticatedFully = false;
 		}
 	}
-	
+	public function getCompany() {
+		return $this->company_id;
+	}
 	public function isAuthenticated() {
 		return $this->authenticatedFully;
 	}

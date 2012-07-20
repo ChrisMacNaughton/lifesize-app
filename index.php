@@ -12,4 +12,10 @@ switch($uri->seg[0]) {
 		$user->logout();
 		header("Location: /");
 		break;
+	case 'users':
+		require_once "system/controllers/user/index.php";
+		break;
+	case 'devices':
+		require_once "system/controllers/device/index.php";
+		break;
 }

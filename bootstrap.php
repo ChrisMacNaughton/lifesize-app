@@ -22,7 +22,7 @@ $options = array(
 $user = get_cfg_var('aws.param2');
 $password = get_cfg_var('aws.param3');
 }
-$dynamodb = new AmazonDynamoDB($options);
+//$dynamodb = new AmazonDynamoDB($options);
 
 try {
     $db = new PDO($dsn, $user, $password);

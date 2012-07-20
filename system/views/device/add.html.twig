@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+	<form action="#" method="post" class="well">
+		<fieldset>
+			<div class="control-group">
+				<label class="control-label" for="ip">System IP</label>
+				<div class="controls">
+					<input type="text" class="span2" name="ip" placeholder="xxx.xxx.xxx.xxx" id="ip" style="height: 24px;"/>
+				</div>
+				<input type="hidden" name="action" value="add" />
+			</div>
+			<div class="form-actions">
+				<input type="submit" name="submit" value="Submit" />
+			</div>
+		</fieldset>
+	</form>
+{% endblock %}
