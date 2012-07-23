@@ -1,13 +1,16 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<form name="device_details" action="/users/edit/{{users.id}}" method="POST">
+<div class="row-fluid">
+<div class="span12">
+<form name="device_details" action="/devices/edit/{{devices.id}}" method="POST">
 
 	<label>IP Address</label><input type="text" name="ip" value="{{devices.ip}}" />
 	<label>Name</label><input type="text" name="name" value="{{devices.name}}">
-	
-	<label>New Password</label><input type="text" name="password" value="{{devices.password}}" />
+	<label>New Password</label><input type="text" name="password" value="{{devices.password}}" max="16"/>
+	<label>License Key</label><textarea name="license" rows="3" class="span6">{{ devices.license}}</textarea>
 	<br /><input type="submit" value="Edit" />
 	<input type="hidden" name="action" value="edit" />
 </form>
+</div></div>
 {% endblock %}
