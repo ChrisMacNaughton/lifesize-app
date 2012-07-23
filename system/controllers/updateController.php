@@ -23,7 +23,7 @@ class updateController extends Controller {
 		}
 	}
 	public function deviceAction($id) {
-		$stmt = $this->db->prepare("SELECT ip, password FROM devices WHERE id = :id");
+		$stmt = $this->db->prepare("SELECT ip, password, license FROM devices WHERE id = :id");
 		$stmt->execute(array(':id'=>$id));
 		$device = $stmt->fetch();
 		$ls = new Net_SSH2($device['ip']);
@@ -64,7 +64,31 @@ class updateController extends Controller {
 		else
 			$final['calling'] = 1;
 		
-			
+		$data = $this->cleanLs('get system licensekey -t maint', $ls);
+		
+		if ($data[2] == 'ok,00')
+			$final['license'] = $data[0];
+		else 
+			$final['license'] = $device['license'];
+		
+		$data = $this->cleanLs('get system model', $ls);
+		if ($data[2] == 'ok,00') {
+			$data = explode(',', $data[0]);
+			$make = $data[0];
+			$model = $data[1];
+		}
+		$stmt = $this->db->prepare("SELECT id FROM makes WHERE name = :name");
+		$stmt->execute(array(':name'=>$make));
+		$res = $stmt->fetch();
+		$final['make_id'] = $res['id'];
+		$stmt = $this->db->prepare("SELECT id FROM models WHERE name = :name");
+		$stmt->execute(array(':name'=>$model));
+		$res = $stmt->fetch();
+		$final['model_id'] = $res['id'];
+		
+		
+		
+		
 		$final['history'] = $calls;
 		echo "<pre>";
 		print_r($final);
