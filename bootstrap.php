@@ -1,0 +1,41 @@
+<?php
+
+require_once 'vendor/autoload.php';
+set_include_path(get_include_path() . PATH_SEPARATOR . 'app/phpseclib' . PATH_SEPARATOR . 'app');
+require_once ('Net/SSH2.php');
+require_once 'PasswordHash.php';
+require_once 'Uri.php';
+require_once 'User.php';
+require_once 'common.php';
+require_once 'system/lib/Controller.php';
+/*
+ * setup configs for local / AWS beanstalk
+*/
+
+$dsn = 'mysql:dbname=vcdb;host=vcawsdb.crwlsevgtlap.us-east-1.rds.amazonaws.com';
+if (get_cfg_var('aws.access_key') === false) {
+include 'config.php';
+define('PATH', $path);
+} else {
+$options = array(
+	'certificate_authority'=>get_cfg_var('aws.param1'),
+	'default_cache_config' => '',
+	'key' => get_cfg_var('aws.access_key'),
+	'secret' => get_cfg_var('aws.secret_key'),
+);
+$user = get_cfg_var('aws.param2');
+$password = get_cfg_var('aws.param3');
+define('PATH',get_cfg_var('aws.param4'));
+}
+//$dynamodb = new AmazonDynamoDB($options);
+
+try {
+    $db = new PDO($dsn, $user, $password);
+} catch (PDOException $e) {
+    $_SESSION['errors'][] = $e->getMessage();
+}
+
+
+$user = new User($db);
+
+$uri = new Uri();

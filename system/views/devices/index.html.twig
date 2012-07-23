@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+{% block afternav %}
+{% if new_device %}<a href="devices/add" class="btn-mini btn-success">New Device</a>{% endif %}
+{% endblock %}
+{% block body %}
+<div class="row-fluid">
+{% for device in devices %}
+<div class="row-fluid">
+<div class="span1 {% if device['online'] == 1 %}online{% else %}offline{%endif %}" style="min-height: 50px;" id="{{device['id']}}-status">
+</div>
+<div class="span4">
+<h3>{% if device['name']|length > 0 %}System Name: {{device['name']}}{% else %}System IP: {{ device['ip']}}{%endif %}</h3>
+<a href="/devices/view/{{device['id']}}">Details</a>
+</div>
+<div class="span1">
+{% if device['Model']['icon'] != "" %}<img src="/assets/img/{{device['Model']['icon']}}" />{% endif %}
+</div>
+<div class="span1{% if device['in_call'] == 1 %} calling{%endif %}" id="{{device['id']}}-oncall" style="min-height: 50px;"></div>
+<div class="span5"></div>
+<div class="row-fluid">
+<div class="span12"><hr></div>
+</div>
+</div>
+{% else %}
+<p>No Devices Found</p>
+{% endfor %}
+</div>
+
+{% endblock %}

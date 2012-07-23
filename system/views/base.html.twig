@@ -1,6 +1,6 @@
 <html>
 <head>
-	<title>{% block title %} - Videoconferencing Control{% endblock %}</title>
+	<title>{% block title %}{{title }} - Videoconferencing Control{% endblock %}</title>
 	{% block stylesheets %}
 	<link href="/assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="/assets/css/bootstrap-responsive.min.css" rel="stylesheet">
@@ -16,7 +16,7 @@
 		<li{% if ( page == 'home' or page == '' ) %} class="active"{% endif %}><a href="/home">Home</a></li>
 		<li{% if ( page == 'devices') %} class="active"{% endif %}><a href="/devices">Devices</a></li>
 		<li{% if ( page == 'users') %} class="active"{% endif %}><a href="/users">Users</a></li>
-		<li><a href="logout">Logout</a></li>
+		<li><a href="users/logout">Logout</a></li>
 	</ul>
 </div>
 	<div class="span2" style="padding-top: 5px;">

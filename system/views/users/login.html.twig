@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+{% block title %}Login{{parent()}}{% endblock %}
+{% block body %}
+<div class="span4 offset4">
+<form action="#" method="post" class="well">
+	<label>E-Mail</label><input type="text" name="email" placeholder="E-Mail"  style="height: 24px;"/>
+	<label>Company ID</label><input type="text" name="company" placeholder="Company Id"  style="height: 24px;"/>
+	<label>Password</label><input type="password" name="password" placeholder="Password"  style="height: 24px;"/>
+	<input type="hidden" name="action" value="login" />
+	<label>
+		Remember Me: <input type="checkbox" name="remember">
+	</label>
+	<input type="submit" value="Submit">
+</form>
+</div>
+{% endblock %}
