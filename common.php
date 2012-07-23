@@ -56,6 +56,7 @@ function time_to_seconds($start) {
 	$hours = $time[0];
 	$minutes = $time[1];
 	$seconds = $time[2] + ($minutes * 60) + ( $hours * 60 * 60);
+	echo "<!-- $time[2] -> $minutes -> $hours -->";
 	return $seconds;
 }
 function settings($setting)
