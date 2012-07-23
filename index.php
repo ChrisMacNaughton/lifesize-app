@@ -12,6 +12,9 @@ $action = $uri->seg[1];
 if ($action == '') {
 	$action = 'index';
 }
+if (!$user->isAuthenticated() && ($uri->seg[0] != 'users' &&$uri->seg[1] != 'login')) {
+	header("Location: /users/login");
+}
 $controllerName = strtolower($controller) . "Controller";
 $args = array();
 $id = null;
