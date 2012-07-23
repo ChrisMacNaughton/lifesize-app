@@ -174,7 +174,6 @@ class Lifesize {
 		return $data;
 	}
 	public function getCode($code) {
-	echo "<!-- $code -->";
 		return self::$errorCodes[$code];
 	}
 	private function seperateData($data, $del = ','){
@@ -201,7 +200,6 @@ class Lifesize {
 		
 	}
 	private function seperateCode($status, $del = ',') {
-	echo "<!-- $status -->";
 		$status = explode(chr(0x0a), $status);
 		$status = $status[0];
 		$status = explode($del, $status);

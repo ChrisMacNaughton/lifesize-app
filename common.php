@@ -4,7 +4,7 @@ function render($file, $data = null) {
 	global $user, $uri;
 	$loader = new Twig_Loader_Filesystem('system/views');
 	$twig = new Twig_Environment($loader, array(
-		'cache'=>'false',
+		'cache'=>false,
 		'debug'=>true
 	));
 	$data['page'] = $uri->seg[0];
