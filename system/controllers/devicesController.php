@@ -31,8 +31,17 @@ class devicesController extends Controller{
 		$license = $_POST['license'];
 		$device = $stmt->fetch();
 		$ip = $device['ip'];
-		
-		$vc = new Net_SSH2($ip);
+		try {
+		echo "The new IP works!";
+			$vc = new Net_SSH2($_POST['ip']);
+			$stmt = $this->db->prepare("UPDATE devices SET ip = :ip WHERE id = :id");
+			$stmt->execute(array(
+				':ip'=>$_POST['ip'],
+				':id'=>$id
+			));
+		} catch(Exception $e) {
+		echo "Using the old IP";
+		$vc = new Net_SSH2($ip);}
 		if ($vc->login('auto', $device['password'])) {
 			$make = $vc->exec('get system model');
 			$make = explode(',', $make);
@@ -51,7 +60,7 @@ class devicesController extends Controller{
 						));
 						}
 					} else {
-						$device['name'] = "ok,00";
+						$results['name'] = "ok,00";
 					}
 					if ($device['password'] != $new_pass) {
 						$data = explode(chr(0x0a), $vc->exec("set password " . $new_pass));
@@ -64,8 +73,9 @@ class devicesController extends Controller{
 							));
 						}
 					} else {
-						$device['password'] = "ok,00";
+						$results['password'] = "ok,00";
 					}
+					/*
 					if ($device['license'] != $license) {
 					echo "<!-- updating license -->";
 						$vc->write("set system licensekey -i << EOF");
@@ -89,16 +99,16 @@ class devicesController extends Controller{
 						}
 						
 					} else {
-						$device['license'] = "ok,00";
+						$results['license'] = "ok,00";
 					}
-					
+					*/
 					foreach ($results as $key=>$value) {
 						if($value != "ok,00") {
 							$_SESSION['errors'][] = l('error_updating') . $key;
 						}
 					}
 					//var_dump($_SESSION['errors']);
-					header("Location: /devices/view/" . $id);
+					//header("Location: /devices/view/" . $id);
 					break;
 			}
 		} else {
