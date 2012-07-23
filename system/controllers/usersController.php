@@ -48,9 +48,14 @@ class usersController extends Controller{
 			}
 			$data['name'] = $_POST['name'];
 			$data['email'] = $_POST['email'];
-			$data['active'] = $_POST['active'];
+			$data['active'] = ($_POST['active'] == true) ? 1 : 0;
 			
-			$this->user->editUser($id, $data);
+			if ($this->user->editUser($id, $data)) {
+			$_SESSION['flash'][] = l("success_edit_user");
+			} else {
+				$_SESSION['errors'][] = l("error_edit_user");
+			}
+			header("Location: /users/view/" . $id);
 		}}
 	}
 	public function loginAction() {

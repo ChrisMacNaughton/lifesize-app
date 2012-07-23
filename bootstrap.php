@@ -1,4 +1,7 @@
 <?php
+session_start();
+$_SESSION['flash'] = (isset($_SESSION['flash'])) ? $_SESSION['flash'] : array();
+$_SESSION['errors'] = (isset($_SESSION['errors'])) ? $_SESSION['errors'] : array();
 define('GUEST_LEVEL', 0);
 define('USER_LEVEL', 1);
 define('OPERATOR_LEVEL', 2);

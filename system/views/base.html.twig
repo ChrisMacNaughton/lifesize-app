@@ -25,13 +25,24 @@
 	</div>
 </div>
 {% endif %}
-<div class="row">
-{% for error in errors %}
-	<div class=" span8 offset2 error">
-		{{error}}
+{% if errors|length > 0 %}
+	<div class="row">
+	{% for error in errors %}
+		<div class=" span8 offset2 error">
+			{{error}}
+		</div>
+	{% endfor %}
 	</div>
-{% endfor %}
-</div>
+{% endif %}
+{% if flash|length > 0 %}
+	<div class="row">
+	{% for notice in flash %}
+		<div class=" span8 offset2 flash">
+			{{notice}}
+		</div>
+	{% endfor %}
+	</div>
+{% endif %}
 {% block body %}
 
 {% endblock%}

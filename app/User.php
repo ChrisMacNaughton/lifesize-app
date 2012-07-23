@@ -153,8 +153,12 @@ class User {
 			echo "<!-- $query -->";
 			echo "<!-- "; print_r($values); echo "-->";
 			$stmt = $this->db->prepare($query);
-			$stmt->execute($values);
-			var_dump($stmt->fetchAll());
+			if ($stmt->execute($values)) {
+				return true;
+			} else {
+				return false;
+			}
+			
 	}
 	public function register($data) {
 		$errors = array();
