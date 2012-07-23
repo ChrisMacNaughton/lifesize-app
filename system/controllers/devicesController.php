@@ -103,8 +103,12 @@ class devicesController extends Controller{
 					*/
 					foreach ($results as $key=>$value) {
 						if($value != "ok,00") {
+							$errors = true;
 							$_SESSION['errors'][] = l('error_updating') . $key;
 						}
+					}
+					if (!$errors) {
+						$_SESSION['flash'][] = l('success_updating');
 					}
 					//var_dump($_SESSION['errors']);
 					header("Location: /devices/view/" . $id);
