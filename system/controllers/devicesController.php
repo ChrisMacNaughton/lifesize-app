@@ -32,7 +32,6 @@ class devicesController extends Controller{
 		$device = $stmt->fetch();
 		$ip = $device['ip'];
 		try {
-		echo "The new IP works!";
 			$vc = new Net_SSH2($_POST['ip']);
 			$stmt = $this->db->prepare("UPDATE devices SET ip = :ip WHERE id = :id");
 			$stmt->execute(array(
@@ -40,7 +39,7 @@ class devicesController extends Controller{
 				':id'=>$id
 			));
 		} catch(Exception $e) {
-		echo "Using the old IP";
+		
 		$vc = new Net_SSH2($ip);}
 		if ($vc->login('auto', $device['password'])) {
 			$make = $vc->exec('get system model');
@@ -108,13 +107,14 @@ class devicesController extends Controller{
 						}
 					}
 					//var_dump($_SESSION['errors']);
-					//header("Location: /devices/view/" . $id);
+					header("Location: /devices/view/" . $id);
 					break;
 			}
 		} else {
 			/*
 			*	Update queue function
 			*/
+			
 		}
 	}
 	public function viewAction($id) {
