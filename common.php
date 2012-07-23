@@ -68,7 +68,11 @@ function settings($setting)
 	
 	// Looks like the setting isn't in the cache,
 	// lets fetch it now...
-	$result = $db->fetcharray($db->query("SELECT setting, value FROM settings WHERE setting='".$db->res($setting)."' LIMIT 1"));
+	$stmt = $db->prepare("SELECT setting, value FROM settings WHERE setting= :setting");
+	$stmt->execute(array(
+		':setting'=>$setting
+	));
+	$result = $stmt->fetch();
 	$CACHE['settings'][$setting] = $result['value'];
 	
 	return $CACHE['settings'][$setting];
