@@ -1,5 +1,6 @@
 <?php
 session_start();
+$CACHE = array();
 $_SESSION['flash'] = (isset($_SESSION['flash'])) ? $_SESSION['flash'] : array();
 $_SESSION['errors'] = (isset($_SESSION['errors'])) ? $_SESSION['errors'] : array();
 define('GUEST_LEVEL', 0);
@@ -42,7 +43,7 @@ try {
     $_SESSION['errors'][] = $e->getMessage();
 }
 
-
+require('system/locale/'.settings('locale').'.php');
 $user = new User($db);
 
 $uri = new Uri();
