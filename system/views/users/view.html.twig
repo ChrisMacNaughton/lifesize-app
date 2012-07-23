@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<form name="user_details" action="/users/edit/{{users.id}}" method="POST">
+	<label>Name</label><input type="text" name="name" value="{{users.name}}">
+	<label>E-Mail</label><input type="text" name="email" value="{{users.email}}">
+	<label>Active<input type="radio" name="active" value="true" {% if users.active %}checked="true"{% else %}{% endif %} /></label><label>Inactive<input type="radio" name="active" value="false" "{% if users.active %}checked="true"{% else %}{% endif %} /></label>
+	<label>New Password</label><input type="password" name="password" placeholder="Password" />
+	<label>Verify</label><input type="password" name="password2" placeholder="Verify" />
+	<br /><input type="submit" value="Edit" />
+	<input type="hidden" name="action" value="edit" />
+</form>
+{% endblock %}

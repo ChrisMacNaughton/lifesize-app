@@ -17,3 +17,6 @@ div .error {
 	background-image: url('/assets/img/camera.png');
 	background-repeat: no-repeat;
 }
+#userlist {
+	list-style-type: none;
+}

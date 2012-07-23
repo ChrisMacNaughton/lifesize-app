@@ -1,1 +1,9 @@
 {% extends 'base.html.twig' %}
+
+{% block body %}
+<ul class="well" id="userlist">
+{% for user in users %}
+	<li><a href="/users/view/{{user.id}}">{{user.name}}</a></ul></li>
+{% endfor %}
+</ul>
+{% endblock %}

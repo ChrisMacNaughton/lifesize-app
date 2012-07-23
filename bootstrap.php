@@ -1,5 +1,9 @@
 <?php
-
+define('GUEST_LEVEL', 0);
+define('USER_LEVEL', 1);
+define('OPERATOR_LEVEL', 2);
+define('ADMIN_LEVEL', 3);
+define('SUPER_ADMIN_LEVEL', 4);
 require_once 'vendor/autoload.php';
 set_include_path(get_include_path() . PATH_SEPARATOR . 'app/phpseclib' . PATH_SEPARATOR . 'app');
 require_once ('Net/SSH2.php');

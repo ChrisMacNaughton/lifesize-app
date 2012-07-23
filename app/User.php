@@ -39,8 +39,11 @@ class User {
 			$this->authenticatedFully = false;
 		}
 	}
+	public function getLevel() {
+		return (int)$this->level;
+	}
 	public function getCompany() {
-		return $this->company_id;
+		return (int)$this->company_id;
 	}
 	public function isAuthenticated() {
 		return $this->authenticatedFully;
@@ -119,7 +122,40 @@ class User {
 		setcookie('vc-control_remember',0,0,'/');
 		$this->authenticatedFully = false;
 	}
-	
+	public function editUser($id, ARRAY $data) {
+		if (isset($data['password']))
+		$data['password'] = $this->hasher->HashPassword( $data['password'] );
+		$data['modified'] = time();
+		
+		$fields = array();
+			$values = array();
+			$value_names = array();
+			foreach($data as $field => $value) {
+				$fields[] = $field;
+				$value_names[] = ":" . $field;
+				$values[":$field"] = $value;
+			}
+			$fields = implode(',',$fields);
+			//$values = implode(',',$values);
+			$value_names = implode(',', $value_names);
+			
+			$query = "UPDATE users SET ";
+			$count = count($data);
+			$i=1;
+			foreach($data as $field => $value) {
+				$query .= "$field = :$field";
+				$i++;
+				//echo "<!-- $count : $i -->";
+				if ($i <= $count) $query .= ', ';
+			}
+			$query .= " WHERE id = :userid";
+			$values[':userid'] = $id;
+			echo "<!-- $query -->";
+			echo "<!-- "; print_r($values); echo "-->";
+			$stmt = $this->db->prepare($query);
+			$stmt->execute($values);
+			var_dump($stmt->fetchAll());
+	}
 	public function register($data) {
 		$errors = array();
 		$stmt = $this->db->prepare("SELECT username FROM users WHERE email= :email LIMIT 1");

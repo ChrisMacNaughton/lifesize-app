@@ -1,7 +1,13 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<pre>
-	{{dump(device)}}
-</pre>
+<form name="device_details" action="/users/edit/{{users.id}}" method="POST">
+
+	<label>IP Address</label><input type="text" name="ip" value="{{devices.ip}}" />
+	<label>Name</label><input type="text" name="name" value="{{devices.name}}">
+	
+	<label>New Password</label><input type="text" name="password" value="{{devices.password}}" />
+	<br /><input type="submit" value="Edit" />
+	<input type="hidden" name="action" value="edit" />
+</form>
 {% endblock %}
