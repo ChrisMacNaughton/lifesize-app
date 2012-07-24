@@ -1,4 +1,20 @@
 <?php
+if (get_cfg_var('aws.access_key') === false) {
+include 'config.php';
+define('PATH', $path);
+} else {
+$options = array(
+	'certificate_authority'=>get_cfg_var('aws.param1'),
+	'default_cache_config' => '',
+	'key' => get_cfg_var('aws.access_key'),
+	'secret' => get_cfg_var('aws.secret_key'),
+);
+$user = get_cfg_var('aws.param2');
+$password = get_cfg_var('aws.param3');
+define('PATH',get_cfg_var('aws.param4'));
+}
+//$dynamodb = new AmazonDynamoDB($options);
+
 session_start();
 $CACHE = array();
 $_SESSION['flash'] = (isset($_SESSION['flash'])) ? $_SESSION['flash'] : array();
@@ -21,21 +37,7 @@ require_once 'system/lib/Controller.php';
 */
 
 $dsn = 'mysql:dbname=vcdb;host=vcawsdb.crwlsevgtlap.us-east-1.rds.amazonaws.com';
-if (get_cfg_var('aws.access_key') === false) {
-include 'config.php';
-define('PATH', $path);
-} else {
-$options = array(
-	'certificate_authority'=>get_cfg_var('aws.param1'),
-	'default_cache_config' => '',
-	'key' => get_cfg_var('aws.access_key'),
-	'secret' => get_cfg_var('aws.secret_key'),
-);
-$user = get_cfg_var('aws.param2');
-$password = get_cfg_var('aws.param3');
-define('PATH',get_cfg_var('aws.param4'));
-}
-//$dynamodb = new AmazonDynamoDB($options);
+
 
 try {
     $db = new PDO($dsn, $user, $password);
