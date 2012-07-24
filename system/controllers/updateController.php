@@ -3,7 +3,7 @@
 class updateController extends Controller {
 	public function indexAction() {
 		$updated = settings('updated');
-		if ($updated > time() - 600) {
+		if ($updated < time() - 600) {
 			$this->db->query("UPDATE settings SET value=" . time() . " WHERE setting = updated");
 		} else {
 			die();
@@ -12,7 +12,8 @@ class updateController extends Controller {
 		$stmt->execute();
 		$devices = $stmt->fetchAll();
 		foreach ($devices as $device) {
-			$url = "/update/device/" . $device['id'];
+			$url = PATH . "/update/device/" . $device['id'];
+			echo $url . "<br />";;
 			$ch = curl_init($url);
 			
 			curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
@@ -20,10 +21,14 @@ class updateController extends Controller {
 
 			curl_exec($ch);
 			curl_close($ch);
+			
+			
 		}
 	}
 	public function deviceAction($id) {
-		$stmt = $this->db->prepare("SELECT ip, password, license FROM devices WHERE id = :id");
+		ignore_user_abort(true);
+		set_time_limit(60);
+		$stmt = $this->db->prepare("SELECT ip, password, license, maxCallId FROM devices WHERE id = :id");
 		$stmt->execute(array(':id'=>$id));
 		$device = $stmt->fetch();
 		$ls = new Net_SSH2($device['ip']);
@@ -54,9 +59,12 @@ class updateController extends Controller {
 		}
 		//get call time and count
 		foreach ($calls as $call) {
+			if ($call[0] > $device['maxCallId'])
 			$final['callTime'] += time_to_seconds($call[8]);
 			$final['callCount']++;
+			$max_call = $call[0];
 		}
+		$final['maxCallId'] = $max_call;
 		//is the system currently participating in a call?
 		$data = $this->cleanLs('status call active', $ls);
 		if ($data[1] == 'ok,00' && $data[0] == '')
@@ -74,13 +82,8 @@ class updateController extends Controller {
 		$data = $this->cleanLs('get system model', $ls);
 		if ($data[2] == 'ok,00') {
 			$data = explode(',', $data[0]);
-			$make = $data[0];
 			$model = $data[1];
 		}
-		$stmt = $this->db->prepare("SELECT id FROM makes WHERE name = :name");
-		$stmt->execute(array(':name'=>$make));
-		$res = $stmt->fetch();
-		$final['make_id'] = $res['id'];
 		$stmt = $this->db->prepare("SELECT id FROM models WHERE name = :name");
 		$stmt->execute(array(':name'=>$model));
 		$res = $stmt->fetch();
@@ -93,6 +96,20 @@ class updateController extends Controller {
 		echo "<pre>";
 		print_r($final);
 		echo "</pre>";
+		$query = array(
+			':name'=>$final['name'],
+			':version'=>$final['version'],
+			':callTime'=>$final['callTime'],
+			':callCount'=>$final['callCount'],
+			':calling'=>$final['calling'],
+			':license'=>$final['license'],
+			':model'=>$final['model_id'],
+			':max'=>$final['maxCallId'],
+			':updated'=>time(),
+			':id'=>$id
+		);
+		$stmt = $this->db->prepare("UPDATE devices SET name = :name, version = :version, call_length = :callTime, call_count = :callCount, calling = :calling, license = :license, model_id = :model, maxCallId = :max, updated = :updated, online_updated = :updated WHERE id = :id");
+		$stmt->execute($query);
 	}
 	
 	private function cleanLs($request, $ssh) {

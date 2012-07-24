@@ -43,7 +43,7 @@ function l($string) {
 	return $string;
 }
 function ping($host) {
-    exec(sprintf('ping -n 1 -w 1000 %s', escapeshellarg($host)), $res, $rval);
+    exec(sprintf('ping -n 1 -w 500 %s', escapeshellarg($host)), $res, $rval);
 	
     return $rval === 0;
 }
