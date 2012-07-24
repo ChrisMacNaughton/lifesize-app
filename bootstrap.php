@@ -13,7 +13,13 @@ $user = get_cfg_var('aws.param2');
 $password = get_cfg_var('aws.param3');
 define('PATH',get_cfg_var('aws.param4'));
 }
-//$dynamodb = new AmazonDynamoDB($options);
+$dynamodb = new AmazonDynamoDB($options);
+
+// Instantiate, configure, and register the session handler
+$session_handler = $dynamodb->register_session_handler(array(
+	'table_name'       => 'sessions',
+	'lifetime'         => 3600,
+));
 
 session_start();
 $CACHE = array();
