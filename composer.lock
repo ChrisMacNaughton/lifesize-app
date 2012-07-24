@@ -1,9 +1,13 @@
 {
-    "hash": "564a9c4471e1c8ad83e8f61d16821cca",
+    "hash": "1158379c53179ebb62f6c7672b288912",
     "packages": [
         {
             "package": "amazonwebservices/aws-sdk-for-php",
             "version": "1.5.10"
+        },
+        {
+            "package": "stripe/stripe-php",
+            "version": "v1.7.2"
         },
         {
             "package": "twig/twig",

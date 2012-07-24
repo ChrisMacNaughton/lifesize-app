@@ -1,4 +1,9 @@
 <?php
+define('GUEST_LEVEL', 0);
+define('USER_LEVEL', 1);
+define('OPERATOR_LEVEL', 2);
+define('ADMIN_LEVEL', 3);
+define('SUPER_ADMIN_LEVEL', 4);
 require_once 'vendor/autoload.php';
 if (get_cfg_var('aws.access_key') === false) {
 include 'config.php';
@@ -14,6 +19,7 @@ $user = get_cfg_var('aws.param2');
 $password = get_cfg_var('aws.param3');
 define('PATH',get_cfg_var('aws.param4'));
 }
+/*
 $dynamodb = new AmazonDynamoDB($options);
 
 // Instantiate, configure, and register the session handler
@@ -21,16 +27,15 @@ $session_handler = $dynamodb->register_session_handler(array(
 	'table_name'       => 'sessions',
 	'lifetime'         => 3600,
 ));
-
+*/
 session_start();
 $CACHE = array();
-$_SESSION['flash'] = (isset($_SESSION['flash'])) ? $_SESSION['flash'] : array();
-$_SESSION['errors'] = (isset($_SESSION['errors'])) ? $_SESSION['errors'] : array();
-define('GUEST_LEVEL', 0);
-define('USER_LEVEL', 1);
-define('OPERATOR_LEVEL', 2);
-define('ADMIN_LEVEL', 3);
-define('SUPER_ADMIN_LEVEL', 4);
+/*
+if (!isset($_SESSION['flash']))
+	$_SESSION['flash'] = array();
+if (!isset($_SESSION['errors']))
+	$_SESSION['errors'] = array();
+*/
 
 set_include_path(get_include_path() . PATH_SEPARATOR . 'app/phpseclib' . PATH_SEPARATOR . 'app');
 require_once ('Net/SSH2.php');

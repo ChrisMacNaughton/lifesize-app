@@ -7,5 +7,5 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Twig_' => $vendorDir . '/twig/twig/lib/',
-    'CRFS' => $baseDir . '/app/',
+    'Stripe' => $vendorDir . '/stripe/stripe-php/lib/',
 );

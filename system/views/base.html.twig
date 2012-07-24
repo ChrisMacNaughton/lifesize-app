@@ -16,8 +16,11 @@
 		<li{% if ( page == 'home' or page == '' ) %} class="active"{% endif %}><a href="/home">Home</a></li>
 		<li{% if ( page == 'devices') %} class="active"{% endif %}><a href="/devices">Devices</a></li>
 		{% if user.level >= 1 %}
-		<li{% if ( page == 'users') %} class="active"{% endif %}><a href="/users">Users</a></li>
-		{% endif %}		
+			<li{% if ( page == 'users') %} class="active"{% endif %}><a href="/users">Users</a></li>
+		{% endif %}
+		{% if user.level >= 3 %}
+			<li{% if ( page == 'company') %} class="active"{% endif %}><a href="/company">Company Details</a></li>
+		{% endif %}
 		<li><a href="users/logout">Logout</a></li>
 	</ul>
 </div>
