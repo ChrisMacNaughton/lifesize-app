@@ -11,6 +11,8 @@ class usersController extends Controller{
 			'users'=>$users,
 			'title'=>'Users'
 		);
+		if ($this->user->hasPermission("usersController","newAction")) $data['new_user'] = true;
+		else $data['new_user'] = false;
 		render('users/index.html.twig', $data);
 	}
 	public function viewAction($id) {
@@ -74,12 +76,23 @@ class usersController extends Controller{
 		render('users/login.html.twig',array());
 	}
 	public function newAction() {
-		if (!($this->user->getLevel() > OPERATOR_LEVEL)) {
-			$_SESSION['error'][] = l("no_permission");
+		if (!($this->user->getLevel() >= OPERATOR_LEVEL)) {
+			$_SESSION['errors'][] = l("no_permission");
 			header("Location: /home");
 		}
 		if (isset($_POST['action']) && $_POST['action'] == 'new') {
-		
+			$data = array(
+				'email'=>$_POST['email'],
+				'name'=>$_POST['name'],
+				'password'=>$_POST['password'],
+				'password2'=>$_POST['password2'],
+				'level'=>$_POST['level'],
+				'company_id'=>$this->user->getCompany(),
+				
+			);
+			if ($this->user->register($data)) {
+				$_SESSION['flash'][] = l('success_new_user');
+			}
 		}
 		render('users/new.html.twig', array(
 			'title'=>"New User",

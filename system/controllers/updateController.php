@@ -13,7 +13,6 @@ class updateController extends Controller {
 		$devices = $stmt->fetchAll();
 		foreach ($devices as $device) {
 			$url = PATH . "/update/device/" . $device['id'];
-			echo $url . "<br />";;
 			$ch = curl_init($url);
 			
 			curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
@@ -24,6 +23,13 @@ class updateController extends Controller {
 			
 			
 		}
+		$url = PATH . "/ping";
+		$ch = curl_init($url);
+			
+		curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
+
+		curl_exec($ch);
+		curl_close($ch);
 	}
 	public function deviceAction($id) {
 		ignore_user_abort(true);
@@ -89,8 +95,12 @@ class updateController extends Controller {
 		$res = $stmt->fetch();
 		$final['model_id'] = $res['id'];
 		
-		
-		
+		$data = $this->cleanLs('get system version', $ls);
+		if ($data[5] == 'ok,00'){
+			$data = explode(',',$data[0]);
+			$final['version'] = $data[1];
+		}
+		//echo "<pre>";print_r($data);echo"</pre>";
 		
 		$final['history'] = $calls;
 		echo "<pre>";
@@ -105,6 +115,7 @@ class updateController extends Controller {
 			':license'=>$final['license'],
 			':model'=>$final['model_id'],
 			':max'=>$final['maxCallId'],
+		//	':version'=>$final['version'],
 			':updated'=>time(),
 			':id'=>$id
 		);

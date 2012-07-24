@@ -1,14 +1,25 @@
 <?php
 
 class devicesController extends Controller{
-	public function beforeAction() {
-		parent::beforeAction();
-		$stmt = $this->db->prepare("SELECT max FROM companies WHERE id = :company_id");
-		$stmt->execute(array(':company_id'=>$this->user->getCompany()));
-		$max = $stmt->fetch();
-		$this->maxDevices = $max['max'];
+	
+	public function newAction() {
+		if (!($this->user->getLevel() > OPERATOR_LEVEL)) {
+			$_SESSION['error'][] = l("no_permission");
+			header("Location: /home");
+		}
+		$data = array();
+		$data['title'] = "New Device";
+		$stmt = $this->db->query("SELECT id, name FROM makes");
+		$stmt->execute();
+		$data['makes'] = $stmt->fetchAll();
+		$stmt = $this->db->prepare("SELECT rate FROM companies WHERE id = :id");
+		$stmt->execute(array(':id'=>$this->user->getCompany()));
+		$res = $stmt->fetch();
+		$data['rate'] = $res['rate'];
+		render('devices/add.html.twig', $data);
 	}
 	public function indexAction() {
+		
 		$stmt = $this->db->prepare("SELECT * FROM devices WHERE company_id = :id");
 		$stmt->execute(
 			array(
@@ -19,6 +30,8 @@ class devicesController extends Controller{
 		'title'=>'Devices',
 		'devices'=>$devices
 		);
+		if ($this->user->hasPermission("devicesController","newAction")) $data['new_device'] = true;
+		else $data['new_device'] = false;
 		render ('devices/index.html.twig', $data);
 	}
 	public function editAction($id) {
@@ -120,6 +133,7 @@ class devicesController extends Controller{
 			*/
 			
 		}
+		header("Location: /home");
 	}
 	public function viewAction($id) {
 		$stmt = $this->db->prepare("SELECT devices.*, makes.name as Make, models.name AS Model FROM devices LEFT JOIN models ON devices.model_id = models.id LEFT JOIN makes ON devices.make_id = makes.id WHERE devices.id = :id AND devices.company_id = :company_id");

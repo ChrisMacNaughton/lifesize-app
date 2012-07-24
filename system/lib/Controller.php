@@ -10,6 +10,7 @@ protected $db;
 		$this->action = $action;
 	}
 	public function beforeAction() {
-		$this->user->hasPermission($this->controller, $this->action, 'user/login');
+		global $id;
+		$authed = $this->user->hasPermission($this->controller, $this->action, $id);
 	}
 }

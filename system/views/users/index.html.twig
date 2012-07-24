@@ -1,9 +1,12 @@
 {% extends 'base.html.twig' %}
-
+{% block afternav %}
+{% if new_user %}<a href="users/new" class="btn-mini btn-success">New User</a>{% endif %}
+{% endblock %}
 {% block body %}
 <ul class="well" id="userlist">
 {% for user in users %}
-	<li><a href="/users/view/{{user.id}}">{{user.name}}</a></ul></li>
+	<li><a href="/users/view/{{user.id}}">{{user.name}}</a></li>
 {% endfor %}
 </ul>
+{{dump(session)}}
 {% endblock %}

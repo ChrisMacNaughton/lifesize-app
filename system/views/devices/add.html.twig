@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 {% block body %}
-	<form action="#" method="post" class="well">
+<div class="span4 well">
+	<form action="#" method="post">
 		<fieldset>
 			<div class="control-group">
 				<label class="control-label" for="ip">System IP</label>
@@ -16,9 +17,29 @@
 				</div>
 				<input type="hidden" name="action" value="add" />
 			</div>
+			<div class="control-group">
+				<label class="control-label" for="make">Device Vendor</label>
+				<div class="controls">
+					<select name="make">
+						{% for make in makes %}
+							<option value="{{make.id}}">{{make.name}}</option>
+						{% endfor %}
+					</select>
+				</div>
+			</div>
 			<div class="form-actions">
 				<input type="submit" name="submit" value="Submit" />
 			</div>
 		</fieldset>
 	</form>
+	</div>
+	<div class="span4 well">
+	<h2>Notice:</h2>
+	<p>
+		Adding another device will increase your monthly bill by <span class="warning">${{rate}}</span>!
+	</p>
+	<p>
+		By continuing, you are agreeing to the rate increase on your next billing cycle.
+	</p>
+	</div>
 {% endblock %}

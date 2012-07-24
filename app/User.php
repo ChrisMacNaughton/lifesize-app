@@ -48,17 +48,73 @@ class User {
 	public function isAuthenticated() {
 		return $this->authenticatedFully;
 	}
-	public function hasPermission($controller, $action, $redirect) {
-		
+	public function hasPermission($controller, $action, $id = null) {
+		switch ($controller) {
+			case "admin":
+				if ($this->level < SUPER_ADMIN_LEVEL)
+					return false;
+				break;
+			case "users":
+				switch($action) {
+					case "indexAction":
+						if ($this->level < USER_LEVEL) 
+							return false;
+						break;
+					case "viewAction":
+						if ($this->userid != $id) {
+							if ($this->level < OPERATOR_LEVEL)
+								return false;
+						}
+						break;
+					case 'editAction':
+						if ($this->userid != $id) {
+							if ($this->level < ADMIN_LEVEL)
+								return false;
+						}
+						break;
+					case 'deleteAction':
+						if ($this->level < ADMIN_LEVEL)
+							return false;
+						break;
+					case "newAction":
+						if ($this->level < OPERATOR_LEVEL)
+							return false;
+						break;
+				}
+				break;
+			case 'devices':
+				switch ($action) {
+					case 'editAction':
+						if ($this->level < ADMIN_LEVEL)
+							return false;
+						break;
+					case 'deleteAction':
+						if ($this->level < ADMIN_LEVEL)
+							return false;
+						break;
+					case "newAction":
+						if ($this->level < ADMIN_LEVEL)
+							return false;
+						break;
+				}
+				break;
+			case 'company':
+				if ($this->level < ADMIN_LEVEL) 
+					return false;
+		}
+		return true;
 	}
 	public function userInfo() {
 		return array(
 			'name'=>$this->name,
 			'email'=>$this->email,
-			'level' => $this->level,
-			'id' => $this->userid,
-			'company_id' => $this->company_id
+			'level' =>(int)$this->level,
+			'id' =>(int)$this->userid,
+			'company_id' =>(int)$this->company_id
 		);
+	}
+	public function getUserId() {
+		return $this->userid;
 	}
 	public function login($email, $company, $password, $remember) {
 		/*
@@ -168,11 +224,6 @@ class User {
 		if ($result) 
 			$errors[] = l('Error_email_taken');
 		
-		$stmt = $this->db->prepare("SELECT id FROM companies WHERE slug = :slug");
-		$stmt->execute(array(':slug'=>$data['company']));
-		$company = $stmt->fetchAll();
-		$data['company_id'] = $company[0]['id'];
-		unset($data['company']);
 		if (empty($data['company_id'])) 
 			$errors['company'] = l('error_company_empty');
 		
@@ -192,11 +243,15 @@ class User {
 			}
 			return false;
 		}
+			if (!isset($data['level'])) {
+				$data['level'] = 0;
+			}
 		
 		unset($data['password2']);
 		
 		$data['password'] = $this->hasher->HashPassword( $data['password'] );
 		$data['created'] = time();
+		$data['active'] = 1;
 		// Build the query
 			$fields = array();
 			$values = array();
@@ -210,9 +265,12 @@ class User {
 			//$values = implode(',',$values);
 			$value_names = implode(',', $value_names);
 			$query = "INSERT INTO users($fields) VALUES($value_names)";
-			echo "<!-- $query -->";
-			echo "<!-- "; print_r($values); echo "-->";
 			$stmt = $this->db->prepare($query);
-			$stmt->execute($values);
+			if ($stmt->execute($values)) {
+				return true;
+			} else {
+				$_SESSION['errors'][] = $stmt->errorInfo();
+				return false;
+			}
 	}
 }

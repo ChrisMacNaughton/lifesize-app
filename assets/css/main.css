@@ -27,3 +27,6 @@ div .flash {
 #userlist {
 	list-style-type: none;
 }
+.warning {
+	color: #c00;
+}

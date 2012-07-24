@@ -2,6 +2,8 @@
 
 {% block body %}
 <div class="row-fluid">
+<h2>{{devices.name}}</h2>
+<p>Last Updated: {{devices.updated|date('m/d/Y h:i:s a', 'CST') }}</p>
 <div class="span12">
 <form name="device_details" action="/devices/edit/{{devices.id}}" method="POST">
 

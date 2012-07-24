@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 {% block afternav %}
-{% if new_device %}<a href="devices/add" class="btn-mini btn-success">New Device</a>{% endif %}
+{% if new_device %}<a href="devices/new" class="btn-mini btn-success">New Device</a>{% endif %}
 {% endblock %}
 {% block body %}
 <div class="row-fluid">
@@ -25,5 +25,4 @@
 <p>No Devices Found</p>
 {% endfor %}
 </div>
-
 {% endblock %}
