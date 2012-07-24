@@ -18,7 +18,6 @@ function render($file, $data = null) {
 	}
 	$data['user'] = $user->userinfo();
 	$twig->addExtension(new Twig_Extension_Debug());
-	$data['session'] = $_SESSION;
 	
 	echo $twig->render($file, $data);
 }

@@ -51,13 +51,19 @@ class devicesController extends Controller{
 				':ip'=>$_POST['ip'],
 				':id'=>$id
 			));
+			
 		} catch(Exception $e) {
 		
 		$vc = new Net_SSH2($ip);}
 		if ($vc->login('auto', $device['password'])) {
-			$make = $vc->exec('get system model');
-			$make = explode(',', $make);
-			$make = $make[0];
+			
+			$url = PATH . "/update/device/" . $id;
+			$ch = curl_init($url);
+				
+			curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
+
+			curl_exec($ch);
+			curl_close($ch);
 			$results = array();
 			switch ($make) {
 				case 'LifeSize':
