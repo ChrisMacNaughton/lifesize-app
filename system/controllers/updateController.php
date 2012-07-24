@@ -5,24 +5,23 @@ class updateController extends Controller {
 		$updated = settings('updated');
 		if ($updated < time() - 600) {
 			$this->db->query("UPDATE settings SET value=" . time() . " WHERE setting = updated");
-		} else {
-			die();
-		}
-		$stmt = $this->db->prepare("SELECT ip, id FROM devices");
-		$stmt->execute();
-		$devices = $stmt->fetchAll();
-		foreach ($devices as $device) {
-			$url = PATH . "/update/device/" . $device['id'];
-			$ch = curl_init($url);
-			
-			curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
-			curl_setopt($ch, CURLOPT_TIMEOUT_MS, 1);
+			$stmt = $this->db->prepare("SELECT ip, id FROM devices");
+			$stmt->execute();
+			$devices = $stmt->fetchAll();
+			foreach ($devices as $device) {
+				$url = PATH . "/update/device/" . $device['id'];
+				$ch = curl_init($url);
+				
+				curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
+				curl_setopt($ch, CURLOPT_TIMEOUT_MS, 1);
 
-			curl_exec($ch);
-			curl_close($ch);
-			
-			
+				curl_exec($ch);
+				curl_close($ch);
+				
+				
+			}
 		}
+		
 		$url = PATH . "/ping";
 		$ch = curl_init($url);
 			
