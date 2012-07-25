@@ -3,7 +3,7 @@
         "name": "twig/twig",
         "version": "v1.9.0",
         "version_normalized": "1.9.0.0",
-        "time": "2012-07-13 14:26:34",
+        "time": "2012-07-13 16:26:34",
         "source": {
             "type": "git",
             "url": "git://github.com/fabpot/Twig.git",
@@ -57,7 +57,7 @@
         "name": "amazonwebservices/aws-sdk-for-php",
         "version": "1.5.10",
         "version_normalized": "1.5.10.0",
-        "time": "2012-07-17 19:26:27",
+        "time": "2012-07-17 21:26:27",
         "source": {
             "type": "git",
             "url": "https://github.com/amazonwebservices/aws-sdk-for-php.git",

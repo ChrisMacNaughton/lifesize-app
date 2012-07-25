@@ -30,3 +30,6 @@ div .flash {
 .warning {
 	color: #c00;
 }
+input {
+	min-height: 30px;
+}
