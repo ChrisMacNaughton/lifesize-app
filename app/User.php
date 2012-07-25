@@ -140,7 +140,7 @@ class User {
 		$stmt->execute(array(':id'=>$userInfo['company_id']));
 		$slug = $stmt->fetchAll();
 		$slug = $slug['0']['slug'];
-		if ($slug != $company) {
+		if (strtolower($slug) != strtolower($company)) {
 		//echo "$slug == $company";
 			$_SESSION['errors'][] = "Company doesn't exist";
 			return false;

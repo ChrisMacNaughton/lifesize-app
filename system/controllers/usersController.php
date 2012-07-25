@@ -2,7 +2,7 @@
 
 class usersController extends Controller{
 	public function indexAction() {
-		$stmt = $this->db->prepare("SELECT * FROM users WHERE company_id = :company_id ORDER BY level");
+		$stmt = $this->db->prepare("SELECT * FROM users WHERE company_id = :company_id ORDER BY name");
 		$stmt->execute(array(
 			':company_id'=>$this->user->getCompany()
 		));

@@ -34,6 +34,41 @@ class devicesController extends Controller{
 		else $data['new_device'] = false;
 		render ('devices/index.html.twig', $data);
 	}
+	public function updateAction($id) {
+		$data = array();
+		$errors = array();
+		$stmt = $this->db->prepare("SELECT * FROM devices WHERE id = :id");
+		$stmt->execute(array(
+		':id'=>$id
+		));
+		$data['device'] = $stmt->fetch(PDO::FETCH_ASSOC);
+		
+		$upload_path = BASE_PATH . '/tmp/uploads/';
+		if (isset($_POST['action']) && $_POST['action'] == 'update') {
+			echo "<pre>";print_r($_FILES);echo "</pre>";
+			$file = explode('.', $_FILES['file']['name']);
+			$last = count($file);
+			$extension = $file[$last-1];
+			if ($extension != 'cmg') {
+				$errors[] = l('error_invalid_upload');
+			}
+			$filename = md5(rand(1,10000));
+			echo "Extension: $extension<br />";
+			echo $filename;
+			if (count($errors) == 0) {
+				$target_path = $upload_path . basename($filename) . '.' . $extension;
+				if(move_uploaded_file($_FILES['file']['tmp_name'], $target_path)) {
+					echo "Success!";
+				} else{
+					echo "There was an error uploading the file, please try again!";
+				}
+			}
+			foreach($errors as $err) {
+				$data['errors'][] = $err;
+			}
+		}
+		render('devices/update.html.twig', $data);
+	}
 	public function editAction($id) {
 		$stmt = $this->db->prepare("SELECT * FROM devices WHERE id = :id");
 		$stmt->execute(array(

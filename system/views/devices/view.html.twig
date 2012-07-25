@@ -5,14 +5,20 @@
 <h2>{{devices.name}}</h2>
 <p>Last Updated: {{devices.updated|date('m/d/Y h:i:s a', 'CST') }}</p>
 <div class="span12">
+{% if user.level > 2 %}
 <form name="device_details" action="/devices/edit/{{devices.id}}" method="POST">
 
 	<label>IP Address</label><input type="text" name="ip" value="{{devices.ip}}"/>
 	<label>Name</label><input type="text" name="name" value="{{devices.name}}">
 	<label>New Password</label><input type="text" name="password" value="{{devices.password}}" max="16"/>
 	<label>License Key</label><textarea name="license" rows="3" class="span6" disabled="disabled">{{ devices.license}}</textarea>
+	Software Version: {{devices.version}} <a class="btn" href="/devices/update/{{devices.id}}">Schedule for Update</a>
 	<br /><input type="submit" value="Edit" />
 	<input type="hidden" name="action" value="edit" />
 </form>
+{% else %}
+	In a call: {%if devices.calling == 1%}Yes{% else %}No{% endif %}<br />
+	Software Version: {{devices.version}}
+{% endif %}
 </div></div>
 {% endblock %}

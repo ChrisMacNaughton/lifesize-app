@@ -4,8 +4,14 @@
 {% endblock %}
 {% block body %}
 <ul class="well" id="userlist">
-{% for user in users %}
-	<li><a href="/users/view/{{user.id}}">{{user.name}}</a></li>
+{% for userid in users %}
+	<li>
+	{% if ( user.level >= 2 or userid.id == user.id )%}
+	<a href="/users/view/{{userid.id}}">{{userid.name}}</a>
+	{% else %}
+	{{userid.name}}
+	{% endif %}
+	</li>
 {% endfor %}
 </ul>
 {% endblock %}

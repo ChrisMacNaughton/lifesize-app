@@ -5,7 +5,7 @@ define('OPERATOR_LEVEL', 2);
 define('ADMIN_LEVEL', 3);
 define('SUPER_ADMIN_LEVEL', 4);
 require_once 'vendor/autoload.php';
-
+define('BASE_PATH', __DIR__);
 if (get_cfg_var('aws.access_key') === false) {
 include 'config.php';
 define('PATH', $path);
