@@ -22,6 +22,9 @@ if ($uri->seg[0] == 'users' && $uri->seg[1] == 'login')
 if ($uri->seg[0] == 'company' && $uri->seg[1] == 'new')
 	$redirect = false;
 
+if ($uri->seg[0] == 'update' || $uri->seg[0] == 'ping')
+	$redirect = false;
+
 if ($redirect === true) {
 	header("Location: /users/login");
 }

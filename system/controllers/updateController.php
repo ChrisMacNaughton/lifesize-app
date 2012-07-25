@@ -2,27 +2,26 @@
 
 class updateController extends Controller {
 	public function indexAction() {
-		$updated = settings('updated');
-		if ($updated < time() - 600) {
-			$query = "UPDATE settings SET `value`='" . time() . "' WHERE `setting`= 'updated'";
-			//echo $query;
-			$stmt = $this->db->prepare($query);
-			$stmt->execute();
-			$stmt = $this->db->prepare("SELECT ip, id FROM devices");
-			$stmt->execute();
-			$devices = $stmt->fetchAll();
-			foreach ($devices as $device) {
-				$url = PATH . "/update/device/" . $device['id'];
-				$ch = curl_init($url);
-				
-				curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
-				curl_setopt($ch, CURLOPT_TIMEOUT_MS, 1);
+		$stmt = $this->db->prepare($query);
+		$stmt->execute();
+		$stmt = $this->db->prepare("SELECT ip, id FROM devices WHERE updated < :updated");
+		$stmt->execute(array(
+		':updated'=>time() -600,
+		));
+		$devices = $stmt->fetchAll();
+		var_dump($devices);
+		foreach ($devices as $device) {
+		echo "Device: " . $device['id'] . '<br />';
+			$url = PATH . "/update/device/" . $device['id'];
+			$ch = curl_init($url);
+			
+			curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
+			curl_setopt($ch, CURLOPT_TIMEOUT_MS, 1);
 
-				curl_exec($ch);
-				curl_close($ch);
-				
-				
-			}
+			curl_exec($ch);
+			curl_close($ch);
+			
+			
 		}
 		
 		$url = PATH . "/ping";
