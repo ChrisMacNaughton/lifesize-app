@@ -13,6 +13,7 @@
 <div class="row-fluid">
 <div class="span10">
 	<ul class="nav nav-pills">
+	{% block nav %}
 		<li{% if ( page == 'home' or page == '' ) %} class="active"{% endif %}><a href="/home">Home</a></li>
 		<li{% if ( page == 'devices') %} class="active"{% endif %}><a href="/devices">Devices</a></li>
 		{% if user.level >= 1 %}
@@ -21,7 +22,11 @@
 		{% if user.level >= 3 %}
 			<li{% if ( page == 'company') %} class="active"{% endif %}><a href="/company">Company Details</a></li>
 		{% endif %}
-		<li><a href="users/logout">Logout</a></li>
+		{% if user.level == 4 %}
+			<li{% if ( page == 'admin') %} class="active"{% endif %}><a href="/admin">AdminCP</a></li>
+		{% endif %}
+		<li><a href="/users/logout">Logout</a></li>
+		{% endblock %}
 	</ul>
 </div>
 	<div class="span2" style="padding-top: 5px;">

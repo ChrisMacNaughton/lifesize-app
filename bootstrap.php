@@ -5,6 +5,7 @@ define('OPERATOR_LEVEL', 2);
 define('ADMIN_LEVEL', 3);
 define('SUPER_ADMIN_LEVEL', 4);
 require_once 'vendor/autoload.php';
+
 if (get_cfg_var('aws.access_key') === false) {
 include 'config.php';
 define('PATH', $path);
@@ -18,7 +19,9 @@ $options = array(
 $user = get_cfg_var('aws.param2');
 $password = get_cfg_var('aws.param3');
 define('PATH',get_cfg_var('aws.param4'));
+$stripe_key = get_cfg_var('aws.param5');
 }
+Stripe::setApiKey($stripe_key);
 /*
 $dynamodb = new AmazonDynamoDB($options);
 

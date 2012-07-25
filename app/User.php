@@ -6,6 +6,7 @@ class User {
 	protected $company_id;
 	protected $hasher;
 	protected $db;
+	protected $errors;
 	protected $authenticatedFully = false;
 	public function __construct($db) {
 		$this->authenticatedFully = false;
@@ -103,6 +104,9 @@ class User {
 					return false;
 		}
 		return true;
+	}
+	public function getErrors() {
+		return $this->errors;
 	}
 	public function userInfo() {
 		return array(
@@ -251,7 +255,6 @@ class User {
 		
 		$data['password'] = $this->hasher->HashPassword( $data['password'] );
 		$data['created'] = time();
-		$data['active'] = 1;
 		// Build the query
 			$fields = array();
 			$values = array();
@@ -269,7 +272,7 @@ class User {
 			if ($stmt->execute($values)) {
 				return true;
 			} else {
-				$_SESSION['errors'][] = $stmt->errorInfo();
+				$this->errors[] = $stmt->errorInfo();
 				return false;
 			}
 	}

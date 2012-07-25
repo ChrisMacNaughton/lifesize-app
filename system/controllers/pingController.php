@@ -4,7 +4,10 @@ class pingController extends Controller {
 	public function indexAction() {
 		$pinged = settings('pinged');
 		if ($pinged < time() - 60) {
-			$this->db->query("UPDATE settings SET value=" . time() . " WHERE setting = pinged");
+			$query = "UPDATE settings SET `value`='" . time() . "' WHERE `setting`= 'pinged'";
+			//echo $query;
+			$stmt = $this->db->prepare($query);
+			$stmt->execute();
 		
 			$stmt = $this->db->prepare("SELECT ip, id FROM devices");
 			$stmt->execute();

@@ -12,7 +12,17 @@ $action = $uri->seg[1];
 if ($action == '') {
 	$action = 'index';
 }
-if (!$user->isAuthenticated() && ($uri->seg[0] != 'users' &&$uri->seg[1] != 'login')) {
+$redirect = true;
+if ($user->isAuthenticated())
+	$redirect = false;
+	
+if ($uri->seg[0] == 'users' && $uri->seg[1] == 'login')
+	$redirect = false;
+	
+if ($uri->seg[0] == 'company' && $uri->seg[1] == 'new')
+	$redirect = false;
+
+if ($redirect === true) {
 	header("Location: /users/login");
 }
 $stmt = $db->prepare("SELECT customer_id FROM companies WHERE id = :id");
@@ -20,9 +30,7 @@ $stmt->execute(array(
 	':id'=>$user->getCompany(),
 ));
 $company = $stmt->fetch();
-if ($user->isAuthenticated() && $company['customer_id'] == null && $uri->seg[0] != 'company') {
-	header("Location: /company");
-}
+
 $controllerName = strtolower($controller) . "Controller";
 $args = array();
 $id = null;

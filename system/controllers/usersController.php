@@ -100,5 +100,6 @@ class usersController extends Controller{
 	}
 	public function logoutAction() {
 		$this->user->logout();
+		header("Location: users/login");
 	}
 }

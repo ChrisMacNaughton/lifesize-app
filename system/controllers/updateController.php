@@ -4,7 +4,10 @@ class updateController extends Controller {
 	public function indexAction() {
 		$updated = settings('updated');
 		if ($updated < time() - 600) {
-			$this->db->query("UPDATE settings SET value=" . time() . " WHERE setting = updated");
+			$query = "UPDATE settings SET `value`='" . time() . "' WHERE `setting`= 'updated'";
+			//echo $query;
+			$stmt = $this->db->prepare($query);
+			$stmt->execute();
 			$stmt = $this->db->prepare("SELECT ip, id FROM devices");
 			$stmt->execute();
 			$devices = $stmt->fetchAll();
