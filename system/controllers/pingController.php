@@ -2,13 +2,13 @@
 
 class pingController extends Controller {
 	public function indexAction() {
-		$stmt = $this->db->prepare("SELECT ip, id FROM devices WHERE updated < :updated");
+		$stmt = $this->db->prepare("SELECT ip, id FROM devices WHERE online_updated < :updated");
 		$stmt->execute(array(
 		':updated'=>time() -600,
 		));
 		$devices = $stmt->fetchAll();
 		foreach ($devices as $device) {
-		
+		echo "Device: " . $device['id'] . '<br />';
 			$url = PATH . "/ping/device/" . $device['id'];
 			$ch = curl_init($url);
 			
