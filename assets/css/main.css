@@ -33,3 +33,6 @@ div .flash {
 input {
 	min-height: 30px;
 }
+.required {
+	color: #c00;
+}

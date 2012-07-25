@@ -1,7 +1,7 @@
 <?php
 
 class Controller {
-	protected $controller, $action, $app, $db;
+	protected $controller, $action, $app, $db, $user;
 	public function beforeAction() {
 	
 	}
@@ -10,6 +10,8 @@ class Controller {
 		$this->action = $action;
 		$this->app = $app;
 		$this->db = $db;
+		global $user;
+		$this->user = $user;
 	}
 	public function render($file, ARRAY $data = null) {
 		global $app;

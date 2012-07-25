@@ -3,17 +3,38 @@
 <div class="span4"></div>
 	<div class="span4 well">
 		<h2>Register</h2>
-		<form action="" method="POST">
-		<label>Company Name</label>
-		<input type="text" name="company_name" />
-		<label>Address Line 1</label>
-		<input type="text" name="address_line_1" />
+		<form action="" method="POST" id="register_form">
+	<fieldset class="control-group{% if errors[':name']%} error {%endif %}">	
+		<label>Company Name<span class="required" title="Required">*</span></label>
+		<input type="text" name="company_name" value="{{register['company'][':name']}}"/>
+		{% if errors[':name']%}
+		<span class="help-inline">{{errors[':name']}}</span>
+		{% endif %}
+	</fieldset>
+	<fieldset class="control-group{% if errors[':address1']%} error {%endif %}">
+		<label>Address Line 1<span class="required" title="Required">*</span></label>
+		<input type="text" name="address_line_1" value="{{register['company'][':address1']}}"/>
+		{% if errors[':address1']%}
+		<span class="help-inline">{{errors[':address1']}}</span>
+		{% endif %}
+	</fieldset>
+	<fieldset class="control-group{% if errors[':address2']%} error {%endif %}">
 		<label>Address Line 2</label>
-		<input type="text" name="address_line_2" />
-		<label>City</label>
-		<input type="text" name="city" />
+		<input type="text" name="address_line_2" value="{{register['company'][':address2']}}"/>
+		{% if errors[':address2']%}
+		<span class="help-inline">{{errors[':address2']}}</span>
+		{% endif %}
+	</fieldset>
+	<fieldset class="control-group{% if errors[':city']%} error {%endif %}">
+		<label>City<span class="required" title="Required">*</span></label>
+		<input type="text" name="city" value="{{register['company'][':city']}}"/>
+		{% if errors[':city']%}
+		<span class="help-inline">{{errors[':city']}}</span>
+		{% endif %}
+	</fieldset>
+	<fieldset class="control-group{% if errors[':state']%} error {%endif %}">
 		<label>State</label>
-		<select name="state"> 
+		<select name="state" id="state"> 
 			<option value="" selected="selected">Select a State</option> 
 			<option value="AL">Alabama</option> 
 			<option value="AK">Alaska</option> 
@@ -67,10 +88,20 @@
 			<option value="WI">Wisconsin</option> 
 			<option value="WY">Wyoming</option>
 		</select>
+		{% if errors[':state']%}
+		<span class="help-inline">{{errors[':state']}}</span>
+		{% endif %}
+	</fieldset>
+	<fieldset class="control-group{% if errors[':zip']%} error {%endif %}">
 		<label>Zip</label>
-		<input type="text" name="zip" />
-		<label>Country</label>
-		<select name="country"> 
+		<input type="text" name="zip" value="{{register['company'][':zip']}}"/>
+		{% if errors[':zip']%}
+		<span class="help-inline">{{errors[':zip']}}</span>
+		{% endif %}
+	</fieldset>
+	<fieldset class="control-group{% if errors[':country']%} error {%endif %}">
+		<label>Country<span class="required" title="Required">*</span></label>
+		<select name="country" id="country"> 
 			<option value="" selected="selected">Select Country</option> 
 			<option value="United States">United States</option> 
 			<option value="United Kingdom">United Kingdom</option> 
@@ -314,8 +345,50 @@
 			<option value="Zambia">Zambia</option> 
 			<option value="Zimbabwe">Zimbabwe</option>
 		</select>
-
+		{% if errors[':country']%}
+		<span class="help-inline">{{errors[':country']}}</span>
+		{% endif %}
+	</fieldset>
+		<hr />
+	<fieldset class="control-group{% if errors[':user_name']%} error {%endif %}">
+		<label>Contact Name<span class="required" title="Required">*</span></label>
+		<input type="text" name="contact_name" value="{{register['user'][':user_name']}}"/>
+		{% if errors[':user_name']%}
+		<span class="help-inline">{{errors[':user_name']}}</span>
+		{% endif %}
+	</fieldset>
+	<fieldset class="control-group{% if errors[':email']%} error {%endif %}">
+		<label>Contact Email<span class="required" title="Required">*</span></label>
+		<input type="text" name="contact_email" value="{{register['user'][':email']}}"/>
+		{% if errors[':email']%}
+		<span class="help-inline">{{errors[':email']}}</span>
+		{% endif %}
+	</fieldset>
+	<fieldset class="control-group{% if errors[':phone']%} error {%endif %}">
+		<label>Contact Phone Number<span class="required" title="Required">*</span></label>
+		<input type="text" name="contact_phone" value="{{register['user'][':phone']}}"/>
+		{% if errors[':address1']%}
+		<span class="help-inline">{{errors[':phone']}}</span>
+		{% endif %}
+	</fieldset>
+		<label><button type="submit" id="submit" class="submit-button">Register</button></label>
+		<input type="hidden" name="action" value="new" />
 		</form>
 	</div>
 </div>
+{% endblock %}
+{% block javascripts %}
+{{parent()}}
+<script type="text/javascript">
+var state = "{{register['company'][':state']}}";
+var country = "{{register['company'][':country']}}";
+$(document).ready(function() {
+	if (state.length > 0) {
+		$('#state').val(state);
+	}
+	if (country.length > 0) {
+		$('#country').val(country);
+	}
+});
+</script>
 {% endblock %}

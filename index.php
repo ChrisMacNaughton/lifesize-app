@@ -1,8 +1,9 @@
 <?php
 $app['start'] = microtime();
+define("COMPANY_NAME", 'VC-Control');
 include 'bootstrap.php';
 
-$app['user'] = new User();
+$user = new User();
 $ctrl = ($uri->seg(0) == '') ? 'default' : $uri->seg(0);
 $actn =  ($uri->seg(1) == '') ? 'index' : $uri->seg(1);
 $id = ($uri->seg(2) == '') ? null : $uri->seg(2);
