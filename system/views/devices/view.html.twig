@@ -3,7 +3,8 @@
 {% block body %}
 <div class="row-fluid">
 <h2>{{devices.name}}</h2>
-<p>Last Updated: {{devices.updated|date('m/d/Y h:i:s a', 'CST') }}</p>
+<h6>Last Updated: {{devices.updated|date('m/d/Y h:i:s a', 'CST') }}</h6>
+<h6>Online Checked: {{devices.online_updated|date('m/d/Y h:i:s a', 'CST') }}</h6>
 <div class="span12">
 {% if user.level > 2 %}
 <form name="device_details" action="/devices/edit/{{devices.id}}" method="POST">
