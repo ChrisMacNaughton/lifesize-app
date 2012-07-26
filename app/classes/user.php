@@ -24,13 +24,19 @@ protected $company = array();
 		}
 	}
 	public function register($user) {
+		global $options;
 		$password = substr(md5(hash('sha512', rand(1,1000))), 0, 10);
 		$loginUrl =  'http://' . PATH . '/user/login';
 		$signature = 'The ' . COMPANY_NAME . ' Team';
-		$emailBody = sprintf("Hello, %s\n\nYour login details are: \n\nEmail: %s\nPassword: %s\n\nYou will be required to change this after your first login.\n\nPlease visit %s to login!\n\nIf the link above doesn't work, copy this link into your browser: %s\n\nThank you!\n%s", $user[':user_name'], $user[':email'],$password,'<a href="' . $loginUrl . '">Login</a>', $loginUrl, $signature);
+		$message = sprintf("Hello, %s\n\nYour login details are: \n\nEmail: %s\nPassword: %s\n\nYou will be required to change this after your first login.\n\nPlease visit %s to login!\n\nIf the link above doesn't work, copy this link into your browser: %s\n\nThank you!\n%s", $user[':user_name'], $user[':email'],$password,'<a href="' . $loginUrl . '">Login</a>', $loginUrl, $signature);
 		
-		echo $emailBody;
+		//echo $message;
+		$destination = $user[':email'];
+		$source = "chmacnaughton@gmail.com";
 		//use amazon email function (amazon SES) to send registration email
+		
+		echo "Source: $source<br />Destination: $destination<br /><br />$message";
+		
 	}
 	public function login($email, $password) {
 		

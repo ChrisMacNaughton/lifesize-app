@@ -3,7 +3,7 @@
 <div class="span4"></div>
 	<div class="span4 well">
 		<h2>Register</h2>
-		<form action="" method="POST" id="register_form">
+		<form action="/company/register" method="POST" id="register_form">
 	<fieldset class="control-group{% if errors[':name']%} error {%endif %}">	
 		<label>Company Name<span class="required" title="Required">*</span></label>
 		<input type="text" name="company_name" value="{{register['company'][':name']}}"/>

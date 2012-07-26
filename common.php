@@ -21,7 +21,6 @@ function l($string) {
 
 	return $string;
 }
-
 function settings($setting)
 {
 	global $CACHE, $db;

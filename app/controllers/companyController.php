@@ -25,36 +25,35 @@ class companyController extends Controller {
 						$errors[$key] = l('error_empty');
 				}
 			}
+			$company[':customer_id'] = "";
 			$user[':user_name'] = $_POST['contact_name'];
 			$user[':email'] = $_POST['contact_email'];
 			$user[':phone'] = $_POST['contact_phone'];
 			if (count($errors) == 0) {
-				if ($this->register($company)) {
-					$user[':company_id'] = $this->db->lastInsertId();
+				if ($company = $this->register($company, $user[':email'])) {
+					$user[':company_id'] = $company[':id'];
 					if ($this->user->register($user)) {
 					
 					} else {
-						$errors[] = $this->db->errorInfo();
+						$errors[] = $this->db->errorCode();
 					}
 				} else {
-					$errors[] = $this->db->errorInfo();
+					$errors[] = $this->db->errorCode();
 				}
 			}
 			$data['register']['company'] = $company;
 			$data['register']['user'] = $user;
-			$data['errors'] = $errors;
 		}
 		$this->render('company/new.html.twig', $data);
 	}
-	protected function register($company) {
+	protected function register($company, $email) {
 		$name = explode(' ', $company[':name']);
 		$slug = '';
 		foreach ($name as $word) {
 			$slug .= $word[0];
-			
 		}
 		$slug_final = $slug . rand(1, 10);
-		$stmt = $this->db->prepare("SELECT * FROM companies WHERE slug = :slug");
+		$stmt = $this->db->prepare("SELECT * FROM companies WHERE id = :slug");
 		$stmt->execute(array(':slug'=>$slug_final));
 		$i=1;
 		while ($stmt->rowCount() > 0) {
@@ -62,7 +61,16 @@ class companyController extends Controller {
 			$stmt->execute(array(':slug'=>$slug_final));
 			$i++;
 		}
-		$company[':slug'] = $slug_final;
+		$company[':id'] = $slug_final;
+		
+		$customer = Stripe_Customer::create(array(
+			"description"=>$company[":slug"],
+			'email'=>$email,
+		));
+		
+		if (isset($customer->id)) {
+			$company[':customer_id'] = $customer->id;
+		}
 		
 		$fields = array();
 		$values = array();
@@ -74,7 +82,13 @@ class companyController extends Controller {
 		$fields = implode(',',$fields);
 		$value_names = implode(',', $value_names);
 		$query = "INSERT INTO companies ($fields) VALUES ($value_names)";
+		//echo $query;
 		$stmt = $this->db->prepare($query);
-		return $stmt->execute($company);
+		
+		if ($stmt->execute($company)) {
+			return $company;
+		} else {
+			return false;
+		}
 	}
 }

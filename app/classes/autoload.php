@@ -1,8 +1,7 @@
 <?php
 
 function load($classname) {
-	$classname = strtolower($classname);
-	$path = BASE_PATH . '/app/classes/'. $classname .'.php';
+	$path = BASE_PATH . '/app/classes/'. strtolower($classname) .'.php';
 	if (file_exists($path)) {
 		include_once $path;
 		return;

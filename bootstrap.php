@@ -9,6 +9,7 @@ set_include_path(get_include_path() . PATH_SEPARATOR . 'app/classes/phpseclib' .
 require_once 'vendor/autoload.php';
 require_once 'Net/SSH2.php';
 require_once 'app/classes/autoload.php';
+require_once 'Mail.php';
 /* set amazon config vars */
 if (get_cfg_var('aws.access_key') === false)
 {
@@ -28,6 +29,7 @@ if (get_cfg_var('aws.access_key') === false)
 }
 $uri = new URI();
 Stripe::setApiKey($stripe_key);
+
 //uncomment the following to switch to using dynamodb to handle sessions
 /*
 $dynamodb = new AmazonDynamoDB($options);
