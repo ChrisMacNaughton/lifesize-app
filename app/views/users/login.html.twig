@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+	<form name="login" action="#" method="post" >
+		<label>Email</label>
+			<input type="text" name="email" />
+		<label>Password</label>
+			<input type="password" name="password" />
+		<label>Company</label>
+			<input type="text" name="company" />
+			<input type="hidden" name="action" value="login" />
+		<label><input type="submit" value="Submit" /></label>
+	</form>
+{% endblock %}

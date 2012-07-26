@@ -26,6 +26,7 @@ class Controller {
 		unset($app['start']);
 		$app['system']['load_time'] = microtime_diff($start);
 		$data['app'] = $app;
+		$data['app']['user'] = $this->user;
 		echo $twig->render($file, $data);
 	}
 }

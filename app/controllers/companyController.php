@@ -29,11 +29,13 @@ class companyController extends Controller {
 			$user[':user_name'] = $_POST['contact_name'];
 			$user[':email'] = $_POST['contact_email'];
 			$user[':phone'] = $_POST['contact_phone'];
+			$user[':level'] = 3;
 			if (count($errors) == 0) {
 				if ($company = $this->register($company, $user[':email'])) {
 					$user[':company_id'] = $company[':id'];
 					if ($this->user->register($user)) {
-					
+						$_SESSION['flash'][] = l('success_register');
+						header("Location: /user/login");
 					} else {
 						$errors[] = $this->db->errorCode();
 					}
