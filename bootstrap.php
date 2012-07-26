@@ -5,7 +5,7 @@
 error_reporting(E_ALL^E_WARNING^E_NOTICE);
 include 'common.php';
 define('BASE_PATH', __DIR__);
-set_include_path(get_include_path() . PATH_SEPARATOR . 'app/classes/phpseclib' . PATH_SEPARATOR . 'app');
+set_include_path(get_include_path() . PATH_SEPARATOR . 'app/classes/phpseclib' . PATH_SEPARATOR . 'app'. PATH_SEPARATOR . 'app/classes/mail');
 require_once 'vendor/autoload.php';
 require_once 'Net/SSH2.php';
 require_once 'app/classes/autoload.php';
