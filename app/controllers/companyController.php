@@ -1,8 +1,19 @@
 <?php
 
 class companyController extends Controller {
+	public function beforeAction() {
+		parent::beforeAction();
+		
+		if ($this->user->getLevel() < 3) {
+			$_SESSION['errors'][] = l('error_no_permission');
+			header("Location: /user/view/" . $this->user->getID());
+		}
+	}
 	public function indexAction () {
-	
+		$data = array(
+			'title'=>$this->user->getCompany(),
+		);
+		$this->render('company/index.html.twig', $data);
 	}
 	public function registerAction() {
 		$data = array(
@@ -68,6 +79,7 @@ class companyController extends Controller {
 		$customer = Stripe_Customer::create(array(
 			"description"=>$company[":slug"],
 			'email'=>$email,
+			'plan'=>'free'
 		));
 		
 		if (isset($customer->id)) {

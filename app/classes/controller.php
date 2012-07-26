@@ -8,6 +8,7 @@ class Controller {
 	public function __construct($controller, $action, $app, $db) {
 		$this->controller = $controller;
 		$this->action = $action;
+		
 		$this->app = $app;
 		$this->db = $db;
 		global $user;
@@ -22,11 +23,16 @@ class Controller {
 		));
 		
 		$twig->addExtension(new Twig_Extension_Debug());
-		$start = $app['start'];
-		unset($app['start']);
-		$app['system']['load_time'] = microtime_diff($start);
-		$data['app'] = $app;
-		$data['app']['user'] = $this->user;
+		$start = $this->app['start'];
+		unset($this->app['start']);
+		$this->app['system']['load_time'] = microtime_diff($start);
+		$data['app'] = $this->app;
+		$data['app']['user'] = $this->user->getUser();
+		$data['errors'] = $_SESSION['errors'];
+		unset($_SESSION['errors']);
+		$data['flash'] = $_SESSION['flash'];
+		unset($_SESSION['flash']);
+		
 		echo $twig->render($file, $data);
 	}
 }

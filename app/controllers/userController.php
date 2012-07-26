@@ -17,6 +17,15 @@ class userController extends Controller {
 		//$this->user->register($user);
 	}
 	public function viewAction($id) {
-		echo $id;
+		$data = array('title'=>"User");
+		$res = $this->user->getUserInfo($id);
+		if ($res === false && $this->user->getLevel() < 4) {
+			$_SESSION['error'][] = l('no_permission');
+			header("Location: /user/view/" . $this->user->getID());
+		}
+		$this->render('users/viewOne.html.twig', $data);
+	}
+	public function logoutAction() {
+		$this->user->logout();
 	}
 }

@@ -21,10 +21,17 @@ if (get_cfg_var('aws.access_key') === false)
 		'key' => get_cfg_var('aws.access_key'),
 		'secret' => get_cfg_var('aws.secret_key'),
 	);
-	$user = get_cfg_var('aws.param2');
-	$password = get_cfg_var('aws.param3');
+	$dbuser = get_cfg_var('aws.param2');
+	$dbpassword = get_cfg_var('aws.param3');
 	define('PATH',get_cfg_var('aws.param4'));
 	$stripe_key = get_cfg_var('aws.param5');
+}
+//connect to the mysql db instance of RDS
+$dsn = 'mysql:dbname=vcdb;host=vcdb.crwlsevgtlap.us-east-1.rds.amazonaws.com';
+try {
+    $db = new PDO($dsn, $dbuser, $dbpassword);
+} catch (PDOException $e) {
+    $app['errors'][]= $e->getMessage();
 }
 $uri = new URI();
 Stripe::setApiKey($stripe_key);
@@ -41,14 +48,9 @@ $session_handler = $dynamodb->register_session_handler(array(
 */
 session_start();
 $CACHE = array();
-//connect to the mysql db instance of RDS
-$dsn = 'mysql:dbname=vcdb;host=vcdb.crwlsevgtlap.us-east-1.rds.amazonaws.com';
 
 
-try {
-    $db = new PDO($dsn, $user, $password);
-} catch (PDOException $e) {
-    $app['errors'][]= $e->getMessage();
-}
+
+
 
 require('app/config/locale/'.settings('locale').'.php');

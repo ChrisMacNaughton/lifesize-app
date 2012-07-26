@@ -9,9 +9,23 @@
 </head>
 <body>
 <div class="container-fluid">
+<ul class="nav nav-tabs">
 {% block nav %}
 
+	<li{% if app.page == 'default' %} class="active"{% endif %}><a href="/home">Dashboard</a></li>
+	<li{% if app.page == 'devices' %} class="active"{% endif %}><a href="/devices">Devices</a></li>
+	{% if app.user.level > 2 %}
+	<li{% if app.page == 'company' %} class="active"{% endif %}><a href="/company">Company</a></li>
+	{% endif %}
+	
+	
+	
+	{% if app.user.level == 4 %}
+	<li{% if app.page == 'admin' %} class="active"{% endif %}><a href="/admin">AdminCP</a></li>
+	{% endif %}
+
 {% endblock %}
+</ul>
 {% block banner %}
 
 {% endblock %}
@@ -28,7 +42,5 @@
     <script src="/assets/js/bootstrap.min.js"></script>
     <script src="/assets/js/main.js"></script>
 {% endblock %}
-<pre>
-{{dump()}}
-</pre></body>
+<pre>{{dump()}}</pre></body>
 </html>

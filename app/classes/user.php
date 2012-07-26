@@ -3,7 +3,7 @@
 class User {
 protected $db;
 
-protected $id, $name, $email, $level, $hasher;
+protected $id, $name, $email, $level, $phone, $hasher;
 
 protected $authenticatedFully = false;
 protected $company = array();
@@ -13,20 +13,55 @@ protected $company = array();
 		$this->hasher = new PasswordHash(12,false);
 		$this->db = $db;
 		$id = (isset($_SESSION['userid'])) ? $_SESSION['userid'] : 0;
-		$sesshash = (isset($_SESSION['sesshash'])) ? $_SESSION['sesshash'] : '';
 		
-		$stmt = $this->db->prepare("SELECT * FROM users WHERE id=:id AND sesshash = :sesshash");
+		$stmt = $this->db->prepare("SELECT * FROM users WHERE id=:id");
 		$stmt->execute(array(
 			':id'=>$id,
-			':sesshash'=>$sesshash
 		));
 		$user = $stmt->fetch(PDO::FETCH_ASSOC);
 		foreach ($user as $key=>$val) {
 			$this->$key = $val;
 		}
+		if ($this->id != 0) {
+			$this->authenticatedFully = true;
+			$stmt = $this->db->prepare("SELECT * FROM companies WHERE id = :id");
+			$stmt->execute(array(':id'=>$this->company_id));
+			$this->company = $stmt->fetch(PDO::FETCH_ASSOC);
+			unset($this->password);
+		}
+	}
+	public function getUserInfo($id) {
+		$stmt = $this->db->prepare("SELECT name, company_id, email, phone FROM users WHERE id = :id");
+		$stmt->execute(array(':id'=>$id));
+		$res = $stmt->fetch(PDO::FETCH_ASSOC);
+		if ($res['company_id'] == $this->company_id)
+			return $res;
+		else 
+			return false;
+	}
+	public function getUser() {
+		$user = array(
+			'name'=>$this->name,
+			'email'=>$this->email,
+			'level'=>$this->level,
+			'phone'=>$this->phone,
+			'company'=>$this->company
+		);
+		return $user;
 	}
 	public function getID() {
 		return $this->id;
+	}
+	public function getLevel() {
+		return $this->level;
+	}
+	public function isAuthenticatedFully() {
+		return $this->authenticatedFully;
+	}
+	public function getCompany($id = null){
+		if (is_null($id)) {
+			return $this->company['name'];
+		}
 	}
 	public function register($user) {
 		global $options;
@@ -81,15 +116,16 @@ protected $company = array();
 		if ($result=== true) {
 			$stmt = $this->db->prepare("SELECT * FROM users WHERE email = :email AND company_id = :id");
 			$stmt->execute(array(':email'=>$email, ':id'=>$company));
-			$res = $stmt->fetch(PDO::FETCH_ASSOC);
-			$this->id = $res['id'];
-			$this->name = $res['name'];
-			$this->level = $res['level'];
-			$this->email = $res['email'];
+			$user = $stmt->fetch(PDO::FETCH_ASSOC);
+			foreach ($user as $key=>$val) {
+				$this->$key = $val;
+			}
+			$_SESSION['userid'] = $user['id'];
 			$this->authenticatedFully = true;
 			$stmt = $this->db->prepare("SELECT * FROM companies WHERE id = :id");
-			$stmt->execute(array(':id'=>$company));
+			$stmt->execute(array(':id'=>$this->company_id));
 			$this->company = $stmt->fetch(PDO::FETCH_ASSOC);
+			unset($this->password);
 			return true;
 		}
 		else {
@@ -99,5 +135,6 @@ protected $company = array();
 	}
 	public function logout() {
 		session_destroy();
+		header("Location: /user/login");
 	}
 }

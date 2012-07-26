@@ -1,0 +1,7 @@
+{% extends 'base.html.twig' %}
+{% block nav %}
+<li{% if app.admin == 'cp'%} class="active"{% endif %}><a href="/admin">AdminCP</a></li>
+<li{% if app.admin == 'companies'%} class="active"{% endif %}><a href="/admin/companies">Companies</a></li>
+<li{% if app.admin == 'devices'%} class="active"{% endif %}><a href="/admin/devices">Devices</a></li>
+<li><a href="/home">Back to the App</a></li>
+{% endblock %}
