@@ -21,6 +21,9 @@ class companyController extends Controller {
 		$this->render('company/index.html.twig', $data);
 	}
 	public function addCardAction($id){
+		if ($this->user->getLevel() < 3 || $this->company['id'] != $id)
+			$json = array('status'=>'error', 'details'=>'No Permission');
+		else{
 		$token = $_POST['id'];
 		$card = $_POST['card'];
 		$oldFingerprint = $this->stripe->active_card->fingerprint;
@@ -45,6 +48,7 @@ class companyController extends Controller {
 			'old'=>$oldFingerprint,
 			'new'=>$card['fingerprint']
 		);
+		}
 		echo json_encode($json);
 	}
 	public function registerAction() {

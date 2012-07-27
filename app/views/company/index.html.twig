@@ -6,7 +6,7 @@
 {% if stripe.active_card == null %}
 None <button class="add_card">Add a Card</button>
 {% else %}
-Ending in: <span id="last4">{{stripe.active_card.last4}}</span><span id="status" style="display: none;">Updated</span><!-- {{dump(stripe)}}--> <button class="add_card">Update Card</button><button class="delete_card">Delete Card</button>
+Ending in: <span id="last4">{{stripe.active_card.last4}}</span><span id="status" style="display: none;">Updated</span><!-- {{dump(stripe)}}--> <button class="add_card">Update Card</button>
 {% endif %}
 <pre>{{dump(company)}}</pre>
 
@@ -49,8 +49,8 @@ $(document).ready(function() {
 		
 		$( "#dialog-form" ).dialog({
 			autoOpen: false,
-			height: 300,
-			width: 350,
+			height: 400,
+			width: 250,
 			modal: true,
 			buttons: {
 				"Add a Card": function() {
