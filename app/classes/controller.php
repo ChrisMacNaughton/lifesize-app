@@ -3,7 +3,20 @@
 class Controller {
 	protected $controller, $action, $app, $db, $user;
 	public function beforeAction() {
-	
+		$table = null;
+		switch ($this->controller)  {
+			case 'events':
+				$table = 'events';
+				break;
+		}
+		if (!is_null($table)){
+			$options = array(
+				':id'=>$this->user->getCompanyId()
+			);
+			$stmt = $this->db->prepare("SELECT * FROM $table WHERE company_id = :id");
+			$stmt->execute($options);
+			$this->$table = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		}
 	}
 	public function __construct($controller, $action, $app, $db) {
 		$this->controller = $controller;

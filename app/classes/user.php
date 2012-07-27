@@ -65,6 +65,9 @@ protected $company = array();
 			return $this->company['name'];
 		}
 	}
+	public function getCompanyId(){
+		return $this->company['id'];
+	}
 	public function getCompanyDetails() {
 		return $this->company;
 	}

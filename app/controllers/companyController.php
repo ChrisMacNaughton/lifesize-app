@@ -6,6 +6,7 @@ class companyController extends Controller {
 		
 		if ($this->user->getLevel() < 3) {
 			$_SESSION['errors'][] = l('error_no_permission');
+			session_write_close();
 			header("Location: /user/view/" . $this->user->getID());
 		}
 		$this->company = $this->user->getCompanyDetails();

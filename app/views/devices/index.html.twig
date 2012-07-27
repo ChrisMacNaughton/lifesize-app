@@ -1,1 +1,29 @@
 {% extends 'base.html.twig' %}
+{% block afternav %}
+{% if app.user.level > 1 %}
+	<a href="/devices/new" CLASS="BTN BTN-SUCCESS" style="margin-top: 5px;">New Device</a>
+{% endif %}
+{% endblock %}
+{% block body %}
+<div class="span10">
+	{% for device in devices %}
+	<div class="row span10" style="border-bottom: 1px solid #ccc">
+	<strong>Name</strong>:{{device.name}}<br />
+	<strong>IP</strong>:{{device.ip}}<br />
+	<strong>Status</strong>:{{device.status}}
+	</div>
+	{% else %}
+	<div class="row span10">
+	<p>You haven't added any devices yet!</p>
+	</div>
+	{% endfor %}
+</div>
+{#
+<div class="span12">
+	<pre>
+	{{dump(devices)}}
+
+	</pre>
+</div>
+#}
+{% endblock %}

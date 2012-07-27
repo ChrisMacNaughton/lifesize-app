@@ -9,33 +9,47 @@
 {% endblock %}
 </head>
 <body>
-<div class="container-fluid">
-<ul class="nav nav-tabs">
-{% block nav %}
+<div class="container">
+	<div class="row">
+		<div class="span10">
+			<ul class="nav nav-tabs">
+			{% block nav %}
 
-	<li{% if app.page == 'default' %} class="active"{% endif %}><a href="/home">Dashboard</a></li>
-	<li{% if app.page == 'devices' %} class="active"{% endif %}><a href="/devices">Devices</a></li>
-	{% if app.user.level > 2 %}
-	<li{% if app.page == 'company' %} class="active"{% endif %}><a href="/company">Company</a></li>
-	{% endif %}
-	
-	
-	
-	{% if app.user.level == 4 %}
-	<li{% if app.page == 'admin' %} class="active"{% endif %}><a href="/admin">AdminCP</a></li>
-	{% endif %}
-	<li><a href="/user/logout">Logout</a></li>
+				<li{% if app.page == 'default' %} class="active"{% endif %}><a href="/home">Dashboard</a></li>
+				<li{% if app.page == 'devices' %} class="active"{% endif %}><a href="/devices">Devices</a></li>
+				<li{% if app.page == 'events' %} class="active"{% endif %}><a href="/events">Events</a></li>
+				{% if app.user.level > 2 %}<li{% if app.page == 'company' %} class="active"{% endif %}><a href="/company">Company</a></li>
+{% endif %}
+				{% if app.user.level == 4 %}<li{% if app.page == 'admin' %} class="active"{% endif %}><a href="/admin">AdminCP</a></li>
+{% endif %}
+				<li><a href="/user/logout">Logout</a></li>
 {% endblock %}
-</ul>
+			</ul>
+		</div>
+		<div class="span2">
+{% block afternav %}
+
+{% endblock %}
+		</div>
+	</div>
 {% block banner %}
 
 {% endblock %}
+{% for error in errors %}
+	<div class="span10 offset1 error">
+		{{error}}
+	</div>
+{% endfor %}
+{% for message in flash %}
+	<div class="span10 offset1 flash">
+		{{message}}
+	</div>
+{% endfor %}
+	<div class="row">
+		{% block body %}
 
-<div class="row-fluid">
-{% block body %}
-
-{% endblock %}
-</div>
+		{% endblock %}
+	</div>
 </div>
 {% block javascripts %}
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>

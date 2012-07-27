@@ -36,3 +36,6 @@ input {
 .required {
 	color: #c00;
 }
+.past {
+	color: #ccc;
+}

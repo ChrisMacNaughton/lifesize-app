@@ -51,3 +51,30 @@ function microtime_diff( $start, $end=NULL ) {
         $diff_usec= floatval($end_usec) - floatval($start_usec); 
         return floatval( $diff_sec ) + $diff_usec; 
     } 
+	
+function _ago($time)
+{
+   $periods = array("second", "minute", "hour", "day", "week", "month", "year", "decade");
+   $lengths = array("60","60","24","7","4.35","12","10");
+
+   $now = time();
+	if ($now > $time )
+	{
+       $difference     = $now - $time;
+	}else{
+		$difference = $time - $now;
+	}
+      
+
+   for($j = 0; $difference >= $lengths[$j] && $j < count($lengths)-1; $j++) {
+       $difference /= $lengths[$j];
+   }
+
+   $difference = round($difference);
+
+   if($difference != 1) {
+       $periods[$j].= "s";
+   }
+
+   return "$difference $periods[$j] ";
+}
