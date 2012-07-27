@@ -13,10 +13,12 @@ protected $company = array();
 		$this->hasher = new PasswordHash(12,false);
 		$this->db = $db;
 		$id = (isset($_SESSION['userid'])) ? $_SESSION['userid'] : 0;
+		$hash = (isset($_SESSION['hash'])) ? $_SESSION['hash'] : 0;
 		
-		$stmt = $this->db->prepare("SELECT * FROM users WHERE id=:id");
+		$stmt = $this->db->prepare("SELECT * FROM users WHERE id=:id AND sesshash = :hash");
 		$stmt->execute(array(
 			':id'=>$id,
+			':hash'=>$hash
 		));
 		$user = $stmt->fetch(PDO::FETCH_ASSOC);
 		foreach ($user as $key=>$val) {
@@ -62,6 +64,9 @@ protected $company = array();
 		if (is_null($id)) {
 			return $this->company['name'];
 		}
+	}
+	public function getCompanyDetails() {
+		return $this->company;
 	}
 	public function register($user) {
 		global $options;
@@ -117,16 +122,30 @@ protected $company = array();
 			$stmt = $this->db->prepare("SELECT * FROM users WHERE email = :email AND company_id = :id");
 			$stmt->execute(array(':email'=>$email, ':id'=>$company));
 			$user = $stmt->fetch(PDO::FETCH_ASSOC);
+			//create sesshash
+			$hashing = $this->db->prepare("UPDATE users SET sesshash = :sesshash WHERE `id` = :id");
+			$hash = hash('sha512', $user['password'].time().$user['email']);
+			$res = $hashing->execute(array(
+				':id'=>$user['id'],
+				':sesshash'=>$hash
+			));
+			if ($res){
+				$_SESSION['hash'] = $hash;
+				
+			//set local object vars
 			foreach ($user as $key=>$val) {
 				$this->$key = $val;
 			}
 			$_SESSION['userid'] = $user['id'];
+			
 			$this->authenticatedFully = true;
 			$stmt = $this->db->prepare("SELECT * FROM companies WHERE id = :id");
 			$stmt->execute(array(':id'=>$this->company_id));
 			$this->company = $stmt->fetch(PDO::FETCH_ASSOC);
 			unset($this->password);
+			
 			return true;
+			}
 		}
 		else {
 			$this->errors[] = l('invalid_email_company_password');

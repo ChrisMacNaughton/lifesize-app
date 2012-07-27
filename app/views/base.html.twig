@@ -4,6 +4,7 @@
 {% block stylesheets %}
 	<link href="/assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="/assets/css/bootstrap-responsive.min.css" rel="stylesheet">
+	<link href="/assets/css/smoothness/jquery-ui-1.8.22.custom.css" rel="stylesheet">
 	<link href="/assets/css/main.css" rel="stylesheet">
 {% endblock %}
 </head>
@@ -23,7 +24,7 @@
 	{% if app.user.level == 4 %}
 	<li{% if app.page == 'admin' %} class="active"{% endif %}><a href="/admin">AdminCP</a></li>
 	{% endif %}
-
+	<li><a href="/user/logout">Logout</a></li>
 {% endblock %}
 </ul>
 {% block banner %}
@@ -42,5 +43,8 @@
     <script src="/assets/js/bootstrap.min.js"></script>
     <script src="/assets/js/main.js"></script>
 {% endblock %}
-<pre>{{dump()}}</pre></body>
+{#
+<pre>{dump()}}</pre>
+#}
+</body>
 </html>

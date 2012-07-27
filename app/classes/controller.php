@@ -32,7 +32,7 @@ class Controller {
 		unset($_SESSION['errors']);
 		$data['flash'] = $_SESSION['flash'];
 		unset($_SESSION['flash']);
-		
+		$data['app']['session'] = $_SESSION;
 		echo $twig->render($file, $data);
 	}
 }

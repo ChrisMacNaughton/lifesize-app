@@ -17,15 +17,11 @@ $redir = true;
 		$redir = false;
 	if ($redir)
 	{
-		$controllerName = 'userController'; $actionName = 'loginAction';
+		$_SESSION['flash'][] = l("error_need_to_login");
+		session_write_close();
+		header("Location: /user/login");
 	}
 }
-$smtpSettings = array(
-	'Iam User Name'=>'vc-control',
-	'server'=>'email-smtp.us-east-1.amazonaws.com',
-	'username'=>'AKIAIGRMTSJRNM5OZJGQ',
-	'password'=>'AgVymCoIrErF6z7uq/5vwolWI3luYtz6j2nru1Vy7X7S'
-);
 $app['page'] = $ctrl;
 
 if (class_exists($controllerName))

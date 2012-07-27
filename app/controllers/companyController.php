@@ -8,12 +8,44 @@ class companyController extends Controller {
 			$_SESSION['errors'][] = l('error_no_permission');
 			header("Location: /user/view/" . $this->user->getID());
 		}
+		$this->company = $this->user->getCompanyDetails();
+		$this->stripe = Stripe_Customer::retrieve($this->company['customer_id']);
 	}
 	public function indexAction () {
 		$data = array(
 			'title'=>$this->user->getCompany(),
+			'company' => $this->company,
+			'stripe'=>$this->stripe
 		);
+		
 		$this->render('company/index.html.twig', $data);
+	}
+	public function addCardAction($id){
+		$token = $_POST['id'];
+		$card = $_POST['card'];
+		$oldFingerprint = $this->stripe->active_card->fingerprint;
+		
+		$company = $this->stripe;
+		$company->card = $token;
+		$response = $company->save();
+		
+		$card = $response->active_card;
+		$options = array(
+			':company_id'=>$id,
+			':country'=>$card['country'],
+			':exp_month'=>$card['exp_month'],
+			':exp_year'=>$card['exp_year'],
+			':fingerprint'=>$card['fingerprint'],
+			':last4'=>$card['last4'],
+			':name'=>$card['name'],
+			':type'=>$card['type']
+		);
+		$json = array(
+			'Last4'=>$options[':last4'],
+			'old'=>$oldFingerprint,
+			'new'=>$card['fingerprint']
+		);
+		echo json_encode($json);
 	}
 	public function registerAction() {
 		$data = array(
