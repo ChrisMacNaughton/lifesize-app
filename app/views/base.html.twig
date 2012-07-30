@@ -14,7 +14,7 @@
 		<div class="span10">
 			<ul class="nav nav-tabs">
 			{% block nav %}
-
+				
 				<li{% if app.page == 'default' %} class="active"{% endif %}><a href="/home">Dashboard</a></li>
 				<li{% if app.page == 'devices' %} class="active"{% endif %}><a href="/devices">Devices</a></li>
 				<li{% if app.page == 'events' %} class="active"{% endif %}><a href="/events">Events</a></li>
@@ -22,6 +22,7 @@
 {% endif %}
 				{% if app.user.level == 4 %}<li{% if app.page == 'admin' %} class="active"{% endif %}><a href="/admin">AdminCP</a></li>
 {% endif %}
+				<li><a href="/user/view/{{app.user.id}}">Profile</a></li>
 				<li><a href="/user/logout">Logout</a></li>
 {% endblock %}
 			</ul>
@@ -59,7 +60,8 @@
 	<!-- {{app.system.load_time }} -->
 {% endblock %}
 {#
-<pre>{dump()}}</pre>
+<pre>{{dump()}}</pre>
 #}
+
 </body>
 </html>

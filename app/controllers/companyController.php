@@ -20,7 +20,10 @@ class companyController extends Controller {
 			'company' => $this->company,
 			'stripe'=>$this->stripe
 		);
-		
+		$stmt = $this->db->prepare("SELECT count(*) AS count FROM users WHERE company_id = :id");
+		$stmt->execute(array(':id'=>$this->company['id']));
+		$count = $stmt->fetch(PDO::FETCH_ASSOC);
+		$data['usercount'] = $count['count'];
 		$this->render('company/index.html.twig', $data);
 	}
 	public function addCardAction($id){

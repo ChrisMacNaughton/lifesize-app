@@ -107,6 +107,7 @@ protected $company = array();
 	}
 	public function getUser() {
 		$user = array(
+			'id'=>$this->id,
 			'name'=>$this->name,
 			'email'=>$this->email,
 			'level'=>$this->level,
@@ -149,9 +150,8 @@ protected $company = array();
 		$user[':name'] = $user[':user_name'];
 		unset($user[':user_name']);
 		$subject = COMPANY_NAME . " Registration";
-		
+		$user[':reset'] = 1;
 		$email = new AmazonSES($options);
-		echo "<pre>";print_r($user);echo "</pre>";
 		$fields = array();
 		$values = array();
 		$value_names = array();
@@ -162,10 +162,10 @@ protected $company = array();
 		$fields = implode(',',$fields);
 		$value_names = implode(',', $value_names);
 		$query = "INSERT INTO users ($fields) VALUES ($value_names)";
-		//echo $query;
+		echo $query;
 		$stmt = $this->db->prepare($query);
 		$result = $stmt->execute($user);
-		
+		print_r($stmt->errorInfo());
 		$response = $email->send_email(
 			$from,
 			array('ToAddresses'=>array(

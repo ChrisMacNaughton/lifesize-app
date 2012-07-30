@@ -21,14 +21,25 @@ class userController extends Controller {
 		$this->render('users/login.html.twig', $data);
 	}
 	public function newAction() {
-		//$this->user->register($user);
+	if ($this->user->getLevel() > 2) {
+		$user = array(
+			':user_name'=>$_POST['name'],
+			':email'=>$_POST['email'],
+			':level'=>$_POST['level'],
+			':company_id' => $this->user->getCompanyID(),
+		);
+		print_r($user);
+		$result = $this->user->register($user);
+		print_r($result);
 		$stmt = $this->db->prepare("INSERT INTO log (user, action,details,timestamp) VALUES (:user, :action, :details, :now)");
 					$stmt->execute(array(
 						':user'=>$this->user->getID(),
 						':action'=>'add_user',
-						':details'=>"User added a new user",
+						':details'=>"User added a new user: " . $user[':name'],
 						':now'=>time()
 					));
+					
+		}
 	}
 	public function resetAction(){
 	$data['title'] = "Reset Password";
@@ -107,16 +118,10 @@ class userController extends Controller {
 			$result = $this->user->changePass($id, $_POST['old_pass'], $_POST['password'], $_POST['password2']);
 			
 			$errors = $this->user->getErrors();
-			echo "<pre>";
-			print_r($errors);
-			echo "</pre>";
 			if ($result === false) {
 				foreach ($errors as $err)
 					$data['errors'][] = $err;
 			}
-			echo "<pre>";
-			var_dump($data);
-			echo "</pre>";
 		}
 		if ($this->user->getID() == $id) {
 			$this->render('users/edit.html.twig', $data);
