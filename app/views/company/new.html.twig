@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
+{% block nav %}{%endblock %}
 {% block body %}
-<div class="span4"></div>
-	<div class="span4 well">
+	<div class="span4 offset1 well">
 		<h2>Register</h2>
 		<form action="/company/register" method="POST" id="register_form">
 	<fieldset class="control-group{% if errors[':name']%} error {%endif %}">	
@@ -374,6 +374,7 @@
 		<label><button type="submit" id="submit" class="submit-button">Register</button></label>
 		<input type="hidden" name="action" value="new" />
 		</form>
+		Already registered? <a href="/user/login">Login</a>!
 	</div>
 </div>
 {% endblock %}

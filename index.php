@@ -17,6 +17,7 @@ $redir = true;
 		$redir = false;
 	if ($controllerName == 'companyController' && $actionName == 'registerAction')
 		$redir = false;
+	
 	if ($redir)
 	{
 		$_SESSION['flash'][] = l("error_need_to_login");

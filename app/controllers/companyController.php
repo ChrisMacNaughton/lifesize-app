@@ -4,13 +4,15 @@ class companyController extends Controller {
 	public function beforeAction() {
 		parent::beforeAction();
 		
-		if ($this->user->getLevel() < 3) {
+		if ($this->user->getLevel() < 3 && $this->action != "register") {
 			$_SESSION['errors'][] = l('error_no_permission');
 			session_write_close();
 			header("Location: /user/view/" . $this->user->getID());
 		}
+		if ($this->action != 'register') {
 		$this->company = $this->user->getCompanyDetails();
 		$this->stripe = Stripe_Customer::retrieve($this->company['customer_id']);
+		}
 	}
 	public function indexAction () {
 		$data = array(
@@ -61,6 +63,7 @@ class companyController extends Controller {
 	}
 	public function registerAction() {
 		$data = array(
+		'title'=>"Register",
 			'register'=>array(
 				'company'=>array(),
 				'user'=>array(),
