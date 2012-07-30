@@ -15,6 +15,13 @@ class userController extends Controller {
 	}
 	public function newAction() {
 		//$this->user->register($user);
+		$stmt = $this->db->prepare("INSERT INTO log (user, action,details,timestamp) VALUES (:user, :action, :details, :now)");
+					$stmt->execute(array(
+						':user'=>$this->user->getID(),
+						':action'=>'add_user',
+						':details'=>"User added a new user",
+						':now'=>time()
+					));
 	}
 	public function viewAction($id) {
 		$data = array('title'=>"User");

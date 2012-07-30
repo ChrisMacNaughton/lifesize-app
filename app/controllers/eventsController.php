@@ -46,7 +46,6 @@ WHERE event_id = :id
 				case 100:
 					$call->execute(array(':id'=>$event['id']));
 					$acall = $call->fetch(PDO::FETCH_ASSOC);
-					
 					$working[$event['type']][] =array(
 						'id'=>$event['id'],
 						'type_code' => $event['type'],
@@ -89,5 +88,19 @@ WHERE event_id = :id
 		$data['events'] = $working;
 		$data['now'] = time();
 		$this->render('events/index.html.twig' , $data);
+	}
+	public function newAction() {
+		$data = array(
+		'title'=>'New Event'
+		);
+		$stmt = $this->db->prepare("SELECT * FROM devices WHERE company_id = :id AND active = 1");
+		$stmt->execute(array(
+			':id'=>$this->company['id'],
+		));
+		$data['devices'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$stmt = $this->db->prepare("SELECT * FROM software_versions");
+		$stmt->execute();
+		$data['updates'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$this->render('events/new.html.twig', $data);
 	}
 }

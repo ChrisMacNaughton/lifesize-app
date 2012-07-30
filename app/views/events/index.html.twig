@@ -1,4 +1,9 @@
 {% extends 'base.html.twig' %}
+{% block afternav %}
+{% if app.user.level > 1 %}
+	<a href="/events/new" CLASS="BTN BTN-SUCCESS" style="margin-top: 5px;">New Event</a>
+{% endif %}
+{% endblock %}
 {% block body %}
 <div class="span12">
 	<h2>Events</h2>

@@ -3,7 +3,7 @@
 class devicesController extends Controller {
 	public function beforeAction() {
 		parent::beforeAction();
-		$stmt = $this->db->prepare("SELECT devices.id, devices.name, devices.ip, devices.password, codes.name AS status FROM devices LEFT JOIN codes ON devices.status = codes.code WHERE company_id = :id");
+		$stmt = $this->db->prepare("SELECT devices.id, devices.name, devices.ip, devices.password, codes.name AS status, devices.active FROM devices LEFT JOIN codes ON devices.status = codes.code WHERE company_id = :id ORDER BY added");
 		$this->company = $this->user->getCompanyDetails();
 		$stmt->execute(array(':id'=>$this->company['id']));
 		$this->devices = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -21,8 +21,18 @@ class devicesController extends Controller {
 		);
 		if (isset($_POST['action']) && $_POST['action'] == 'new') {
 			echo "<!--";print_r($_POST);echo"-->";
-			$stmt = $this->db->prepare("INSERT INTO devices (ip, password, name, company_id) VALUES (:ip, :password, :name, :company)");
+			$id_num = substr(hash('md5',(rand(1,100000))), 0, 10);
+			$stmt = $this->db->prepare("SELECT * FROM devices WHERE id = :id");
+			$stmt->execute(array(':id'=>'dev'.$id_num));
+			
+			while ($stmt->rowCount() > 0) {
+				$id_num = md5(sha1(rand(1,100000)));
+				$stmt->execute(array(':id'=>'dev'.$id_num));
+			}
+			
+			$stmt = $this->db->prepare("INSERT INTO devices (id, ip, password, name, company_id, status) VALUES (:id, :ip, :password, :name, :company, 10)");
 			$options = array(
+				':id'=>'dev-' . $id_num,
 				':ip'=>$_POST['ip'],
 				':password'=>(isset($_POST['password'])) ?$_POST['password'] : 'Lifesize',
 				':name'=>$_POST['name'],
@@ -37,6 +47,13 @@ class devicesController extends Controller {
 				$result = $stmt->execute($options);
 				if ($result) {
 					$_SESSION['flash'][] = l('success_add_device');
+					$stmt = $this->db->prepare("INSERT INTO log (user, action,details,timestamp) VALUES (:user, :action, :details, :now)");
+					$stmt->execute(array(
+						':user'=>$this->user->getID(),
+						':action'=>'add_device',
+						':details'=>"User added device dev-" . $id_num,
+						':now'=>time()
+					));
 				} else {
 					$err = $stmt->errorInfo();
 					$_SESSION['errors'][] = $err[2];

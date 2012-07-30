@@ -49,6 +49,13 @@ class companyController extends Controller {
 			'old'=>$oldFingerprint,
 			'new'=>$card['fingerprint']
 		);
+		$stmt = $this->db->prepare("INSERT INTO log (user, action,details,timestamp) VALUES (:user, :action, :details, :now)");
+					$stmt->execute(array(
+						':user'=>$this->user->getID(),
+						':action'=>'change_credit_card',
+						':details'=>"User changed the credit card on file",
+						':now'=>time()
+					));
 		}
 		echo json_encode($json);
 	}

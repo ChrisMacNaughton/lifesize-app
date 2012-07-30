@@ -28,7 +28,7 @@ class Controller {
 		$this->user = $user;
 	}
 	public function render($file, ARRAY $data = null) {
-		global $app;
+		global $app, $path;
 		$loader = new Twig_Loader_Filesystem('app/views');
 		$twig = new Twig_Environment($loader, array(
 			'cache'=>false,
@@ -38,6 +38,7 @@ class Controller {
 		$twig->addExtension(new Twig_Extension_Debug());
 		$start = $this->app['start'];
 		unset($this->app['start']);
+		$this->app['system']['path'] = $path;
 		$this->app['system']['load_time'] = microtime_diff($start);
 		$data['app'] = $this->app;
 		$data['app']['user'] = $this->user->getUser();
