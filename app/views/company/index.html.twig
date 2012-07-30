@@ -6,10 +6,15 @@
 {% if stripe.active_card == null %}
 None <button class="add_card">Add a Card</button>
 {% else %}
-Ending in: <span id="last4">{{stripe.active_card.last4}}</span><span id="status" style="display: none;">Updated</span><!-- {{dump(stripe)}}--> <button class="add_card">Update Card</button>
+Ending in: <span id="last4">{{stripe.active_card.last4}}</span><span id="status" style="display: none;">Updated</span> <button class="add_card">Update Card</button>
 {% endif %}
 <br /><br />
 Current Users: {{usercount}} <button class="add_user">New user</button>
+<ul class="users">
+	{% for user in users %}
+		<li><a href="/user/view/{{user.id}}">{{user.name}}</a></li>
+	{% endfor %}
+	</ul>
 <div id="dialog-form" title="Add a Card" style="display: none;">
 	<p class="validateTips">All form fields are required.</p>
 
@@ -47,6 +52,7 @@ Current Users: {{usercount}} <button class="add_user">New user</button>
 		</select>
 	</fieldset>
 	</form>
+	
 </div>
 
 {% endblock %}
