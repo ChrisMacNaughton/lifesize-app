@@ -32,8 +32,72 @@ protected $company = array();
 			unset($this->password);
 		}
 	}
+	public function hashPass($pass) {
+		return $this->hasher->HashPassword($pass);
+	}
+	public function reset() {
+		return (bool)$this->reset;
+	}
+	public function changePass($id, $old_pass, $password, $password2) {
+		$stmt = $this->db->prepare("SELECT * FROM users WHERE id = :id");
+		$stmt->execute(array(
+			':id'=>$id
+		));
+		$res = $stmt->fetch(PDO::FETCH_ASSOC);
+		
+		if (!$this->hasher->CheckPassword($old_pass, $res['password'])) {
+			$errors[] = l('old_password_nomatch');
+		}
+		if ($password != $password2) {
+			$errors[] = l('password_nomatch');
+		}
+		$valid = $this->is_valid_password($password);
+		if ($valid === false) {
+		foreach ($this->errors['password'] as $err) {
+			$errors[] = $err;
+		}
+			unset($this->errors['password']);
+		}
+		if (count($errors) == 0) {
+			$hashed = $this->hasher->HashPassword($password);
+			$stmt = $this->db->prepare("UPDATE users SET password = :password, reset = 0 WHERE id = :id");
+			$options = array(
+				':id'=>$id,
+				':password'=>$hashed
+			);
+			
+			$result = $stmt->execute($options);
+			
+		}
+		 
+		
+		if ($result === false) {
+			$errors[] = $this->db->errorInfo();
+		}
+		
+		if (count($errors) == 0) {
+			return true;
+		} else {
+			$this->errors = $errors;
+			return false;
+		}
+	}
+	protected function is_valid_password($password) {
+		if (strlen($password) < 8) {
+			$this->errors['password'][] = l('error_password_length');
+		}
+		
+		
+		if (count($this->errors['password']) == 0)
+			return true;
+		else
+			return false;
+	}
+	public function getErrors() {
+		return $this->errors;
+	}
 	public function getUserInfo($id) {
-		$stmt = $this->db->prepare("SELECT name, company_id, email, phone FROM users WHERE id = :id");
+		$stmt = $this->db->prepare("SELECT id, name, company_id, email, phone FROM users WHERE id = :id");
 		$stmt->execute(array(':id'=>$id));
 		$res = $stmt->fetch(PDO::FETCH_ASSOC);
 		if ($res['company_id'] == $this->company_id)

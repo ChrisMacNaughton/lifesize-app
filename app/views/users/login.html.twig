@@ -2,6 +2,7 @@
 {% block nav %}
 {% endblock %}
 {% block body %}
+<div class="span10 offset1">
 	<form name="login" action="" method="post" >
 		<label>Email</label>
 			<input type="text" name="email" />
@@ -10,6 +11,8 @@
 		<label>Company</label>
 			<input type="text" name="company" />
 			<input type="hidden" name="action" value="login" />
-		<label><input type="submit" value="Submit" /></label>
+		<label><input type="submit" value="Submit" /></label><br />
+		<a href="/user/reset">Reset Password</a> | Not yet <a href="/company/register">registered</a>?
 	</form>
+	</div>
 {% endblock %}

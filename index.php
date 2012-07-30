@@ -13,6 +13,8 @@ if (!$user->isAuthenticatedFully()) {
 $redir = true;
 	if ($controllerName == 'userController' && $actionName == 'loginAction') 
 		$redir = false;
+	if ($controllerName == 'userController' && $actionName == 'resetAction') 
+		$redir = false;
 	if ($controllerName == 'companyController' && $actionName == 'registerAction')
 		$redir = false;
 	if ($redir)
