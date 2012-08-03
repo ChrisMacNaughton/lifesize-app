@@ -24,6 +24,7 @@ if (get_cfg_var('aws.access_key') === false)
 	$dbuser = get_cfg_var('aws.param2');
 	$dbpassword = get_cfg_var('aws.param3');
 	define('PATH',get_cfg_var('aws.param4'));
+	$path = PATH;
 	$stripe_key = get_cfg_var('aws.param5');
 }
 //connect to the mysql db instance of RDS
