@@ -23,11 +23,11 @@ class devicesController extends Controller {
 			echo "<!--";print_r($_POST);echo"-->";
 			$id_num = substr(hash('md5',(rand(1,100000))), 0, 10);
 			$stmt = $this->db->prepare("SELECT * FROM devices WHERE id = :id");
-			$stmt->execute(array(':id'=>'dev'.$id_num));
+			$stmt->execute(array(':id'=>'dev-'.$id_num));
 			
 			while ($stmt->rowCount() > 0) {
 				$id_num = md5(sha1(rand(1,100000)));
-				$stmt->execute(array(':id'=>'dev'.$id_num));
+				$stmt->execute(array(':id'=>'dev-'.$id_num));
 			}
 			
 			$stmt = $this->db->prepare("INSERT INTO devices (id, ip, password, name, company_id, status) VALUES (:id, :ip, :password, :name, :company, 10)");

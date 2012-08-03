@@ -93,6 +93,58 @@ WHERE event_id = :id
 		$data = array(
 		'title'=>'New Event'
 		);
+		if (isset($_POST['start_date'])) {
+			$id_num = substr(hash('md5',(rand(1,100000))), 0, 10);
+			$stmt = $this->db->prepare("SELECT * FROM events WHERE id = :id");
+			$stmt->execute(array(':id'=>'ev-'.$id_num));
+			
+			while ($stmt->rowCount() > 0) {
+				$id_num = md5(sha1(rand(1,100000)));
+				$stmt->execute(array(':id'=>'ev-'.$id_num));
+			}
+			$event_id = 'ev-'.$id_num;
+			$event_options = array(
+				':event_id'=>$event_id,
+				':start'=>strtotime($_POST['start_date'] . $_POST['start_time']),
+				':company'=>$this->company['id'],
+				':type'=>$_POST['type'],
+				':notes'=>$_POST['notes']
+			);
+			$stmt = $this->db->prepare("INSERT INTO events (id, company_id, type, start_time, notes) VALUES (:event_id, :company, :type, :start, :notes)");
+			$stmt->execute($event_options);
+			$errors[] = $stmt->errorInfo();
+			switch($_POST['type']){
+				case 100:
+					$details = array(
+						':event'=>$event_id,
+						':caller'=>$_POST['fromIP'],
+						':calling'=>$_POST['calling'],
+					);
+					$stmt = $this->db->prepare("INSERT INTO calls (event_id, caller, in_call) VALUES (:event, :caller, :calling)");
+					$stmt->execute($details);
+					$errors[] = $stmt->errorInfo();
+					break;
+				case 101:
+					$details = array(
+						':event'=>$event_id,
+						':caller'=>$_POST['fromIP'],
+						':current'=>'',
+						':new'=>$_POST['updateTo']
+					);
+					$stmt = $this->db->prepare("INSERT INTO updates (event_id, device_id, current_version, new_version) VALUES (:event, :caller, :current, :new)");
+					$stmt->execute($details);
+					$errors[] = $stmt->errorInfo();
+					break;
+			}
+			foreach( $errors as $err) {
+				if ($err[0] != '00000') {
+					$data['errors'][] = $err[2];
+					echo "<!--";print_r($err);echo"-->";
+				}
+			}
+			$data['flash'][] = l('success_adding_event');
+		}
+		
 		$stmt = $this->db->prepare("SELECT * FROM devices WHERE company_id = :id AND active = 1");
 		$stmt->execute(array(
 			':id'=>$this->company['id'],

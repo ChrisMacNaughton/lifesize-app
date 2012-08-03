@@ -30,7 +30,8 @@
 		<div class="formFields" id="details" >
 		</div>
 		<label>Notes</label>
-		<textarea rows ="3"></textarea>
+		<textarea rows ="3" name="notes"></textarea><br />
+		<input type="submit" value="Submit" disabled="disabled" id="submit"/>
 	</form>
 </div>
 {% endblock %}
@@ -43,7 +44,7 @@ $(document).ready(function() {
 	$('#event_type').change(function() {
 		var formType = $('#event_type').val();
 		var formArea = $('#details');
-		
+		$('#submit').removeAttr('disabled');
 		$('#ip-details').css('display', 'block');
 		if (formType == 100) //video conference
 		{

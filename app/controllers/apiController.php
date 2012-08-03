@@ -13,8 +13,42 @@ class apiController {
 	public function beforeAction() {
 		
 	}
-	public function devicesAction() {
-		if ($this->user->getLevel() < 3) {
+	public function eventsAction() {
+		$action = $this->init(2);
+		switch($action) {
+			case 'delete':
+				$options = array(
+					':id'=>$_POST['id']
+				);
+				$stmt = $this->db->prepare("SELECT notes FROM events WHERE id = :id");
+				$stmt->execute($options);
+				$data = $stmt->fetch(PDO::FETCH_ASSOC);
+				$stmt = $this->db->prepare("DELETE FROM events WHERE id = :id");
+				$result = $stmt->execute($options);
+				
+				$err = $stmt->errorInfo();
+				$result = array(
+					'Status'=>($result) ? "Success":"Error",
+					'Errors'=>($result) ? null : array(
+						'Code'=>$err[0],
+						'DriverError'=>$err[1],
+						'DriverMessage'=>$err[2]
+					),
+					'Deleted'=>$_POST['id']
+				);
+				$stmt = $this->db->prepare("INSERT INTO log (user, action,details,timestamp) VALUES (:user, :action, :details, :now)");
+					$stmt->execute(array(
+						':user'=>$this->user->getID(),
+						':action'=>'delete_event',
+						':details'=>"User deleted event: " . $options[':id'] . ", notes: " . $data['notes'],
+						':now'=>time()
+					));
+				echo json_encode($result);
+				break;
+		}
+	}
+	protected function init($permission) {
+		if ($this->user->getLevel() < $permission) {
 			if (!isset($errors))
 			$errors = array(
 				'code'=>'401: NO PERMISSION',
@@ -44,6 +78,10 @@ class apiController {
 				'details'=>$errors['details']);
 			die(json_encode($error));
 		}
+		return $action;
+	}
+	public function devicesAction() {
+		$action = $this->init(3);
 		
 		switch($action) {
 			case 'enable':

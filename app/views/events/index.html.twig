@@ -10,9 +10,10 @@
 </div><div class="span12">
 	<h3>Video Conferences</h3>
 </div>
-	<div class="span10 offset1"><div class="span7" style="text-align: center;"><h4>Details</h4></div><div class="span2" style="text-align: center;"><h4>Notes</h4></div></div>
+	<div class="span10 offset1"><div class="span6" style="text-align: center;"><h4>Details</h4></div><div class="span2" style="text-align: center;"><h4>Notes</h4></div></div>
 {% for call in events.100 %}
-	<div class="span10 offset1 well{% if call.start_time < now %} past{%endif %}"><div class="span7">{% if call.start_time < now %}<del>{%endif %}
+	<div class="span10 offset1 well{% if call.start_time < now %} past{%endif %}" id="event-{{call.id}}">
+		<div class="span6">{% if call.start_time < now %}<del>{%endif %}
 		Scheduled<span title="{{call.start_time|date('m/d/Y h:i:s a', 'CST')}}">{% if call.start_time > now %} in about {{call.scheduled}}{% else %} about {{call.scheduled}}ago{% endif %}</span>{% if call.start_time < now %}</del><br />
 		{{call.call.caller}} ({{call.call.caller_ip}}) called:{%else %}<br />
 		{{call.call.caller}} ({{call.call.caller_ip}}) will be calling:{%endif %}
@@ -25,6 +26,11 @@
 	<div class="span2">
 	{{call.notes}}
 	</div>
+	<div class="span1">
+		{% if app.user.level > 1 %}
+		<button class='btn btn-danger remove' id="{{call.id}}">Remove</button>
+		{% endif %}
+	</div>
 	</div>
 {% else %}
 	<div class="span10 offset1">
@@ -35,7 +41,7 @@
 	<h3>Updates</h3>
 </div>
 {% for call in events.101 %}
-	<div class="span10 offset1 well{% if call.start_time < now %} past{%endif %}"><div class="span7">{% if call.start_time < now %}
+	<div class="span10 offset1 well{% if call.start_time < now %} past{%endif %}" id="event-{{call.id}}"><div class="span6">{% if call.start_time < now %}
 	
 		<del>{%endif %}
 		Scheduled{% if call.start_time > now %} in about {{call.scheduled}}{% else %} about {{call.scheduled}}ago{% endif %}{% if call.start_time < now %}</del>{% endif %}<br />
@@ -44,17 +50,41 @@
 	<div class="span2">
 	{{call.notes}}
 	</div>
+	<div class="span1">
+		{% if app.user.level > 1 %}
+		<button class='btn btn-danger remove' id="{{call.id}}">Remove</button>
+		{% endif %}
+	</div>
 	</div>
 {% else %}
 	<div class="span10 offset1">
-		No VideoConferences Scheduled
+		No Updates Scheduled
 	</div>
 {% endfor %}
-{#
-<div class="span12">
-<pre>
-	{{dump(events.100)}}
-</pre>
-</div>
-#}
+{% endblock %}
+{% block javascripts %}
+{{parent()}}
+<script type="text/javascript">
+$(document).ready(function() {
+	$(".remove")
+	.button()
+	.click(function() {
+		var eventId = $(this).prop('id');
+		$.post(
+				'{{app.system.protocol}}://{{app.system.path}}/api/events?action=delete',
+				{id: eventId},
+				function(data) {
+					data = $.parseJSON(data);
+					
+					if (data['Status'] == "Success")
+					{
+						var div = "#event-" + eventId;;
+						console.log("Removing: " + div);
+						$(div).remove();
+					}
+				}
+			);
+	});
+});
+</script>
 {% endblock %}
