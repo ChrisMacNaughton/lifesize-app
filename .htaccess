@@ -1,5 +1,6 @@
 RewriteEngine on
-RewriteCond %{HTTP:X-Forwarded-Proto} https
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [L,R]
 
 RewriteCond $1 !^(index\.php|vendors|assets)
 RewriteCond %{REQUEST_FILENAME} !-f
