@@ -51,7 +51,7 @@ $(document).ready(function() {
 			var checkbox = $input.is(":checked") ? true : false;
 			var id = $input.attr("id");
 			$.post(
-				'http://{{app.system.path}}/api/devices?action=enable',
+				'https://{{app.system.path}}/api/devices?action=enable',
 				{id: id, active: checkbox},
 				function(data) {
 					console.log(data);
