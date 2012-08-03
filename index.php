@@ -1,5 +1,6 @@
 <?php
-echo "<!--";print_r($_SERVER['HTTP_X_FORWARDED_PROTO']); echo "-->";
+if ($_SERVER['HTTP_X_FORWARDED_PROTO'] == "http")
+	header("Location: https://app.control.vc");
 $app['start'] = microtime();
 define("COMPANY_NAME", 'VC-Control');
 include 'bootstrap.php';
