@@ -7,3 +7,4 @@ $lang[':name'] = "Name";
 $lang['not_blank'] = "cannot be blank";
 $lang['success_add_device'] = "Success adding a new device!";
 $lang['reset_password'] = "Please reset your password!";
+$lang['error_need_to_login'] = "Please login to continue";
