@@ -1,5 +1,5 @@
 <?php
-echo "<!--";print_r($_SERVER); echo "-->";
+echo "<!--";print_r($_SERVER['HTTP_X_FORWARDED_PROTO']); echo "-->";
 $app['start'] = microtime();
 define("COMPANY_NAME", 'VC-Control');
 include 'bootstrap.php';
