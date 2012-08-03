@@ -1,4 +1,5 @@
 <?php
+echo "<!--";print_r($_HEADERS); echo "-->";
 $app['start'] = microtime();
 define("COMPANY_NAME", 'VC-Control');
 include 'bootstrap.php';
