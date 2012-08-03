@@ -1,5 +1,5 @@
 <?php
-/*
+
 require_once 'bootstrap.php';
 
 $ec2 = new AmazonEC2($options);
@@ -13,9 +13,10 @@ $instances = $ec2->describe_instances(array(
 ));
 $instances = $instances->body->reservationSet->to_array();
 $instances = $instances['item'];
-echo "<pre>";
-print_r($instances['instancesSet']);
-echo "</pre>";
+if (is_null($instances['instancesSet'])) { //multiple servers
+	$count =  count($instances);
+} else { //single server
+	$count = count($instances['instancesSet']);
+}
 
-echo "Count: " . count($instances['instancesSet']);
-*/
+echo "Servers: " . $count;
