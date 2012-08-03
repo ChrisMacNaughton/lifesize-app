@@ -1,4 +1,7 @@
 RewriteEngine on
+RewriteCond %{HTTPS} !=on
+RewriteRule .* https://%{SERVER_NAME}%{REQUEST_URI} [R,L]
+
 RewriteCond $1 !^(index\.php|vendors|assets)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*) index.php/$1 [L]
