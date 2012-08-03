@@ -7,7 +7,7 @@ include 'common.php';
 define('BASE_PATH', __DIR__);
 set_include_path(get_include_path() . PATH_SEPARATOR . 'app/classes/phpseclib' . PATH_SEPARATOR . 'app');
 require_once 'vendor/autoload.php';
-require_once 'Net/SSH2.php';
+//require_once 'Net/SSH2.php';
 require_once 'app/classes/autoload.php';
 /* set amazon config vars */
 if (get_cfg_var('aws.access_key') === false)
@@ -38,7 +38,7 @@ $uri = new URI();
 Stripe::setApiKey($stripe_key);
 
 //uncomment the following to switch to using dynamodb to handle sessions
-/*
+
 $dynamodb = new AmazonDynamoDB($options);
 
 // Instantiate, configure, and register the session handler
@@ -46,12 +46,8 @@ $session_handler = $dynamodb->register_session_handler(array(
 	'table_name'       => 'sessions',
 	'lifetime'         => 3600,
 ));
-*/
+
 session_start();
 $CACHE = array();
-
-
-
-
 
 require('app/config/locale/'.settings('locale').'.php');
