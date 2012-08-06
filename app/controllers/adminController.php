@@ -3,7 +3,7 @@
 class adminController extends Controller{
 	public function beforeAction() {
 		parent::beforeAction();
-		
+		global $options;
 		$ec2 = new AmazonEC2($options);
 		$ami_id = "ami-976dc3fe";
 
