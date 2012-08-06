@@ -36,6 +36,7 @@ class Controller {
 		));
 		if (!isset($data['flash']))
 		$data['flash'] = array();
+		$data['errors'] = array();
 		$twig->addExtension(new Twig_Extension_Debug());
 		$start = $this->app['start'];
 		unset($this->app['start']);
@@ -45,12 +46,13 @@ class Controller {
 		$data['app']['system']['protocol'] = "http";
 		$data['app']['user'] = $this->user->getUser();
 		foreach ($_SESSION['errors'] as $err) 
-		$data['errors'][] = $err;
+			$data['errors'][] = $err;
 		unset($_SESSION['errors']);
 		foreach ($_SESSION['flash'] as $flash)
 			$data['flash'][] = $flash;
 		unset($_SESSION['flash']);
 		$data['app']['session'] = $_SESSION;
+		ksort($data['app']);ksort($data);
 		echo $twig->render($file, $data);
 	}
 }

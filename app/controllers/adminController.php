@@ -25,7 +25,7 @@ class adminController extends Controller{
 	
 	public function indexAction() {
 		$this->app['admin'] = 'cp';
-		$data = array('title'=>'AdminCP');	
+		$data = array('title'=>'AdminCP');
 		$this->render('admin/index.html.twig', $data);
 	}
 	public function devicesAction() {
