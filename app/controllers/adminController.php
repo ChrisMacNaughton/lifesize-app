@@ -26,11 +26,22 @@ class adminController extends Controller{
 	public function indexAction() {
 		$this->app['admin'] = 'cp';
 		$data = array('title'=>'AdminCP');
+		$stmt = $this->db->query("SELECT count(*) as count FROM companies");
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+		$data['companyCount'] = (int)$result['count'];
 		$this->render('admin/index.html.twig', $data);
 	}
 	public function devicesAction() {
 		$this->app['admin'] = 'devices';
-		$data = array('title'=>'Devices - AdminCP');	
+		$data = array('title'=>'Devices - AdminCP');
+		//company count
+		$stmt = $this->db->query("SELECT count(*) as count FROM companies");
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+		$data['companyCount'] = (int)$result['count'];
+		//devices count
+		$stmt = $this->db->query("SELECT count(*) as count FROM devices");
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+		$data['deviceCount'] = (int)$result['count'];
 		$this->render('admin/devices.html.twig', $data);
 	}
 	public function companiesAction() {

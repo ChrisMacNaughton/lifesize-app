@@ -5,3 +5,8 @@
 <li{% if app.admin == 'devices'%} class="active"{% endif %}><a href="/admin/devices">Devices</a></li>
 <li><a href="/home">Back to the App</a></li>
 {% endblock %}
+{% block body %}
+<pre>
+{{dump()}}
+</pre>
+{% endblock %}
