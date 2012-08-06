@@ -28,6 +28,8 @@ class Controller {
 		$this->user = $user;
 	}
 	public function render($file, ARRAY $data = null) {
+		$this->app['controller'] = $this->controller;
+		$this->app['action'] = $this->action;
 		global $app, $path;
 		$loader = new Twig_Loader_Filesystem('app/views');
 		$twig = new Twig_Environment($loader, array(
@@ -36,15 +38,25 @@ class Controller {
 		));
 		if (!isset($data['flash']))
 		$data['flash'] = array();
+		if (!isset($data['errors']))
 		$data['errors'] = array();
+		echo "<!-- Controller: " . $this->app['controller'] . "  :  Action: " . $this->app['action'] . " -->";
+		if($this->app['controller'] == 'user' && $this->app['action'] == 'login') {
+			$login = true;
+		}
+		else {
+			$login = false;
+		}
 		$twig->addExtension(new Twig_Extension_Debug());
-		$start = $this->app['start'];
-		unset($this->app['start']);
-		$this->app['system']['path'] = PATH;
-		$this->app['system']['load_time'] = microtime_diff($start);
-		$data['app'] = $this->app;
-		$data['app']['system']['protocol'] = "http";
-		$data['app']['user'] = $this->user->getUser();
+		if (!$login) {
+			$start = $this->app['start'];
+			unset($this->app['start']);
+			$this->app['system']['path'] = PATH;
+			$this->app['system']['load_time'] = microtime_diff($start);
+			$data['app'] = $this->app;
+			$data['app']['system']['protocol'] = "http";
+			$data['app']['user'] = $this->user->getUser();
+		} 
 		foreach ($_SESSION['errors'] as $err) 
 			$data['errors'][] = $err;
 		unset($_SESSION['errors']);
