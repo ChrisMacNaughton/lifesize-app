@@ -139,7 +139,7 @@ protected $company = array();
 	public function register($user) {
 		global $options;
 		$password = substr(md5(hash('sha512', rand(1,1000))), 0, 10);
-		
+		$user[':id'] = 'usr-' . substr(hash('sha512', rand(1,1000)), 0, 10);
 		$user[':password'] = $this->hasher->HashPassword($password);
 		$loginUrl =  'http://' . PATH . '/user/login';
 		$signature = 'The ' . COMPANY_NAME . ' Team';

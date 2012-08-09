@@ -21,7 +21,7 @@ class devicesController extends Controller {
 		);
 		if (isset($_POST['action']) && $_POST['action'] == 'new') {
 			echo "<!--";print_r($_POST);echo"-->";
-			$id_num = substr(hash('md5',(rand(1,100000))), 0, 10);
+			$id_num = substr(hash('sha512',(rand(1,100000))), 0, 10);
 			$stmt = $this->db->prepare("SELECT * FROM devices WHERE id = :id");
 			$stmt->execute(array(':id'=>'dev-'.$id_num));
 			
