@@ -2,6 +2,10 @@
 
 class userController extends Controller {
 	public function loginAction() {
+		if ($this->user->isAuthenticatedFully()) {
+			session_write_close();
+			header("Location: /user/view/" . $this->user->getId());
+		}
 		$data = array('title'=>'Login');
 		if (isset($_POST['action']) && $_POST['action'] == 'login') {
 			if ($this->user->login($_POST['email'], $_POST['password'], $_POST['company'])) {
