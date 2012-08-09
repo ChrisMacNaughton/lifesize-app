@@ -54,7 +54,7 @@ class Controller {
 			$this->app['system']['path'] = PATH;
 			$this->app['system']['load_time'] = microtime_diff($start);
 			$data['app'] = $this->app;
-			$data['app']['system']['protocol'] = "http";
+			$data['app']['system']['protocol'] = "https";
 			$data['app']['user'] = $this->user->getUser();
 		} 
 		foreach ($_SESSION['errors'] as $err) 
