@@ -22,8 +22,6 @@
 				#}
 				{% if app.user.level > 2 %}<li{% if app.page == 'company' %} class="active"{% endif %}><a href="/company">Company</a></li>
 {% endif %}
-				{% if app.user.level == 4 %}<li{% if app.page == 'admin' %} class="active"{% endif %}><a href="/admin">AdminCP</a></li>
-{% endif %}
 				<li><a href="/user/view/{{app.user.id}}">Profile</a></li>
 				<li><a href="/user/logout">Logout</a></li>
 {% endblock %}
