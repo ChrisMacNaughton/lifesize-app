@@ -26,17 +26,19 @@ class devicesController extends Controller {
 			$stmt->execute(array(':id'=>'dev-'.$id_num));
 			
 			while ($stmt->rowCount() > 0) {
-				$id_num = md5(sha1(rand(1,100000)));
+				$id_num = substr(hash('sha512',(rand(1,100000))), 0, 10);
 				$stmt->execute(array(':id'=>'dev-'.$id_num));
 			}
 			
-			$stmt = $this->db->prepare("INSERT INTO devices (id, ip, password, name, company_id, status) VALUES (:id, :ip, :password, :name, :company, 10)");
+			$stmt = $this->db->prepare("INSERT INTO devices (id, ip, password, name, company_id, status, online, added, active) VALUES (:id, :ip, :password, :name, :company, 10, 0, :added, :active)");
 			$options = array(
 				':id'=>'dev-' . $id_num,
 				':ip'=>$_POST['ip'],
 				':password'=>(isset($_POST['password'])) ?$_POST['password'] : 'Lifesize',
 				':name'=>$_POST['name'],
 				':company'=>$this->company['id'],
+				':added'=>time(),
+				':active'=>1
 			);
 			foreach ($options as $key=>$value) {
 				if ((is_null($value) || $value == '') && $key != ':name') {
