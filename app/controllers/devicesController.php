@@ -21,6 +21,7 @@ class devicesController extends Controller {
 				':id'=>$id,
 				':company'=>$this->company['id']
 		));
+		$device = $stmt->fetch(PDO::FETCH_ASSOC);
 		print_r($device);
 	}
 	public function newAction() {
