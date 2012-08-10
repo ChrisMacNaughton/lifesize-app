@@ -14,6 +14,7 @@ if (get_cfg_var('aws.access_key') === false)
 {
 	include 'config.php';
 	define('PATH', $path);
+	define(DEV_ENV, true);
 } else {
 	$options = array(
 		'certificate_authority'=>get_cfg_var('aws.param1'),
@@ -26,7 +27,9 @@ if (get_cfg_var('aws.access_key') === false)
 	define('PATH',get_cfg_var('aws.param4'));
 	$path = PATH;
 	$stripe_key = get_cfg_var('aws.param5');
+	define(DEV_ENV, false);
 }
+
 //connect to the mysql db instance of RDS
 $dsn = 'mysql:dbname=vcdb;host=vcdb.crwlsevgtlap.us-east-1.rds.amazonaws.com';
 try {
