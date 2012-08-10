@@ -15,6 +15,14 @@ class devicesController extends Controller {
 		);
 		$this->render('devices/index.html.twig', $data);
 	}
+	public function viewAction($id) {
+		$stmt = $this->db->prepare("SELECT * FROM devices WHERE id = :id AND company_id = :company");
+		$stmt->execute(array(
+				':id'=>$id,
+				':company'=>$this->company['id']
+		));
+		print_r($device);
+	}
 	public function newAction() {
 		$data = array(
 			'title'=>'New Device'
