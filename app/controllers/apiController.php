@@ -85,7 +85,7 @@ class apiController {
 		
 		switch($action) {
 			case 'enable':
-				$stmt = $this->db->prepare("UPDATE devices SET active = :active, modified = :now WHERE id = :id");
+				$stmt = $this->db->prepare("UPDATE devices SET active = :active, modified = :now, duration=0, status=10, updated = 0 WHERE id = :id");
 				if ($_POST['active'] == 'true')
 					$active = 1;
 				else if ($_POST['active'] == 'false')
@@ -95,6 +95,7 @@ class apiController {
 					':active'=>$active,
 					':now'=>time()
 				);
+				$id = $_POST['id'];
 				$result = $stmt->execute($options);
 				
 				$err = $stmt->errorInfo();
@@ -108,6 +109,10 @@ class apiController {
 					'Updated'=>$_POST['id']
 				);
 				$enabled = ($active) ?"activated":"de-activated";
+				if ($active == 0) {
+					$this->db->query("DELETE * FROM devices_history WHERE device_id = '" . $id . "'");
+
+				}
 				if ($result)
 				{
 					$stmt = $this->db->prepare("INSERT INTO log (user, action,details,timestamp) VALUES (:user, :action, :details, :now)");

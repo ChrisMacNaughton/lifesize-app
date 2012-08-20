@@ -9,13 +9,15 @@
 	{% for device in devices %}
 	<div class="row span10" style="border-bottom: 1px solid #ccc">
 	<div class="span2">
-	<strong>Name</strong>: <a href="{{app.system.protocol}}://{{app.system.path}}/devices/view/{{device.id}}">{{device.name}}</a><br />
+	<strong>Name</strong>: {% if device.active == 1%}<a href="{{app.system.protocol}}://{{app.system.path}}/devices/view/{{device.id}}">{{device.name}}</a>{% else %}{{device.name}}{%endif %}<br />
 	<strong>IP</strong>:{{device.ip}}<br />
 	<strong>Status</strong>:{{device.status}}<br />
 	
 	</div>
+	{% if app.user.level > 2 %}
 	<div class="span2" style="padding-top: 5px;"><input type="checkbox" id="{{device.id}}" {% if device.active%}checked="checked"{%endif%}/>
 	</div>
+	{% endif %}
 	</div>
 	{% else %}
 	<div class="row span10">
@@ -26,7 +28,7 @@
 {#
 <div class="span12">
 	<pre>
-	{{dump(devices)}}
+	{{dump()}}
 
 	</pre>
 </div>
@@ -50,6 +52,9 @@ $(document).ready(function() {
 		change: function($input) {
 			var checkbox = $input.is(":checked") ? true : false;
 			var id = $input.attr("id");
+			if (checkbox == true) var message = "Enable this Device?";
+			else var message = "Disable this device and delete associated data?\n (THERE IS NO UNDO)";
+			if (window.confirm(message)){
 			$.post(
 				'{{app.system.protocol}}://{{app.system.path}}/api/devices?action=enable',
 				{id: id, active: checkbox},
@@ -57,6 +62,9 @@ $(document).ready(function() {
 					console.log(data);
 				}
 			);
+		} else {
+			$('#{{device.id}}').attr('checked', !$('#{{device.id}}').attr('checked')).iButton("repaint");
+		}
 		}
 	});
 	{% endfor %}

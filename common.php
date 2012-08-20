@@ -83,3 +83,23 @@ function to_seconds($duration) {
 	$i = explode(':', $duration);
 	return ($i[0] * 60 * 60) + ($i[1] * 60) + $i[2];
 }
+function formatTime($secs) {
+   $times = array(3600, 60, 1);
+   $time = '';
+   $tmp = '';
+   for($i = 0; $i < 3; $i++) {
+      $tmp = floor($secs / $times[$i]);
+      if($tmp < 1) {
+         $tmp = '00';
+      }
+      elseif($tmp < 10) {
+         $tmp = '0' . $tmp;
+      }
+      $time .= $tmp;
+      if($i < 2) {
+         $time .= ':';
+      }
+      $secs = $secs % $times[$i];
+   }
+   return $time;
+}
