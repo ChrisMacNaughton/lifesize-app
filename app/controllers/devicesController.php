@@ -29,11 +29,12 @@ class devicesController extends Controller {
 		//echo $image;
 	}
 	public function viewAction($id) {
-		$stmt = $this->db->prepare("SELECT * FROM devices WHERE id = :id AND company_id = :company");
+		$stmt = $this->db->prepare("SELECT id, name, ip, company_id, online, status, duration, model_id, software_version_id, updated, screenshot FROM devices WHERE id = :id AND company_id = :company");
 		$stmt->execute(array(
 				':id'=>$id,
 				':company'=>$this->company['id']
 		));
+
 		$device = $stmt->fetch(PDO::FETCH_ASSOC);
 		$data['device'] = $device;
 		//print_r($device);

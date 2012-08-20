@@ -78,3 +78,8 @@ function _ago($time)
 
    return "$difference $periods[$j] ";
 }
+
+function to_seconds($duration) {
+	$i = explode(':', $duration);
+	return ($i[0] * 60 * 60) + ($i[1] * 60) + $i[2];
+}
