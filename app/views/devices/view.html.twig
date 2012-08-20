@@ -1,6 +1,9 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+<h1>{{device.name}}</h1>
+<h3>Screenshot</h3>
+<img src="{{app.system.protocol}}://{{app.system.path}}/devices/img/{{device.id}}" width="208px" height="117px" />
 <pre>
 {{dump()}}
 </pre>
