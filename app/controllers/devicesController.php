@@ -15,6 +15,19 @@ class devicesController extends Controller {
 		);
 		$this->render('devices/index.html.twig', $data);
 	}
+	public function imgAction($id) {
+		$stmt = $this->db->prepare("SELECT screenshot FROM devices WHERE id = :id AND company_id = :company");
+		$stmt->execute(array(
+				':id'=>$id,
+				':company'=>$this->company['id']
+		));
+		$img = $stmt->fetch(PDO::FETCH_ASSOC);
+		$im = imagecreatefromstring(base64_decode($img['screenshot']));
+		header('Content-Type: image/png');
+		imagepng($im);
+		imagedestroy($im);
+		//echo $image;
+	}
 	public function viewAction($id) {
 		$stmt = $this->db->prepare("SELECT * FROM devices WHERE id = :id AND company_id = :company");
 		$stmt->execute(array(
@@ -22,7 +35,9 @@ class devicesController extends Controller {
 				':company'=>$this->company['id']
 		));
 		$device = $stmt->fetch(PDO::FETCH_ASSOC);
-		print_r($device);
+		$data['device'] = $device;
+		//print_r($device);
+		$this->render('devices/view.html.twig', $data);
 	}
 	public function newAction() {
 		$data = array(

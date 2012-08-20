@@ -9,7 +9,7 @@
 	{% for device in devices %}
 	<div class="row span10" style="border-bottom: 1px solid #ccc">
 	<div class="span2">
-	<strong>Name</strong>:{{device.name}}<br />
+	<strong>Name</strong>: <a href="{{app.system.protocol}}://{{app.system.path}}/devices/view/{{device.id}}">{{device.name}}</a><br />
 	<strong>IP</strong>:{{device.ip}}<br />
 	<strong>Status</strong>:{{device.status}}<br />
 	
