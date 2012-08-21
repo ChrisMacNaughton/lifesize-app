@@ -129,7 +129,7 @@ class companyController extends Controller {
 			$i++;
 		}
 		$company[':id'] = $slug_final;
-		
+		$company[':created'] = time();
 		$customer = Stripe_Customer::create(array(
 			"description"=>$company[":slug"],
 			'email'=>$email,
