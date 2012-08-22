@@ -162,10 +162,11 @@ protected $company = array();
 		$fields = implode(',',$fields);
 		$value_names = implode(',', $value_names);
 		$query = "INSERT INTO users ($fields) VALUES ($value_names)";
-		echo $query;
+		//echo $query;
 		$stmt = $this->db->prepare($query);
 		$result = $stmt->execute($user);
-		print_r($stmt->errorInfo());
+		$userid = $user[':id'];
+		//print_r($stmt->errorInfo());
 		$response = $email->send_email(
 			$from,
 			array('ToAddresses'=>array(
@@ -177,7 +178,9 @@ protected $company = array();
 			)
 		);
 		if ($response && $result)
-			return true;
+			return array('id'=>$userid, 'name'=>$user[':name']);
+		else
+			return false;
 	}
 	public function login($email, $password, $company) {
 		$stmt = $this->db->prepare("SELECT password FROM users WHERE email = :email AND company_id = :id");

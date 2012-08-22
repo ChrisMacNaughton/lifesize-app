@@ -80,6 +80,18 @@ class apiController {
 		}
 		return $action;
 	}
+	public function userAction() {
+		$action = $this->init(3);
+		$id = $_POST['id'];
+
+		$stmt = $this->db->prepare("DELETE FROM users WHERE id = :id");
+		$res = $stmt->execute(array(
+			':id'=>$id
+			));
+		
+		echo json_encode($res);
+		
+	}
 	public function devicesAction() {
 		$action = $this->init(3);
 		

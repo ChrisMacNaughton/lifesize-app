@@ -32,9 +32,10 @@ class userController extends Controller {
 			':level'=>$_POST['level'],
 			':company_id' => $this->user->getCompanyID(),
 		);
-		print_r($user);
+		//print_r($user);
 		$result = $this->user->register($user);
-		print_r($result);
+		//print_r($result);
+		echo json_encode($result);
 		$stmt = $this->db->prepare("INSERT INTO log (user, action,details,timestamp) VALUES (:user, :action, :details, :now)");
 					$stmt->execute(array(
 						':user'=>$this->user->getID(),
