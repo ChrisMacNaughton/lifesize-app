@@ -36,6 +36,7 @@ class devicesController extends Controller {
 		));
 
 		$device = $stmt->fetch(PDO::FETCH_ASSOC);
+		$data['title'] = "View Device";
 		$data['device'] = $device;
 		$stmt = $this->db->prepare("SELECT sum(duration) AS duration FROM devices WHERE company_id = :id");
 		$stmt->execute(array(':id'=>$this->company['id']));

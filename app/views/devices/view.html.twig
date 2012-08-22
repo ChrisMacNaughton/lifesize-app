@@ -1,5 +1,4 @@
 {% extends 'base.html.twig' %}
-
 {% block body %}
 <h1>{{device.name}}</h1>
 <div class="row">
@@ -8,11 +7,14 @@
 	<img src="{{app.system.protocol}}://{{app.system.path}}/devices/img/{{device.id}}" width="208px" height="117px" />
 	</div>
 	<div class="span3">
+		<h3>Device Data</h3>
 		<strong>Online:</strong> {% if device.online == 1%}Yes{%else %}No{%endif %}<br />
 		<strong>Call Length:</strong> {{device.duration}} Hours
 	</div>
 </div>
+{#
 <pre>
 {{dump(device)}}
 </pre>
+#}
 {% endblock %}
