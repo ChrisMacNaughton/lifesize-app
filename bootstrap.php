@@ -29,7 +29,7 @@ if (get_cfg_var('aws.access_key') === false)
 	$stripe_key = get_cfg_var('aws.param5');
 	define(DEV_ENV, false);
 }
-
+Stripe::setApiKey($stripe_key);
 //connect to the mysql db instance of RDS
 $dsn = 'mysql:dbname=vcdb;host=vcdb.crwlsevgtlap.us-east-1.rds.amazonaws.com';
 try {
@@ -38,7 +38,7 @@ try {
     $app['errors'][]= $e->getMessage();
 }
 $uri = new URI();
-Stripe::setApiKey($stripe_key);
+
 
 //uncomment the following to switch to using dynamodb to handle sessions
 

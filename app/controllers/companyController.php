@@ -20,11 +20,14 @@ class companyController extends Controller {
 			'company' => $this->company,
 			'stripe'=>$this->stripe
 		);
+		$options = array(':id'=>$this->company['id']);
+		$subscription = explode('_', $this->company['subscription_id']);
+		$max_devices = $subscription[1];
 		$stmt = $this->db->prepare("SELECT count(*) AS count FROM users WHERE company_id = :id");
-		$stmt->execute(array(':id'=>$this->company['id']));
+		$stmt->execute($options);
 		$count = $stmt->fetch(PDO::FETCH_ASSOC);
 		$stmt = $this->db->prepare("SELECT * FROM users WHERE company_id = :id");
-		$stmt->execute(array(':id'=>$this->company['id']));
+		$stmt->execute($options);
 		$data['users'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
 		$data['usercount'] = $count['count'];

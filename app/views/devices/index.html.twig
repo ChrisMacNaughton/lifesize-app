@@ -1,23 +1,23 @@
 {% extends 'base.html.twig' %}
 {% block afternav %}
-{% if app.user.level > 2 %}
+{% if app.user.level > 2 %}{% if max_devices > current_devices or max_devices == 0 %}
 	<a href="/devices/new" CLASS="BTN BTN-SUCCESS" style="margin-top: 5px;">New Device</a>
-{% endif %}
+{% endif %}{%endif %}
 {% endblock %}
 {% block body %}
 <div class="span10">
 	{% for device in devices %}
 	<div class="row span10" style="border-bottom: 1px solid #ccc">
-	<div class="span2">
-	<strong>Name</strong>: {% if device.active == 1%}<a href="{{app.system.protocol}}://{{app.system.path}}/devices/view/{{device.id}}">{{device.name}}</a>{% else %}{{device.name}}{%endif %}<br />
-	<strong>IP</strong>:{{device.ip}}<br />
-	<strong>Status</strong>:{{device.status}}<br />
-	
-	</div>
-	{% if app.user.level > 2 %}
-	<div class="span2" style="padding-top: 5px;"><input type="checkbox" id="{{device.id}}" {% if device.active%}checked="checked"{%endif%}/>
-	</div>
-	{% endif %}
+		<div class="span3">
+		<strong>Name</strong>: {% if device.active == 1%}<a href="{{app.system.protocol}}://{{app.system.path}}/devices/view/{{device.id}}">{{device.name}}</a>{% else %}{{device.name}}{%endif %}<br />
+		<strong>IP</strong>:{{device.ip}}<br />
+		<strong>Status</strong>:{{device.status}}<br />
+		
+		</div>
+		{% if app.user.level > 2 %}
+		<div class="span2" style="padding-top: 5px;"><input type="checkbox" id="{{device.id}}" {% if device.active%}checked="checked"{%endif%}/>
+		</div>
+		{% endif %}
 	</div>
 	{% else %}
 	<div class="row span10">

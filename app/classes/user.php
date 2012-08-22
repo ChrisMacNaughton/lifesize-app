@@ -15,6 +15,7 @@ protected $company = array();
 		$id = (isset($_SESSION['userid'])) ? $_SESSION['userid'] : 0;
 		$hash = (isset($_SESSION['hash'])) ? $_SESSION['hash'] : 0;
 		
+		//echo "<!--";print_r($_SESSION);echo"-->";
 		$stmt = $this->db->prepare("SELECT * FROM users WHERE id=:id AND sesshash = :hash");
 		$stmt->execute(array(
 			':id'=>$id,

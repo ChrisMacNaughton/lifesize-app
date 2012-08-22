@@ -7,11 +7,16 @@ class devicesController extends Controller {
 		$this->company = $this->user->getCompanyDetails();
 		$stmt->execute(array(':id'=>$this->company['id']));
 		$this->devices = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$subscription = explode('_', $this->company['subscription_id']);
+		//echo "<!--";print_r($subscription);echo"-->";
+		$this->max_devices = ($subscription[1] != "-") ? $subscription[1] : 0;
 	}
 	public function indexAction() {
 		$data = array(
 			'title'=>'Devices',
-			'devices'=>$this->devices
+			'devices'=>$this->devices,
+			'max_devices'=>$this->max_devices,
+			'current_devices'=>count($this->devices)
 		);
 		$this->render('devices/index.html.twig', $data);
 	}
@@ -28,6 +33,26 @@ class devicesController extends Controller {
 		imagedestroy($im);
 		//echo $image;
 	}
+	public function editAction($id) {
+		$stmt = $this->db->prepare("SELECT id, name, ip, company_id, online, status, duration, model_id, software_version_id, updated, screenshot FROM devices WHERE id = :id AND company_id = :company");
+		$stmt->execute(array(
+				':id'=>$id,
+				':company'=>$this->company['id']
+		));
+
+		$device = $stmt->fetch(PDO::FETCH_ASSOC);
+		$data['title'] = "View Device";
+		$data['device'] = $device;
+		$stmt = $this->db->prepare("SELECT sum(duration) AS duration FROM devices WHERE company_id = :id");
+		$stmt->execute(array(':id'=>$this->company['id']));
+		$res = $stmt->fetch(PDO::FETCH_ASSOC);
+		$data['device']['duration_raw'] = $data['device']['duration'];
+		$data['device']['duration'] = formatTime($device['duration']);
+		$data['device']['global_duration_raw'] = $data['device']['global_duration'];
+		$data['device']['global_duration'] = formatTime($res['duration']);
+		//print_r($device);
+		$this->render('devices/edit.html.twig', $data);
+	}
 	public function viewAction($id) {
 		$stmt = $this->db->prepare("SELECT id, name, ip, company_id, online, status, duration, model_id, software_version_id, updated, screenshot FROM devices WHERE id = :id AND company_id = :company");
 		$stmt->execute(array(
@@ -41,7 +66,9 @@ class devicesController extends Controller {
 		$stmt = $this->db->prepare("SELECT sum(duration) AS duration FROM devices WHERE company_id = :id");
 		$stmt->execute(array(':id'=>$this->company['id']));
 		$res = $stmt->fetch(PDO::FETCH_ASSOC);
+		$data['device']['duration_raw'] = $data['device']['duration'];
 		$data['device']['duration'] = formatTime($device['duration']);
+		$data['device']['global_duration_raw'] = $data['device']['global_duration'];
 		$data['device']['global_duration'] = formatTime($res['duration']);
 		//print_r($device);
 		$this->render('devices/view.html.twig', $data);
