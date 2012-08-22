@@ -41,10 +41,14 @@
 		{{error}}
 	</div>
 {% endfor %}
+{% set previous = "" %}
 {% for message in flash %}
+	{% if previous != message %}
 	<div class="span10 offset1 flash">
 		{{message}}
 	</div>
+	{% endif %}
+	{% previous = message %}
 {% endfor %}
 	<div class="row">
 		{% block body %}
