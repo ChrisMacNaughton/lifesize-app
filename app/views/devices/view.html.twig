@@ -8,8 +8,8 @@
 	<img src="{{app.system.protocol}}://{{app.system.path}}/devices/img/{{device.id}}" width="208px" height="117px" />
 	</div>
 	<div class="span3">
-		Online: {% if device.online == 1%}Yes{%else %}No{%endif %}
-		Call Length: 
+		<strong>Online:</strong> {% if device.online == 1%}Yes{%else %}No{%endif %}<br />
+		<strong>Call Length:</strong> {{device.duration}} Hours
 	</div>
 </div>
 <pre>
