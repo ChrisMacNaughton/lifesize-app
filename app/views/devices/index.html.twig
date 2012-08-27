@@ -14,6 +14,9 @@
 		<strong>Status</strong>:{{device.status}}<br />
 		
 		</div>
+		<div class="span1">
+			<img src="assets/img/{% if device.online == 1 %}online{% else %}offline{% endif %}.png" alt="{% if device.online == 1 %}online{% else %}offline{% endif %}" title="{% if device.online == 1 %}Online{% else %}Offline{% endif %}"/>
+		</div>
 		{% if app.user.level > 2 %}
 		<div class="span2" style="padding-top: 5px;"><input type="checkbox" id="{{device.id}}" {% if device.active%}checked="checked"{%endif%}/>
 		</div>

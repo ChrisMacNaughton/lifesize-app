@@ -36,6 +36,7 @@ try {
     $db = new PDO($dsn, $dbuser, $dbpassword);
 } catch (PDOException $e) {
     $app['errors'][]= $e->getMessage();
+    //die($e->getMessage());
 }
 $uri = new URI();
 

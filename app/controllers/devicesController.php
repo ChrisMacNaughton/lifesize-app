@@ -3,7 +3,7 @@
 class devicesController extends Controller {
 	public function beforeAction() {
 		parent::beforeAction();
-		$stmt = $this->db->prepare("SELECT devices.id, devices.name, devices.ip, devices.password, codes.name AS status, devices.active FROM devices LEFT JOIN codes ON devices.status = codes.code WHERE company_id = :id ORDER BY name, ip, added");
+		$stmt = $this->db->prepare("SELECT devices.id, devices.name, devices.ip, devices.password, codes.name AS status, devices.active, devices.online FROM devices LEFT JOIN codes ON devices.status = codes.code WHERE company_id = :id ORDER BY name, ip, added");
 		$this->company = $this->user->getCompanyDetails();
 		$stmt->execute(array(':id'=>$this->company['id']));
 		$this->devices = $stmt->fetchAll(PDO::FETCH_ASSOC);
