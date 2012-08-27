@@ -44,13 +44,13 @@ $uri = new URI();
 //uncomment the following to switch to using dynamodb to handle sessions
 
 $dynamodb = new AmazonDynamoDB($options);
-
+/*
 // Instantiate, configure, and register the session handler
 $session_handler = $dynamodb->register_session_handler(array(
 	'table_name'       => 'sessions',
 	'lifetime'         => 3600,
 ));
-
+*/
 session_start();
 $CACHE = array();
 

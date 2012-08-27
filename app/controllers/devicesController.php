@@ -20,6 +20,20 @@ class devicesController extends Controller {
 		);
 		$this->render('devices/index.html.twig', $data);
 	}
+	public function alarmsAction($dev_id) {
+		$data = array('title'=>"Alarms");
+		$data['device_id']=$dev_id;
+		$stmt = $this->db->prepare("SELECT devices.name, codes.name AS status FROM devices LEFT JOIN codes ON devices.status = codes.code WHERE active = 1 AND id = :id LIMIT 1");
+		$stmt->execute(array(':id'=>$dev_id));
+		$data['device'] = $stmt->fetch(PDO::FETCH_ASSOC);
+		$data['db_errors'][] = $stmt->errorInfo();
+		$data['alarm_list'] = $this->db->query("SELECT * FROM alarms")->fetchAll(PDO::FETCH_ASSOC);
+		$stmt = $this->db->prepare("SELECT D.user_id, D.device_id, D.alarm_id, D.last_notified, D.n, D.active, A.name, A.description FROM devices_alarms AS D LEFT JOIN alarms AS A ON D.alarm_id = A.id WHERE user_id = :user AND device_id = :device");
+		$stmt->execute(array(':user'=>$this->user->getID(), ':device'=>$dev_id));
+		$data['alarms'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$data['db_errors'][] = $stmt->errorInfo();
+		echo $this->render('devices/alarms/index.html.twig', $data);
+	}
 	public function imgAction($id) {
 		$stmt = $this->db->prepare("SELECT screenshot FROM devices WHERE id = :id AND company_id = :company");
 		$stmt->execute(array(

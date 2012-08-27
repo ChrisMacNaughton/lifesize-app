@@ -16,7 +16,7 @@ class userController extends Controller {
 					header("Location: /user/edit/" . $this->user->getId());
 				} else {
 					session_write_close();
-					header("Location: /user/view");
+					header("Location: /devices");
 				}
 			} else {
 				$_SESSION['errors'] = $this->user->errors;

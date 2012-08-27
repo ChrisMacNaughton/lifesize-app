@@ -13,6 +13,46 @@ class apiController {
 	public function beforeAction() {
 		
 	}
+	public function alarmsAction() {
+		$action = $this->init(1);
+		$user_id = $this->user->getID();
+		$alarm_id = $_POST['id'];
+		$device_id = $_POST['device'];
+		if ($_POST['active'] == 'true')
+			$active = 1;
+		else if ($_POST['active'] == 'false')
+			$active = 0;
+		switch($action) {
+			case "toggle":
+				$stmt = $this->db->prepare("SELECT * FROM devices_alarms WHERE user_id = :id AND alarm_id = :alarm LIMIT 1");
+				$stmt->execute(array(':id'=>$user_id, ':alarm'=>$alarm_id));
+				$res = $stmt->rowCount();
+				if ($res == 0) {
+					$query = "INSERT INTO devices_alarms (alarm_id, device_id, user_id, active) VALUES (:alarm, :device, :user, :active)";
+				} else {
+					$query = "UPDATE devices_alarms SET active = :active WHERE alarm_id = :alarm AND device_id = :device AND user_id = :user";
+				}
+				$stmt = $this->db->prepare($query);
+				//print_r($stmt);
+				$options = array(
+					':active'=>$active,
+					':user'=>$user_id,
+					':alarm'=>$alarm_id,
+					':device'=>$device_id
+					);
+				//print_r($options);
+				$stmt->execute($options);
+				$ret = $stmt->rowCount();
+				if($ret == 1) {
+					echo "True";
+				} else {
+					echo "False";
+				}
+				//echo "SET active = " . $active . " " . $alarm_id . " for " . $user_id;
+				break;
+
+		}
+	}
 	public function eventsAction() {
 		$action = $this->init(2);
 		switch($action) {
