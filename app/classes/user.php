@@ -146,7 +146,7 @@ protected $company = array();
 		$signature = 'The ' . COMPANY_NAME . ' Team';
 		$message = sprintf("Hello, %s\n\nYour login details are: \n\nEmail: %s\nPassword: %s\nCompany: %s\n\nYou will be required to change this after your first login.\n\nPlease visit %s to login!\n\nThank you!\n%s", $user[':user_name'], $user[':email'],$password,$user[':company_id'],$loginUrl, $signature);
 		
-		$from = "chmacnaughton@gmail.com";
+		$from = "no-reply@control.vc";
 		$to = $user[":email"];
 		$user[':name'] = $user[':user_name'];
 		unset($user[':user_name']);

@@ -73,7 +73,7 @@ class userController extends Controller {
 			$signature = 'The ' . COMPANY_NAME . ' Team';
 			$message = sprintf("Hello, %s\n\nYour password has been reset! Your login details are now: \n\nEmail: %s\nPassword: %s\nCompany: %s\n\nYou will be required to change this after your first login.\n\nPlease visit %s to login!\n\nThank you!\n%s", $user['name'], $user['email'],$new_pass,$user['company_id'],$loginUrl, $signature);
 			
-			$from = "chmacnaughton@gmail.com";
+			$from = "no-reply@control.vc";
 			$to = $user["email"];
 			$subject = COMPANY_NAME . " Support";
 			$email = new AmazonSES($options);
