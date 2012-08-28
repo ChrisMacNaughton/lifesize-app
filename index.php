@@ -1,7 +1,7 @@
 <?php
 
 $app['start'] = microtime();
-define("COMPANY_NAME", 'VC-Control');
+define("COMPANY_NAME", 'ControlVC');
 include 'bootstrap.php';
 if ($_SERVER['HTTP_X_FORWARDED_PROTO'] == "http" && $uri->seg(1) != 'update')
 	header("Location: https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
