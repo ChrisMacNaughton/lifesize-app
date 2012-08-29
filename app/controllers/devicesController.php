@@ -14,9 +14,7 @@ class devicesController extends Controller {
 	public function indexAction() {
 		$data = array(
 			'title'=>'Devices',
-			'devices'=>$this->devices,
-			'max_devices'=>$this->max_devices,
-			'current_devices'=>count($this->devices)
+			'devices'=>$this->devices
 		);
 		$this->render('devices/index.html.twig', $data);
 	}
