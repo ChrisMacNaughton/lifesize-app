@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 {% block body %}
-<h1>{{device.name}}</h1>
+<h1 style="display: inline-block;">{{device.name}}</h1><a href="{{app.system.protocol}}://{{app.system.path}}/devices/edit/{{device.id}}">Edit</a><br />
 <div class="row">
 	<div class="span3">
 	<h3>Screenshot</h3>
