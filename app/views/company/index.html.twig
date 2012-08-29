@@ -3,10 +3,10 @@
 {% block body %}
 <h2>{{company.name}}</h2>
 <p>Card on File:
-{% if stripe.active_card == null %}
+{% if company.last4 == null %}
 None <button class="add_card">Add a Card</button>
 {% else %}
-Ending in: <span id="last4">{{stripe.active_card.last4}}</span><span id="status" style="display: none;">Updated</span> <button class="add_card">Update Card</button>
+<span id="last4">************{{company.last4}}</span><span id="status" style="display: none;">Updated</span> <button class="add_card">Update Card</button>
 {% endif %}
 <br /><br />
 Current Users: {{usercount}} <button class="add_user">New user</button>

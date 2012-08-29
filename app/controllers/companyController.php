@@ -11,14 +11,13 @@ class companyController extends Controller {
 		}
 		if ($this->action != 'register') {
 		$this->company = $this->user->getCompanyDetails();
-		$this->stripe = Stripe_Customer::retrieve($this->company['customer_id']);
+		//$this->stripe = Stripe_Customer::retrieve($this->company['customer_id']);
 		}
 	}
 	public function indexAction () {
 		$data = array(
 			'title'=>$this->user->getCompany(),
-			'company' => $this->company,
-			'stripe'=>$this->stripe
+			'company' =>$this->company
 		);
 		$options = array(':id'=>$this->company['id']);
 		$subscription = explode('_', $this->company['subscription_id']);
