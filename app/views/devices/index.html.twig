@@ -17,10 +17,6 @@
 		<div class="span1">
 			<img src="assets/img/{% if device.online == 1 %}{% if device.status == 'In a call'%}camera{%else %}online{%endif %}{% else %}offline{% endif %}.png" alt="{% if device.online == 1 %}online{% else %}offline{% endif %}" title="{% if device.online == 1 %}{% if device.status == 'In a call'%}In a call{%else %}Online{%endif %}{% else %}Offline{% endif %}"/>
 		</div>
-		{% if app.user.level > 2 %}
-		<div class="span2" style="padding-top: 5px;"><input type="checkbox" id="{{device.id}}" {% if device.active%}checked="checked"{%endif%}/>
-		</div>
-		{% endif %}
 	</div>
 	{% else %}
 	<div class="row span10">
@@ -36,40 +32,4 @@
 	</pre>
 </div>
 #}
-{% endblock %}
-{% block stylesheets %}
-{{parent()}}
-<link href="/assets/css/jquery.ibutton.css" rel="stylesheet">
-{% endblock %}
-{% block javascripts %}
-{{parent()}}
-<script src="/assets/js/easing.js"></script>
-<script src="/assets/js/jquery.ibutton.js"></script>
-<script type="text/javascript">
-$(document).ready(function() {
-{% for device in devices %}
-	
-	$('#{{device.id}}').iButton({
-	labelOn: "Active",
-	labelOff: "Inactive",
-		change: function($input) {
-			var checkbox = $input.is(":checked") ? true : false;
-			var id = $input.attr("id");
-			if (checkbox == true) var message = "Enable this Device?";
-			else var message = "Disable this device and delete associated data?\n (THERE IS NO UNDO)";
-			if (window.confirm(message)){
-			$.post(
-				'{{app.system.protocol}}://{{app.system.path}}/api/devices?action=enable',
-				{id: id, active: checkbox},
-				function(data) {
-				}
-			);
-		} else {
-			$('#{{device.id}}').attr('checked', !$('#{{device.id}}').attr('checked')).iButton("repaint");
-		}
-		}
-	});
-	{% endfor %}
-});
-</script>
 {% endblock %}
