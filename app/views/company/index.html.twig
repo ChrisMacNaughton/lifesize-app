@@ -90,14 +90,15 @@ $(document).ready(function() {
 					data: {name: $("#name").val(), email: $("#email").val(), level: $("#level").val()},
 					type: "POST"
 				}).done(function(data){
+
 					console.log(data);
 					if(data != 'false') {
 						data = $.parseJSON(data);
-						$('.users').append('<li id="' + data['id'] + '""><a href="/user/view/'+data['id']+'">'+data['name']+'</a> | <a href="javascript:deleteUser("' + data['id'] + '"")">Delete</a></li>');
-					}
-					$( this ).dialog( "close" );
-				});
+						$('.users').append('<li id="' + data['id'] + '"><a href="/user/view/'+data['id']+'">'+data['name']+'</a> | <a href="javascript:deleteUser(' + "'" + data['id'] + "'" + ')">Delete</a></li>');
 					
+					}
+				});
+					$( this ).dialog( "close" );
 				},
 				Cancel: function() {
 					$( this ).dialog( "close" );

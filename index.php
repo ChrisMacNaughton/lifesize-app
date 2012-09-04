@@ -3,7 +3,7 @@
 $app['start'] = microtime();
 define("COMPANY_NAME", 'ControlVC');
 include 'bootstrap.php';
-if ($_SERVER['HTTP_X_FORWARDED_PROTO'] == "http" && $uri->seg(1) != 'update')
+if ($_SERVER['HTTP_X_FORWARDED_PROTO'] == "http")
 	header("Location: https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
 $user = new User();
 $ctrl = ($uri->seg(0) == '' || $uri->seg[0] == 'home') ? 'default' : $uri->seg(0);
@@ -23,7 +23,7 @@ $redir = true;
 	
 	if ($redir)
 	{
-		if(!array_search(l("error_need_to_login"), $_SESSION['flash']))
+		if(!array_search(l("error_need_to_login"), $_SESSION['flash']) && ($ctrl != 'default' && $actn != 'index'))
 		$_SESSION['flash'][] = l("error_need_to_login");
 		session_write_close();
 		header("Location: /user/login");

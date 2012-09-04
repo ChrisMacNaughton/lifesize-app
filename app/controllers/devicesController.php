@@ -61,6 +61,21 @@ class devicesController extends Controller {
 		));
 
 		$device = $stmt->fetch(PDO::FETCH_ASSOC);
+		if(isset($_POST['action']) && $_POST['action'] == 'edit') {
+			unset($_POST['action']);
+			echo"<!--";print_r($_POST);echo"-->";
+			if($_POST['name'] != '') $edits[] = array(
+				':id'=>'edit-'. substr(sha1($device['id'] . $device['name'] . 'edit at' . microtime(true)),0,10),
+				':object'=>'system',
+				':target'=>'name',
+				':detail'=>$_POST['name'],
+				':added'=>time(),
+				':user'=>$this->user->getID()
+				);
+			$name = ($_POST['name'] != '') ? $_POST['name'] : $device['name'];
+			echo "<!-- Name: $name -->";
+			echo "<!-- Edits: ";print_r($edits);echo "-->";
+		}
 		$data['title'] = "View Device";
 		$data['device'] = $device;
 		$stmt = $this->db->prepare("SELECT sum(duration) AS duration FROM devices WHERE company_id = :id");
@@ -74,7 +89,7 @@ class devicesController extends Controller {
 		$this->render('devices/edit.html.twig', $data);
 	}
 	public function viewAction($id) {
-		$stmt = $this->db->prepare("SELECT id, name, ip, company_id, online, status, duration, model_id, software_version_id, updated, screenshot FROM devices WHERE id = :id AND company_id = :company");
+		$stmt = $this->db->prepare("SELECT id, name, ip, company_id, online, status, duration, model_id, software_version_id, updated FROM devices WHERE id = :id AND company_id = :company");
 		$stmt->execute(array(
 				':id'=>$id,
 				':company'=>$this->company['id']
