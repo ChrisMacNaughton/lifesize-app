@@ -10,25 +10,9 @@ require_once 'vendor/autoload.php';
 //require_once 'Net/SSH2.php';
 require_once 'app/classes/autoload.php';
 /* set amazon config vars */
-if (get_cfg_var('aws.access_key') === false)
-{
-	include 'config.php';
-	define('PATH', $path);
-	define(DEV_ENV, true);
-} else {
-	$options = array(
-		'certificate_authority'=>true,
-		'default_cache_config' => '',
-		'key' => get_cfg_var('aws.access_key'),
-		'secret' => get_cfg_var('aws.secret_key'),
-	);
-	$dbuser = get_cfg_var('aws.param2');
-	$dbpassword = get_cfg_var('aws.param3');
-	define('PATH',get_cfg_var('aws.param4'));
-	$path = PATH;
-	$stripe_key = get_cfg_var('aws.param5');
-	define(DEV_ENV, false);
-}
+
+include 'config.php';
+
 Stripe::setApiKey($stripe_key);
 //connect to the mysql db instance of RDS
 $dsn = 'mysql:dbname=vcdb;host=vcdb.crwlsevgtlap.us-east-1.rds.amazonaws.com';
