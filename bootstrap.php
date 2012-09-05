@@ -17,7 +17,7 @@ if (get_cfg_var('aws.access_key') === false)
 	define(DEV_ENV, true);
 } else {
 	$options = array(
-		'certificate_authority'=>get_cfg_var('aws.param1'),
+		'certificate_authority'=>true,
 		'default_cache_config' => '',
 		'key' => get_cfg_var('aws.access_key'),
 		'secret' => get_cfg_var('aws.secret_key'),
