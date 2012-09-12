@@ -62,3 +62,4 @@ if (method_exists($controller, $actionName)) {
 	$controller = new errorController();
 	$controller->errorAction($ctrl, $actn);
 }
+$db = null;

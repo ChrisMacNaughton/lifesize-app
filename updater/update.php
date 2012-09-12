@@ -248,3 +248,4 @@ while(true){
 }
 
 ulog($updater_log, "Closing Down");
+$db = null;

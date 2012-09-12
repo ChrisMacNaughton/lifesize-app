@@ -46,5 +46,5 @@ while(true) {
 		if($errors[0] != '0000')
 			print_r($errors);
 	}
-	sleep(1 * 60 * 60);
+	sleep(1 * 30 * 60);
 }
