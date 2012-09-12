@@ -20,8 +20,8 @@ try {
 }
 $updater_log = $db->prepare("INSERT INTO updater_log (updater_id, type, `timestamp`, action, detail) VALUES (:id, :type, :time, :action, :detail)");
 
-ulog(false, "Connected!");
-
+//ulog(false, "Connected!");
+ulog($updater_log, 'Initialized');
 $email = new AmazonSES($options);
 
 $signature = 'The ' . COMPANY_NAME . ' Team';
@@ -46,7 +46,7 @@ function ulog($updater_log, $action, $detail = '') {
 		//print_r($updater_log->errorInfo());
 	} else {
 		$message = $action . " " . $detail;
-		echo "[$type ".UPDATER_ID."](".time().")||" . $message . "\n";
+		//echo "[$type ".UPDATER_ID."](".time().")||" . $message . "\n";
 		//$log = fopen('log', 'a');
 		//fwrite($log, "[Updater ".UPDATER_ID."](".time().")||" . $message . "\n");
 		//fclose($log);

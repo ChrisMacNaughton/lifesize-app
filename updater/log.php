@@ -68,7 +68,7 @@ foreach ($logs as $action) { $id = substr($action['updater_id'],0,5); ?>
 	<tr><!-- <?php print_r($action); ?>-->
 		<td style="border-bottom: 1px solid #ccc;" class="updater-<?php echo $id ?>"><span title="<?php echo $action['updater_id']; ?>"><?php echo $id; ?></span></td>
 		<td style="border-bottom: 1px solid #ccc;"><?php echo $action['type']; ?></td>
-		<td style="border-bottom: 1px solid #ccc;"><?php echo date('m/d/Y H:i:s',$action['timestamp'] - 60 * 60 * 7); ?></td>
+		<td style="border-bottom: 1px solid #ccc;"><?php echo date('m/d/Y H:i:s',$action['timestamp']/* - 60 * 60 * 7*/); ?></td>
 		<td style="border-bottom: 1px solid #ccc;"><?php echo $action['action']; ?></td>
 		<td style="border-bottom: 1px solid #ccc;"><?php echo $action['detail']; ?></td>
 	</tr>

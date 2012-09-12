@@ -1,7 +1,9 @@
 <?php
 define('START', time());
-ignore_user_abort(true);
-$type = "Updater-web";
+ignore_user_abort(true);set_time_limit(0);
+
+$type = "Updater";
+if(!isset($argc)) $type .= "-web";
 require_once('common.php');
 $time = (int)time() - 60;
 $res = $db->query("SELECT value FROM settings WHERE setting = 'max_updaters'")->fetch(PDO::FETCH_ASSOC);
