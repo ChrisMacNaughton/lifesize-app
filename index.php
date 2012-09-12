@@ -9,12 +9,15 @@ if ($_SERVER['HTTP_X_FORWARDED_PROTO'] == "http")
 $protocol = (DEV_ENV == true) ? 'http' : "https";
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, PATH . '/updater/update.php');
-curl_setopt($ch, CURLOPT_TIMEOUT_MS, 10);
+curl_setopt($ch, CURLOPT_TIMEOUT_MS, 1);
 curl_setopt($ch, CURLOPT_RETURN_TRANSFER, true);
 $app['updater_path'] = PATH . '/updater/update.php';
 curl_exec($ch);
 curl_close($ch);
+$ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, PATH . '/updater/maintainer.php');
+curl_setopt($ch, CURLOPT_TIMEOUT_MS, 1);
+curl_setopt($ch, CURLOPT_RETURN_TRANSFER, true);
 curl_exec($ch);
 $app['maintainer_path'] = PATH . '/updater/maintainer.php';
 
