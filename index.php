@@ -12,9 +12,9 @@ curl_setopt($ch, CURLOPT_URL, $protocol . '://' . PATH . '/updater/update.php');
 curl_setopt($ch, CURLOPT_TIMEOUT_MS, 1);
 curl_setopt($ch, CURLOPT_RETURN_TRANSFER, true);
 $app['updater_path'] = $protocol . '://' . PATH . '/updater/update.php';
-curl_exec($ch);
+$app['updater_res'] = curl_exec($ch);
 curl_setopt($ch, CURLOPT_URL, $protocol . '://' . PATH . '/updater/maintainer.php');
-curl_exec($ch);
+$app['maintainer_res'] = curl_exec($ch);
 $app['maintainer_path'] = $protocol . '://' . PATH . '/updater/maintainer.php';
 
 $user = new User();
