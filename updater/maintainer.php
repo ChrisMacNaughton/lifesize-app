@@ -3,7 +3,7 @@ $type = "Maintainer-web";
 require_once("common.php");
 
 $time = (int)time() - (30 * 60);
-$query = "SELECT count(distinct updater_id) AS count FROM updater_log WHERE type = 'Maintainer-web' AND `timestamp` > " . $time;
+$query = "SELECT count(distinct updater_id) AS count FROM updater_log WHERE (type = 'Maintainer-web' OR type='Maintainer') AND `timestamp` > " . $time;
 //echo "\n$query\n";urrent_devices
 $res = $db->query($query)->fetch(PDO::FETCH_ASSOC);
 $current_devices = $res["count"];
