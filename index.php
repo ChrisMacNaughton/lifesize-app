@@ -15,11 +15,11 @@ $app['updater_path'] = 'localhost/updater/update.php';
 curl_exec($ch);
 curl_close($ch);
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, PATH . '/updater/maintainer.php');
+curl_setopt($ch, CURLOPT_URL, 'localhost/updater/maintainer.php');
 curl_setopt($ch, CURLOPT_TIMEOUT_MS, 1);
 curl_setopt($ch, CURLOPT_RETURN_TRANSFER, true);
 curl_exec($ch);
-$app['maintainer_path'] = PATH . '/updater/maintainer.php';
+$app['maintainer_path'] = 'localhost/updater/maintainer.php';
 
 $user = new User();
 $ctrl = ($uri->seg(0) == '' || $uri->seg[0] == 'home') ? 'default' : $uri->seg(0);
