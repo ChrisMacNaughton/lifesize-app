@@ -6,16 +6,16 @@ define("COMPANY_NAME", 'ControlVC');
 include 'bootstrap.php';
 if ($_SERVER['HTTP_X_FORWARDED_PROTO'] == "http")
 	header("Location: https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
-
+$protocol = (DEV_ENV == true) ? 'http' : "https";
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, PATH . '/updater/update.php');
+curl_setopt($ch, CURLOPT_URL, $protocol . '://' . PATH . '/updater/update.php');
 curl_setopt($ch, CURLOPT_TIMEOUT_MS, 1);
 curl_setopt($ch, CURLOPT_RETURN_TRANSFER, true);
-$app['updater_path'] = PATH . '/updater/update.php';
+$app['updater_path'] = $protocol . '://' . PATH . '/updater/update.php';
 curl_exec($ch);
-curl_setopt($ch, CURLOPT_URL, PATH . '/updater/maintainer.php');
+curl_setopt($ch, CURLOPT_URL, $protocol . '://' . PATH . '/updater/maintainer.php');
 curl_exec($ch);
-$app['maintainer_path'] = PATH . '/updater/maintainer.php';
+$app['maintainer_path'] = $protocol . '://' . PATH . '/updater/maintainer.php';
 
 $user = new User();
 $ctrl = ($uri->seg(0) == '' || $uri->seg[0] == 'home') ? 'default' : $uri->seg(0);
