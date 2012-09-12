@@ -9,7 +9,7 @@ if ($_SERVER['HTTP_X_FORWARDED_PROTO'] == "http")
 $protocol = (DEV_ENV == true) ? 'http' : "https";
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $protocol . '://' . PATH . '/updater/update.php');
-curl_setopt($ch, CURLOPT_TIMEOUT_MS, 1);
+curl_setopt($ch, CURLOPT_TIMEOUT_MS, 10);
 curl_setopt($ch, CURLOPT_RETURN_TRANSFER, true);
 $app['updater_path'] = $protocol . '://' . PATH . '/updater/update.php';
 curl_exec($ch);
