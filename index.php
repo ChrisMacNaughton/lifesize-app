@@ -8,10 +8,10 @@ if ($_SERVER['HTTP_X_FORWARDED_PROTO'] == "http")
 	header("Location: https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
 $protocol = (DEV_ENV == true) ? 'http' : "https";
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, PATH . '/updater/update.php');
+curl_setopt($ch, CURLOPT_URL, 'localhost/updater/update.php');
 curl_setopt($ch, CURLOPT_TIMEOUT_MS, 1);
 curl_setopt($ch, CURLOPT_RETURN_TRANSFER, true);
-$app['updater_path'] = PATH . '/updater/update.php';
+$app['updater_path'] = 'localhost/updater/update.php';
 curl_exec($ch);
 curl_close($ch);
 $ch = curl_init();
