@@ -1,8 +1,17 @@
 <?php
 $type = "Maintainer-web";
 require_once("common.php");
+
+$time = (int)time() - (30 * 60);
+$query = "SELECT count(distinct updater_id) AS count FROM updater_log WHERE type = 'Maintainer-web' AND `timestamp` > " . $time;
+//echo "\n$query\n";urrent_devices
+$res = $db->query($query)->fetch(PDO::FETCH_ASSOC);
+$current_devices = $res["count"];
+if($current_devices >= 1) {
+	die();
+}
 Stripe::setApiKey($stripe_key);
-$log_cleaner = $db->prepare("DELETE * FROM updater_log WHERE timestamp < :time AND type = 'maintainer-web'");
+$log_cleaner = $db->prepare("DELETE * FROM updater_log WHERE timestamp < :time");
 $company_list_stmt = $db->prepare("SELECT id, customer_id, subscription_id FROM companies WHERE synced < :time");
 $update_company = $db->prepare("UPDATE companies SET last4 = :last4, active=:active, subscription_id = :plan_id, `interval` = :interval, synced = :time");
 while(true) {

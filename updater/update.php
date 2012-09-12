@@ -8,7 +8,7 @@ require_once('common.php');
 $time = (int)time() - 60;
 $res = $db->query("SELECT value FROM settings WHERE setting = 'max_updaters'")->fetch(PDO::FETCH_ASSOC);
 $max_updaters = $res['value'];
-$query = "SELECT count(distinct updater_id) AS count FROM updater_log WHERE type = 'Updater' AND `timestamp` > " . $time;
+$query = "SELECT count(distinct updater_id) AS count FROM updater_log WHERE type = 'Updater-web' AND `timestamp` > " . $time;
 //echo "\n$query\n";
 $res = $db->query($query)->fetch(PDO::FETCH_ASSOC);
 $current_devices = $res["count"];
