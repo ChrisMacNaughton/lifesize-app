@@ -1,4 +1,9 @@
 <?php
+if($_SERVER['SERVER_ADDR'] != '127.0.0.1'){
+	header("Status: 404");
+	die();
+}
+
 include 'config.php';
 $dsn = 'mysql:dbname=vcdb;host=vcdb.crwlsevgtlap.us-east-1.rds.amazonaws.com';
 try {
