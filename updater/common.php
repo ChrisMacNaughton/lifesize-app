@@ -21,7 +21,6 @@ try {
 $updater_log = $db->prepare("INSERT INTO updater_log (updater_id, type, `timestamp`, action, detail) VALUES (:id, :type, :time, :action, :detail)");
 
 //ulog(false, "Connected!");
-ulog($updater_log, 'Initialized');
 $email = new AmazonSES($options);
 
 $signature = 'The ' . COMPANY_NAME . ' Team';
@@ -52,4 +51,3 @@ function ulog($updater_log, $action, $detail = '') {
 		//fclose($log);
 	}
 }
-

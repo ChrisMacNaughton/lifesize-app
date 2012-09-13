@@ -10,6 +10,8 @@ $current_devices = $res["count"];
 if($current_devices >= 1) {
 	die();
 }
+ulog($updater_log, 'Initialized');
+
 Stripe::setApiKey($stripe_key);
 $log_cleaner = $db->prepare("DELETE * FROM updater_log WHERE timestamp < :time");
 $company_list_stmt = $db->prepare("SELECT id, customer_id, subscription_id FROM companies WHERE synced < :time");
