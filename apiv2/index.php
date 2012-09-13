@@ -9,9 +9,8 @@ if (isset($_GET['debug']) && ($_GET['debug'] == true) && ($user['level'] == 4)) 
 	$data['debug']['total_time'] = round((microtime(true) - $start) * 1000, 3);
 	$data['debug']['database']['db_time'] = round($db_time, 3);
 	$data['debug']['user'] = $user;
-
+	$data['debug']['server'] = $_SERVER;
 	ksort($data['debug']);
-	//$data['debug']['server'] = $_SERVER;
 }
-
+	
 $view->render($data);
