@@ -1,6 +1,18 @@
 <?php
 if($_SERVER['SERVER_ADDR'] != '127.0.0.1'){
 	header("Status: 404");
+	?>
+	<div id="error404" class="content">
+		<div class="block">
+		<h1><span>Error 404</span></h1>
+		<h2><span>Oops!</span></h2>
+		<div class="dontWorry">It's looking like you may have taken a wrong turn.
+		<br>Don't worry... it happens to the best of us.
+		<br /><a href="https://app.control.vc">Back to the app!</a></div>
+		          
+		</div>
+	</div>
+	<?php
 	die();
 }
 
