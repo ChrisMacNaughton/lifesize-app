@@ -7,7 +7,7 @@ if (get_cfg_var('aws.access_key') === false) {
 	$options['key'] = 'AKIAIZCMBC2UFLIFHU2Q';
 	$options['secret'] = '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';
 
-	$path = 'ls.dev';
+	$path = 'controlvc.dev';
 	define('PATH', $path);
 	
 	

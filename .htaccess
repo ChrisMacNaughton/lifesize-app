@@ -1,5 +1,8 @@
 RewriteEngine on
 
+RewriteCond %{HTTP_HOST} ^api\.control\.vc$
+RewriteRule ^ https://control.vc/apiv2%{REQUEST_URI} [L,P]
+
 RewriteCond $1 !^(index\.php|vendors|assets)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*) index.php/$1 [L]
