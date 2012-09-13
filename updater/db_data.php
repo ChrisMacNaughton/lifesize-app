@@ -14,6 +14,7 @@ try {
 $data = array();
 echo "What would you like to do?\n";
 echo "1) Change a user level\n";
+echo "2) Change update interval for a company\n";
 $option = fgets(STDIN);
 echo chr(27).chr(91).'H'.chr(27).chr(91).'J';
 switch($option) {
@@ -70,6 +71,28 @@ switch($option) {
 			$data['errors'][] = "Cancelled user level change";
 			break;
 		}
+		break;
+	case 2:
+		echo chr(27).chr(91).'H'.chr(27).chr(91).'J'; 
+		echo "Company ID: ";
+		$companyId = rtrim(fgets(STDIN));
+		$stmt = $db->prepare("SELECT `interval` FROM companies WHERE id = :id");
+		$stmt->execute(array(':id'=>$companyId));
+		$data['db_errors'][] = $stmt->errorInfo();
+		$res = $stmt->fetch(PDO::FETCH_ASSOC);
+		if($res == ""){
+			die("Invalid Company ID\n\n");
+		}
+		$interval = $res['interval'];
+		//print_r($res);
+		//print_r($stmt->errorInfo());
+		echo "New Interval (Old Interval: $interval minutes): ";
+		$interval = rtrim(fgets(STDIN));
+		$stmt = $db->prepare("UPDATE companies SET `interval` = :interval WHERE id = :id");
+		$stmt->execute(array(
+			':id'=>$companyId,
+			':interval'=>$interval));
+		$data['db_errors'][] = $stmt->errorInfo();
 		break;
 	default:
 		$data['errors'][] = "You must make a choice";

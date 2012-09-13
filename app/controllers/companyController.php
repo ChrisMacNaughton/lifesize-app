@@ -40,7 +40,7 @@ class companyController extends Controller {
 		$card = $_POST['card'];
 		$oldFingerprint = $this->stripe->active_card->fingerprint;
 		
-		$company = $this->stripe;
+		$company = Stripe_Customer::retrieve($this->company['customer_id']);
 		$company->card = $token;
 		$response = $company->save();
 		
@@ -68,6 +68,12 @@ class companyController extends Controller {
 						':now'=>time()
 					));
 		}
+		$stmt = $this->db->prepare("UPDATE companies SET last4 = :last4 WHERE id = :id");
+		$stmt->execute(array(
+			':last4'=>$options[':last4'],
+			':id'=>$thid->company['id']
+		));
+		$json['errors'] = $stmt->errorInfo();
 		echo json_encode($json);
 	}
 	public function registerAction() {

@@ -54,11 +54,11 @@ Current Users: {{usercount}} <button class="add_user">New user</button>
 	</form>
 	
 </div>
-{#
+
 <pre>
-	{{dump()}}
+	{{dump(company)}}
 </pre>
-#}
+
 {% endblock %}
 {% block javascripts %}
 {{parent()}}
@@ -152,7 +152,9 @@ function stripeResponseHandler(status, response) {
 		data: response,
 		type: "POST"
 	}).done(function(data){
+		console.log(data);
 		data = $.parseJSON(data);
+		console.log('test2');
 		console.log(data);
 		if(data['old'] != data['new'])
 		{

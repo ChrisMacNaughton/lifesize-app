@@ -9,3 +9,7 @@ $dbname = "vcdb";
 $dbhost = "vcdb.crwlsevgtlap.us-east-1.rds.amazonaws.com";
 $dbuser = 'vcawsuser';
 $dbpassword = 'Mplz_D8ZJoxwXPug';
+//dev key
+//$stripe_key = "RErWJasvTnxUahbxUsW6wbjTVALVk3KL";
+//live key
+$stripe_key = "gXvEMFzbneZV0BxeD4rBobo3zRfh7Zvu";
