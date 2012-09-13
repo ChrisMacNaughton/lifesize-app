@@ -3,6 +3,7 @@
 class xmlView extends defaultView {
 	public function render($data) {
 		header("Status" . $data['code'], false, $data['code']);
+		unset($data['code']);
 		header("Content-Type: Application/xml");
 		echo $this->xml_encode(array('results'=>$data));
 	}
