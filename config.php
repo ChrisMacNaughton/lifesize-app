@@ -23,7 +23,7 @@ if (get_cfg_var('aws.access_key') === false) {
 	$path = PATH;
 
 	$app['twig_options'] = array(
-			'cache'=>'/cache',
+			'cache'=>'cache',
 			'debug'=>false
 		);
 }
