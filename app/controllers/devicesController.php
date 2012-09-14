@@ -63,17 +63,32 @@ class devicesController extends Controller {
 		$device = $stmt->fetch(PDO::FETCH_ASSOC);
 		if(isset($_POST['action']) && $_POST['action'] == 'edit') {
 			unset($_POST['action']);
-			echo"<!--";print_r($_POST);echo"-->";
-			if($_POST['name'] != '') $edits[] = array(
-				':id'=>'edit-'. substr(sha1($device['id'] . $device['name'] . 'edit at' . microtime(true)),0,10),
-				':object'=>'system',
-				':target'=>'name',
-				':detail'=>$_POST['name'],
-				':added'=>time(),
-				':user'=>$this->user->getID()
-				);
-			$name = ($_POST['name'] != '') ? $_POST['name'] : $device['name'];
-			echo "<!-- Name: $name -->";
+			foreach ($_POST as $target=>$detail){
+				switch($target){
+					case "name":
+						$t = "name";
+						break;
+					case "password":
+						$t="password";
+						break;
+					case "ip":
+						$t="ip";
+						break;
+					default:
+						break(2);
+				}
+				if($detail != "" && $device[$t] != $detail){
+
+					$edits[] = array(
+						':id'=>'edit-'. substr(sha1($device['id'] . $device['name'] . 'edit at' . microtime(true)),0,10),
+						':object'=>'system',
+						':target'=>$t,
+						':detail'=>$detail,
+						':added'=>time(),
+						':user'=>$this->user->getID()
+					);
+				}
+			}
 			echo "<!-- Edits: ";print_r($edits);echo "-->";
 		}
 		$data['title'] = "View Device";
@@ -83,7 +98,7 @@ class devicesController extends Controller {
 		$res = $stmt->fetch(PDO::FETCH_ASSOC);
 		$data['device']['duration_raw'] = $data['device']['duration'];
 		$data['device']['duration'] = formatTime($device['duration']);
-		$data['device']['global_duration_raw'] = $data['device']['global_duration'];
+		$data['device']['global_duration_raw'] = $res['duration'];
 		$data['device']['global_duration'] = formatTime($res['duration']);
 		//print_r($device);
 		$this->render('devices/edit.html.twig', $data);

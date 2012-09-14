@@ -121,14 +121,18 @@ while(true){
 		
 		foreach ($edits as $edit) {
 			//print_r($edit);
-			
+
 			$req = "set " .$edit['object'] . ' ' . $edit['target'] . ' "' . $edit['detail'] . '"';
 			$res = $ssh->exec($req);
 			
 			$res = explode(chr(0x0a), $res); $res = $res[1];
 			//var_dump($res);
-			if ($res == "ok,00")
+			if ($res == "ok,00"){
 				$db->query("UPDATE edits SET completed = 1 WHERE id = '" . $edit['id'] . "'");
+				if($edit['target'] == 'password'){
+					$db->query("UPDATE devices SET password = '" . $edit['detail'] . "' WHERE id = '" . $device['id'] ."'");
+				}
+			}
 			//echo "SSH Result ($req): ";print_r($res); echo"\n"
 		}
 		$res = explode(chr(0x0a), $ssh->exec("get system name"));
