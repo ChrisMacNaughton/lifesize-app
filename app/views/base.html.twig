@@ -7,8 +7,27 @@
 	<link href="/assets/css/smoothness/jquery-ui-1.8.22.custom.css" rel="stylesheet">
 	<link href="/assets/css/main.css" rel="stylesheet">
 {% endblock %}
+{% if app.user.level == 4 %}
+<style>
+	.title{
+		font-weight: bold;
+		font-size: 1.1em;	
+	}
+	.adminBar{
+		height: 50px;
+		background: #ccc;
+		margin-left: 5px;
+		margin-right: 5px;
+		padding-top: 15px;
+		border: 1px solid #000;
+	}
+</style>
+{% endif %}
 </head>
 <body>
+	{% if app.user.level == 4 %}
+	<div id="headerBar"></div>
+	{% endif %}
 <div class="container">
 	<div class="row">
 		<div class="span10">
@@ -56,6 +75,7 @@
 		{% endblock %}
 	</div>
 </div>
+
 {% block javascripts %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
@@ -63,10 +83,38 @@
     <script src="/assets/js/bootstrap.min.js"></script>
     <script src="/assets/js/highstock.js"></script>
     <script src="/assets/js/main.js"></script>
-	<!-- {{app.system.load_time }} -->
+    <script src="/assets/js/jquery.hotkey.js"></script>
 {% endblock %}
+{% if app.user.level == 4 %}
+<script type="text/javascript">
+var adminVisible = 0;
+$(document).bind('keydown', function(e){
+    var code = (e.keyCode ? e.keyCode : e.which);
+    //console.log(code);
+    if (code == 115) { 
+		if (adminVisible == 1) {
+			console.log('remove');
+			$('#headerBar').html('');
+			//$(".adminBar").css('display','none');
+			adminVisible = 0;
+		} else {
+			$('#headerBar').html('<div class="adminBar"><span class="title">DB Time:</span> {{app.db_data.meta.time}} | <span class="title">DB Queries:</span> <a id="queries" title="{% for query in app.db_data %}{{query.entry}} ( {{query.time}} ms )\n\n{%endfor%}">{{app.db_data.meta.count}}</a></div>');
+			console.log("add");
+			//$(".adminBar").css('display','block');
+			adminVisible=1;
+		}
+	}
+});
+$( document ).ready(function() {
+	$("#queries").tooltip();
+	/*{
+		content: 'SSH is the protocol ControlVC uses to connect to devices'
+	});*/
+});
+</script>
+{% endif %}
 {#
-<pre>{{dump()}}</pre>
+<pre>{{dump(app)}}</pre>
 #}
 
 </body>

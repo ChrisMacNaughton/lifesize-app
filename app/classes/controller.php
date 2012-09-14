@@ -77,7 +77,9 @@ class Controller {
 			$data['flash'][] = $flash;
 		unset($_SESSION['flash']);
 		$data['app']['session'] = $_SESSION;
+		$data['app']['db_data'] = $this->db->printLog();
 		ksort($data['app']);ksort($data);
+
 		echo $twig->render($file, $data);
 	}
 }

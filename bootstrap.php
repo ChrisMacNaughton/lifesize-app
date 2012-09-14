@@ -16,8 +16,9 @@ include 'config.php';
 Stripe::setApiKey($stripe_key);
 //connect to the mysql db instance of RDS
 $dsn = 'mysql:dbname=vcdb;host=vcdb.crwlsevgtlap.us-east-1.rds.amazonaws.com';
+require_once 'app/classes/loggedPdo.php';
 try {
-    $db = new PDO($dsn, $dbuser, $dbpassword);
+    $db = new LoggedPDO($dsn, $dbuser, $dbpassword);
 } catch (PDOException $e) {
     $app['errors'][]= $e->getMessage();
     die($e->getMessage());
