@@ -9,7 +9,10 @@ if (get_cfg_var('aws.access_key') === false) {
 
 	$path = 'controlvc.dev';
 	define('PATH', $path);
-	
+	$app['twig_options'] = array(
+			'cache'=>false,
+			'debug'=>true
+		);
 	
 } else {
 	$options['key'] = get_cfg_var('aws.access_key');
@@ -18,6 +21,11 @@ if (get_cfg_var('aws.access_key') === false) {
 	define(DEV_ENV, false);
 	define('PATH',get_cfg_var('aws.param1'));
 	$path = PATH;
+
+	$app['twig_options'] = array(
+			'cache'=>'/cache',
+			'debug'=>false
+		);
 }
 //dev key
 //$stripe_key = "RErWJasvTnxUahbxUsW6wbjTVALVk3KL";

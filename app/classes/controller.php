@@ -37,10 +37,7 @@ class Controller {
 		$this->app['action'] = $this->action;
 		global $app, $path;
 		$loader = new Twig_Loader_Filesystem('app/views');
-		$twig = new Twig_Environment($loader, array(
-			'cache'=>false,
-			'debug'=>true
-		));
+		$twig = new Twig_Environment($loader, $this->app['twig_options']);
 
 		if (!isset($data['flash']))
 		$data['flash'] = array();
