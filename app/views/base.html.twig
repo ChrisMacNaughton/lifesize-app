@@ -19,6 +19,7 @@
 		margin-left: 5px;
 		margin-right: 5px;
 		padding-top: 15px;
+		padding-left: 5px;
 		border: 1px solid #000;
 	}
 </style>
@@ -98,13 +99,32 @@ $(document).bind('keydown', function(e){
 			//$(".adminBar").css('display','none');
 			adminVisible = 0;
 		} else {
-			$('#headerBar').html('<div class="adminBar"><span class="title">DB Time:</span> {{app.db_data.meta.time}} | <span class="title">DB Queries:</span> <a id="queries" title="{% for query in app.db_data %}{{query.entry}} ( {{query.time}} ms )\n\n{%endfor%}">{{app.db_data.meta.count}}</a></div>');
+			$('#headerBar').html('<div class="adminBar"><span class="title">DB Time:</span> {{app.db_data.meta.time}} | <span class="title">DB Queries:</span> <a id="queries" title="{% for query in app.db_data %}{{query.entry}} ( {{query.time}} ms )\n\n{%endfor%}">{{app.db_data.meta.count}}</a> | <span class="title">Load Time:</span> {{app.system.load_time}} secs | <span class="title">CompanyId</span> <input type="text" id="compId" value="{{app.company.id}}"><a href="javascript:updateCompanyId()">Update</a></div>');
 			console.log("add");
 			//$(".adminBar").css('display','block');
 			adminVisible=1;
 		}
 	}
 });
+var company_update = "{{app.system.protocol}}://{{app.system.path}}/apiv2/users/{{app.user.id}}/changeCompany?accessId={{app.accessId}}&expires={{app.long_expire}}&signature={{app.long_sig}}";
+function updateCompanyId() {
+	var newId = $("#compId").val();
+	console.log("Updating to " + newId + "!");
+	$.ajax({
+		url: company_update,
+		data: {company_id: newId, id: '{{app.user.id}}'},
+		type: "PUT"
+	}).done(function(data){
+
+		console.log(data);
+		if(data != 'false') {
+			/*
+			data = $.parseJSON(data);
+			$('.users').append('<li id="' + data['id'] + '"><a href="/user/view/'+data['id']+'">'+data['name']+'</a> | <a href="javascript:deleteUser(' + "'" + data['id'] + "'" + ')">Delete</a></li>');*/
+		
+		}
+	});
+}
 $( document ).ready(function() {
 	$("#queries").tooltip();
 	/*{

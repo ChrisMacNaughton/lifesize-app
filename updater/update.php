@@ -19,7 +19,7 @@ if ($current_devices == $max_updaters OR $current_devices > $max_updaters){
 }
 ulog($updater_log, 'Initialized');
 
-$stmt = $db->prepare("SELECT devices.* FROM devices INNER JOIN companies ON devices.company_id = companies.id WHERE updated < (:now - companies.interval * 60) AND companies.active = 1 AND devices.active=1 AND updating < :updating ORDER BY updated LIMIT 1");
+$stmt = $db->prepare("SELECT devices.* FROM devices INNER JOIN companies ON devices.company_id = companies.id WHERE updated <= (:now - companies.interval * 60) AND companies.active = 1 AND devices.active=1 AND updating < :updating ORDER BY updated LIMIT 1");
 $rsrv = $db->prepare("UPDATE devices SET updating = :time WHERE id = :id AND updating = :updating");
 $updateStmt = $db->prepare("UPDATE devices SET updated = :updated, duration = :duration, status = :status, name = :name, model_id = :model, software_version_id = :version, screenshot = :screenshot, online = 1 WHERE id = :id");
 $last_run = time();

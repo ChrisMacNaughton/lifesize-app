@@ -59,16 +59,17 @@ class Controller {
 			$data['app'] = $this->app;
 			$data['app']['system']['protocol'] = (DEV_ENV == true) ? 'http' : "https";
 			$data['app']['user'] = $this->user->getUser();
+			$data['app']['company'] = $this->company;
 			$data['app']['app_key'] = $this->app_key;
 			$data['app']['accessId'] = $this->access_id;
 			$data['app']['quick_expire'] =time() + 15;
 			$string = $this->access_id . chr(0x0D) . $data['app']['quick_expire'];
 			$data['app']['quick_sig'] = urlencode(base64_encode(hash_hmac('sha1', $string, $this->secret, true)));
-/*
+
 			$data['app']['long_expire'] =time() + 300;
 			$string = $this->access_id . chr(0x0D) . $data['app']['long_expire'];
-			$data['app']['long_sig'] = urlencode(base64_encode(hash_hmac('sha1', $string, $secret, true)));
-			*/
+			$data['app']['long_sig'] = urlencode(base64_encode(hash_hmac('sha1', $string, $this->secret, true)));
+			
 		} 
 		foreach ($_SESSION['errors'] as $err) 
 			$data['errors'][] = $err;
