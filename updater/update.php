@@ -1,4 +1,8 @@
 <?php
+if(function_exists(newrelic_disable_autorun)){
+	newrelic_disable_autorun();
+	newrelic_ignore_apdex();
+}
 define('START', time());
 ignore_user_abort(true);set_time_limit(0);
 

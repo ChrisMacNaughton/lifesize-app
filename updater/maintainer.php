@@ -1,4 +1,9 @@
 <?php
+
+if(function_exists(newrelic_disable_autorun)){
+	newrelic_disable_autorun();
+	newrelic_ignore_apdex();
+}
 $type = "Maintainer-web";
 require_once("common.php");
 

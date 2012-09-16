@@ -1,6 +1,10 @@
 <?php
 if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == "http")
 	header("Location: https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+
+if(function_exists(newrelic_disable_autorun)){
+	newrelic_disable_autorun();
+}
 error_reporting(E_ALL^E_NOTICE^E_WARNING);
 require_once 'bootstrap.php';
 
