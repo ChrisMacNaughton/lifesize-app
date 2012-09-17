@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ALL);
 $arr = array();
 $app['start'] = microtime();
 if(extension_loaded('newrelic')){
