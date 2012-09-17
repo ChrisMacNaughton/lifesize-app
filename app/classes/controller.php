@@ -78,7 +78,7 @@ class Controller {
 		unset($_SESSION['flash']);
 		$data['app']['session'] = $_SESSION;
 		if($this->user->getLevel() == 4){
-			$data['app']['new_relic'] = NEW_RELIC;
+			$data['app']['new_relic'] = (NEW_RELIC)?"enabled":"disabled";
 			if(NEW_RELIC){
 
 			}
