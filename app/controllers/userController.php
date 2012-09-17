@@ -129,11 +129,11 @@ class userController extends Controller {
 			}
 		}
 		if ($this->user->getID() == $id) {
-			
+			$page = 'users/edit.html.twig';
 		} else {
-
+			$page = 'users/editOther.html.twig';
 		}
-		$this->render('users/edit.html.twig', $data);
+		$this->render($page, $data);
 	}
 	public function logoutAction() {
 		$this->user->logout();
