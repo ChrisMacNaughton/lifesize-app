@@ -1,9 +1,10 @@
-<?
+<?php
 if(function_exists('newrelic_ignore_transaction')){
 	newrelic_disable_autorun();
 	//newrelic_ignore_transaction();
-	newrelic_background_job();
+	newrelic_background_job('true');
 }
+
 require_once 'vendor/autoload.php';
 date_default_timezone_set('UTC');
 define("COMPANY_NAME", 'ControlVC');
@@ -21,11 +22,11 @@ ulog(false, "Connecting to the database");
 try {
     $db = new PDO($dsn, $dbuser, $dbpassword);
 } catch (PDOException $e) {
-    die(ulog(false, "Error connecting to the database: " .  $e->getMessage()));
+    die(ulog(false, "Error connecting to the database: " . $e->getMessage()));
+    //echo $e->getMessage();
 }
 $updater_log = $db->prepare("INSERT INTO updater_log (updater_id, type, `timestamp`, action, detail) VALUES (:id, :type, :time, :action, :detail)");
 
-//ulog(false, "Connected!");
 $email = new AmazonSES($options);
 
 $signature = 'The ' . COMPANY_NAME . ' Team';
@@ -47,12 +48,8 @@ function ulog($updater_log, $action, $detail = '') {
 			':action'=>$action,
 			':detail'=>$detail
 			));
-		//print_r($updater_log->errorInfo());
 	} else {
 		$message = $action . " " . $detail;
-		//echo "[$type ".UPDATER_ID."](".time().")||" . $message . "\n";
-		//$log = fopen('log', 'a');
-		//fwrite($log, "[Updater ".UPDATER_ID."](".time().")||" . $message . "\n");
-		//fclose($log);
+		//echo $message;
 	}
 }
