@@ -52,6 +52,7 @@ $redir = true;
 	}
 }
 $app['page'] = $ctrl;
+define('TRANSACTION',$controllerName . '/' . $actionName);
 
 if (class_exists($controllerName))
 	$controller = new $controllerName($ctrl, $actn, $app, $db);
@@ -68,7 +69,7 @@ if (method_exists($controller, $actionName)) {
 	$controller = new errorController();
 	$controller->errorAction($ctrl, $actn);
 }
-define('TRANSACTION',$controllerName . '/' . $actionName);
 if (NEW_RELIC) 
-			newrelic_name_transaction(TRANSACTION);
+	newrelic_name_transaction(TRANSACTION);
+
 $db = null;
