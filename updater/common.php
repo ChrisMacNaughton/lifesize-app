@@ -1,5 +1,5 @@
 <?
-if(function_exists(newrelic_disable_autorun)){
+if(function_exists('newrelic_disable_autorun')){
 	newrelic_disable_autorun();
 	newrelic_ignore_transaction();
 }

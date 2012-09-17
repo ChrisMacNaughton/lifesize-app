@@ -1,7 +1,7 @@
 <?php
 $arr = array();
 $app['start'] = microtime();
-if(function_exists(newrelic_disable_autorun)){
+if(function_exists('newrelic_disable_autorun')){
 	define('NEW_RELIC', true);
 } else {
 	define("NEW_RELIC", false);
