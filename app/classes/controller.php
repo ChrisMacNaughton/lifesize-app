@@ -28,7 +28,7 @@ class Controller {
 		//$res = $db->query("SELECT app_key FROM apps WHERE id='app-controlVC' AND active=1 LIMIT 1");
 		//$res = $res->fetch(PDO::FETCH_ASSOC);
 		//$this->app_key = $res['app_key'];
-		$res = $db->prepare("SELECT access_id, secret FROM api_keys WHERE user_id = :userid AND active=1 LIMIT 1");
+		$res = $this->db->prepare("SELECT access_id, secret FROM api_keys WHERE user_id = :userid AND active=1 LIMIT 1");
 		$res->execute(array(':userid'=>$this->user->getID()));
 		$res = $res->fetch(PDO::FETCH_ASSOC);
 		$this->access_id = $res['access_id']; $this->secret = $res['secret'];
