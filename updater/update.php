@@ -14,8 +14,11 @@ $res = $db->query($query)->fetch(PDO::FETCH_ASSOC);
 $current_devices = $res["count"];
 
 if ($current_devices == $max_updaters OR $current_devices > $max_updaters){
-	echo "\n\n";
 	die('Already at max updaters of ' . $max_updaters . " ( $current_devices ) ");
+}
+$result = $db->query("SELECT value FROM settings WHERE setting = 'continue'")->fetch(PDO::FETCH_ASSOC);
+if ($result['value'] == 0) {
+	die("Do not continue (per db)");
 }
 ulog($updater_log, 'Initialized');
 
@@ -234,8 +237,12 @@ while(true){
 		sleep(rand(1,5));
 	}
 	
-	if ($last_run < $time - 120) {
+	if ($last_run < $time - 30) {
 		//ulog($updater_log, "Memory Usage: ".memory_get_usage());
+		$result = $db->query("SELECT value FROM settings WHERE setting = 'continue'")->fetch(PDO::FETCH_ASSOC);
+		if ($result['value'] == 0) {
+			break;
+		}
 		$db = null;
 		try {
 		    $db = new PDO($dsn, $dbuser, $dbpassword);
@@ -243,10 +250,7 @@ while(true){
 			break;
 		}
 
-		$result = $db->query("SELECT value FROM settings WHERE setting = 'continue'")->fetch(PDO::FETCH_ASSOC);
-		if ($result['value'] == 0) {
-			break;
-		}
+		
 		$last_run = $time;
 	}
 
