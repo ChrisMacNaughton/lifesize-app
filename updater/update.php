@@ -59,7 +59,7 @@ while(true){
 	$query = "INSERT INTO device_updates (id, device_id, updated) VALUES ('$updateId','". $device['id']. "', '" . time() ."')";
 	//echo $query . "\n";
 	$db->query($query);
-	if (!$ssh->login('auto', $device['password'])) {
+	if (!$ssh->login('auto', $device['password']) || !$ssh->login('auto','lifesize')) {
 		#ulog($updater_log, $device['id'] . " is Offline");
 		$prev_offline->execute(array(':id'=>$device['id']));
 		$res = $prev_offline->fetch(PDO::FETCH_ASSOC);
