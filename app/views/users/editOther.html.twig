@@ -1,15 +1,31 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<h2>Change {{user.name}}'s Password</h2>
-<form action="" method="POST">
-	<label>Current Password</label>
-	<input type="password" name="old_pass" />
-	<label>New Password</label>
-	<input type="password" name="password" />
-	<label>Verify</label>
-	<input type="password" name="password2" />
-	<input type="hidden" name="action" value="editPassword" />
-	<label><input type="submit" value="Submit"></label>
-</form>
+<div class="row">
+	<div class="span6">
+		<h2>Change {{user.name}}'s Password</h2>
+		<form action="" method="POST">
+			<label>Current Password</label>
+			<input type="password" name="old_pass" />
+			<label>New Password</label>
+			<input type="password" name="password" />
+			<label>Verify</label>
+			<input type="password" name="password2" />
+			<input type="hidden" name="action" value="editPassword" />
+			<label><input type="submit" value="Submit"></label>
+		</form>
+	</div><div class="span6">
+		<h2>Change {{user.name}}'s Level</h2>
+		<form action="" method="POST">
+			<label>User Level</label>
+			<select name="level">
+				<option value='1'{% if user.level == 1%} selected="selected"{%endif %}>Basic</option>
+				<option value='2'{% if user.level == 2%} selected="selected"{%endif %}>Operator</option>
+				<option value='3'{% if user.level == 3%} selected="selected"{%endif %}>Manager</option>
+			</select>
+			<input type="hidden" name="action" value="editLevel" />
+			<label><input type="submit" value="Submit"></label>
+		</form>
+	</div>
+</div>
 {% endblock %}

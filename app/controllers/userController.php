@@ -40,7 +40,7 @@ class userController extends Controller {
 					$stmt->execute(array(
 						':user'=>$this->user->getID(),
 						':action'=>'add_user',
-						':details'=>"User added a new user: " . $user[':name'],
+						':details'=>$result['id'],
 						':now'=>time()
 					));
 					
@@ -104,7 +104,12 @@ class userController extends Controller {
 			session_write_close();
 			header("Location: /user/view/" . $this->user->getID());
 		}
+		$stmt = $this->db->prepare("SELECT name, users.id AS id FROM users INNER JOIN log ON users.id = log.user WHERE log.action='add_user' AND details = :userid");
+		$stmt->execute(array(':userid'=>$id));
+		
 		$data['user'] = $res;
+		$data['user']['creator'] = $stmt->fetch(PDO::FETCH_ASSOC);
+		$data['user']['gravatar'] = md5(strtolower(trim($data['user']['email'])));
 		$this->render('users/viewOne.html.twig', $data);
 	}
 	public function editAction($id){
@@ -112,26 +117,35 @@ class userController extends Controller {
 			$data = array(
 				'title'=>"Edit"
 			);
+			$data['user'] = $this->user->getUserInfo($id);
 		if ($this->user->getLevel() < 3 && $this->user->getID() != $id )
 		{
 			$_SESSION['error'][] = l('no_permission');
 			session_write_close();
 			header("Location: /user/view/" . $this->user->getID());
 		}
-		if (isset($_POST['action']) && $_POST['action'] == 'editPassword'){
-			
-			$result = $this->user->changePass($id, $_POST['old_pass'], $_POST['password'], $_POST['password2']);
-			
-			$errors = $this->user->getErrors();
-			if ($result === false) {
-				foreach ($errors as $err)
-					$data['errors'][] = $err;
+		if (isset($_POST['action'])){
+			if($_POST['action'] == 'editPassword'){
+				$result = $this->user->changePass($id, $_POST['old_pass'], $_POST['password'], $_POST['password2']);
+				
+				$errors = $this->user->getErrors();
+				if ($result === false) {
+					foreach ($errors as $err)
+						$data['errors'][] = $err;
+				}
+			}
+			else if ($_POST['action'] == 'editLevel') {
+				
+				$stmt = $this->db->prepare("UPDATE users SET level = :level WHERE id = :id");
+				$options = array(':level'=>$_POST['level'], ':id'=>$data['user']['id']);
+				$stmt->execute($options);
+				echo "<!-- ";print_r($options);print_r($stmt->errorInfo()); echo"-->";
+				header("Location: /user/edit/".$id);
 			}
 		}
 		if ($this->user->getID() == $id) {
 			$page = 'users/edit.html.twig';
 		} else {
-			$data['user'] = $this->user->getUserInfo($id);
 			$page = 'users/editOther.html.twig';
 		}
 		$this->render($page, $data);

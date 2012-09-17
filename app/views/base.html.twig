@@ -81,7 +81,6 @@
 {% block javascripts %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
-	<script src="/assets/js/jquery-tools.js"></script>
     <script src="/assets/js/bootstrap.min.js"></script>
     <script src="/assets/js/highstock.js"></script>
     <script src="/assets/js/main.js"></script>
@@ -119,13 +118,12 @@ function update_metrics() {
 var company_update = "{{app.system.protocol}}://{{app.system.path}}/apiv2/users/{{app.user.id}}/changeCompany?accessId={{app.accessId}}&expires={{app.long_expire}}&signature={{app.long_sig}}";
 function updateCompanyId() {
 	var newId = $("#compId").val();
-	console.log("Updating to " + newId + "!");
 	$.ajax({
 		url: company_update,
-		data: {company_id: newId, id: '{{app.user.id}}'},
+		data: {company_id: newId},
 		type: "PUT"
 	}).done(function(data){
-
+		console.log("Data:");
 		console.log(data);
 		if(data != 'false') {
 			/*

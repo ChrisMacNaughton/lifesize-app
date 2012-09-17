@@ -39,3 +39,11 @@ input {
 .past {
 	color: #ccc;
 }
+h1 .small{
+	font-size: 14px;
+	color: #ccc;
+}
+h1 .small a {
+	color: #999;
+	padding-left: 15px;
+}

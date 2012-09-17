@@ -45,10 +45,9 @@ Current Users: {{usercount}} <button class="add_user">New user</button>
 		<input type="text" name="email" id="email">
 		<label>User Level</label>
 		<select name="level" id="level">
-		<option value="0">User</option>
-		<option value="1">Engineer</option>
-		<option value="2">Manager</option>
-		<option value="3">Admin</option>
+		<option value="1">Basic</option>
+		<option value="2">Operator</option>
+		<option value="3">Manager</option>
 		</select>
 	</fieldset>
 	</form>
@@ -79,7 +78,7 @@ $(document).ready(function() {
 			email = $("#email"),
 			level = $("#level"),
 			allFields = $( [] ).add( card ).add( month ).add( year ).add( cvc ).add( name ).add(username).add(email).add(level);
-		$( "#user_form").dialog({
+		$("#user_form").dialog({
 			autoOpen: false,
 			height: 400,
 			width: 250,

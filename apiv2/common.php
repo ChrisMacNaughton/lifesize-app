@@ -25,7 +25,7 @@ function handle_exception($e) {
     if(isset($request['request']) && $request['request'] == 'status'){
         $view->render(array('code'=>$e->getCode(), 'result'=>array('Status'=>'Online')));
     } else {
-        $view->render(array('code'=>$e->getCode(), 'result'=>array('Error'=>$e->getMessage(), 'request'=>$request)));
+        $view->render(array('code'=>$e->getCode(), 'result'=>array('Error'=>$e->getMessage()/*, 'request'=>$request*/)));
         
     }
 	//$view->render();

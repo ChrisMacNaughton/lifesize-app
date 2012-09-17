@@ -124,11 +124,19 @@ class apiController {
 		$action = $this->init(3);
 		$id = $_POST['id'];
 
-		$stmt = $this->db->prepare("DELETE FROM users WHERE id = :id");
-		$res = $stmt->execute(array(
-			':id'=>$id
-			));
-		
+		if($_GET['action'] == "delete") {
+			$stmt = $this->db->prepare("DELETE FROM users WHERE id = :id");
+			$res = $stmt->execute(array(
+				':id'=>$id
+				));
+			$stmt = $this->db->prepare("INSERT INTO log (user, action,details,timestamp) VALUES (:user, :action, :details, :now)");
+				$stmt->execute(array(
+					':user'=>$this->user->getID(),
+					':action'=>'delete_user',
+					':details'=>$id,
+					':now'=>time()
+				));
+		}
 		echo json_encode($res);
 		
 	}

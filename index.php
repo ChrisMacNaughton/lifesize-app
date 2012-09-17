@@ -50,6 +50,8 @@ $redir = true;
 		if(!array_search(l("error_need_to_login"), $_SESSION['flash']) && ($ctrl != 'default' && $actn != 'index'))
 		$_SESSION['flash'][] = l("error_need_to_login");
 		session_write_close();
+		if (NEW_RELIC) 
+			newrelic_name_transaction('redirect_to_login');
 		header("Location: /user/login");
 	}
 }

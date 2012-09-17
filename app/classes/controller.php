@@ -23,14 +23,16 @@ class Controller {
 		$this->action = $action;
 		$this->app = $app;
 		$this->db = $db;
-		$res = $db->query("SELECT app_key FROM apps WHERE id='app-controlVC' AND active=1 LIMIT 1");
-		$res = $res->fetch(PDO::FETCH_ASSOC);
-		$this->app_key = $res['app_key'];
-		$res = $db->query("SELECT access_id, secret FROM api_keys WHERE app_key = '" . $this->app_key . "' LIMIT 1");
-		$res = $res->fetch(PDO::FETCH_ASSOC);
-		$this->access_id = $res['access_id']; $this->secret = $res['secret'];
 		global $user;
 		$this->user = $user;
+		//$res = $db->query("SELECT app_key FROM apps WHERE id='app-controlVC' AND active=1 LIMIT 1");
+		//$res = $res->fetch(PDO::FETCH_ASSOC);
+		//$this->app_key = $res['app_key'];
+		$res = $db->prepare("SELECT access_id, secret FROM api_keys WHERE user_id = :userid AND active=1 LIMIT 1");
+		$res->execute(array(':userid'=>$this->user->getID()));
+		$res = $res->fetch(PDO::FETCH_ASSOC);
+		$this->access_id = $res['access_id']; $this->secret = $res['secret'];
+		
 	}
 	public function render($file, ARRAY $data = null) {
 		$this->app['controller'] = $this->controller;

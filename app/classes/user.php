@@ -98,7 +98,7 @@ protected $company = array();
 		return $this->errors;
 	}
 	public function getUserInfo($id) {
-		$stmt = $this->db->prepare("SELECT id, name, company_id, email, phone FROM users WHERE id = :id");
+		$stmt = $this->db->prepare("SELECT id, name, company_id, email, phone, level, created FROM users WHERE id = :id");
 		$stmt->execute(array(':id'=>$id));
 		$res = $stmt->fetch(PDO::FETCH_ASSOC);
 		if ($res['company_id'] == $this->company_id)
@@ -152,6 +152,7 @@ protected $company = array();
 		unset($user[':user_name']);
 		$subject = COMPANY_NAME . " Registration";
 		$user[':reset'] = 1;
+		$user[':created'] = time();
 		$email = new AmazonSES($options);
 		$fields = array();
 		$values = array();
