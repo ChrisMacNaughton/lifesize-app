@@ -1,10 +1,7 @@
 <?php
 
-if(function_exists(newrelic_disable_autorun)){
-	newrelic_disable_autorun();
-	newrelic_ignore_apdex();
-}
-$type = "Maintainer-web";
+$type = "Maintainer";
+if(!isset($argc)) $type .= "-web";
 require_once("common.php");
 
 $time = (int)time() - (30 * 60);

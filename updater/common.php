@@ -1,4 +1,8 @@
-<?php
+<?
+if(function_exists(newrelic_disable_autorun)){
+	newrelic_disable_autorun();
+	newrelic_ignore_transaction();
+}
 require_once 'vendor/autoload.php';
 date_default_timezone_set('UTC');
 define("COMPANY_NAME", 'ControlVC');
