@@ -1,6 +1,6 @@
 <?php
 if(extension_loaded('newrelic')){
-	newrelic_disable_autorun();
+	newrelic_disable_autorum();
 	//newrelic_ignore_transaction();
 	newrelic_background_job();
 }
