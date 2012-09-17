@@ -4,7 +4,7 @@ $app['start'] = microtime();
 if(function_exists('newrelic_name_transaction')){
 	define('NEW_RELIC', true);
 } else {
-	define("NEW_RELIC", false);
+	define('NEW_RELIC', false);
 }
 define("COMPANY_NAME", 'ControlVC');
 include 'bootstrap.php';
@@ -68,6 +68,7 @@ if (method_exists($controller, $actionName)) {
 	$controller = new errorController();
 	$controller->errorAction($ctrl, $actn);
 }
+define('TRANSACTION',$controllerName . '/' . $actionName);
 if (NEW_RELIC) 
-			newrelic_name_transaction($controllerName . '/' . $actionName);
+			newrelic_name_transaction(TRANSACTION);
 $db = null;

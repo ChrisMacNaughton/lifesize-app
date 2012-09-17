@@ -82,7 +82,7 @@ class Controller {
 			if(NEW_RELIC){
 
 			}
-
+			$data['app']['transaction'] = TRANSACTION;
 			$data['app']['db_data'] = $this->db->printLog();
 		}
 		ksort($data['app']);ksort($data);
