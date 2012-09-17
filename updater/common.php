@@ -50,6 +50,6 @@ function ulog($updater_log, $action, $detail = '') {
 			));
 	} else {
 		$message = $action . " " . $detail;
-		//echo $message;
+		echo $message;
 	}
 }
