@@ -61,7 +61,7 @@ define('TRANSACTION',$controllerName . '/' . $actionName);
 if (class_exists($controllerName))
 	$controller = new $controllerName($ctrl, $actn, $app, $db);
 else
-	$controller = new errorController();
+	$controller = new errorController($ctrl, $actn, $app, $db);
 	
 if (method_exists($controller, $actionName)) {
 	$controller->beforeAction();
