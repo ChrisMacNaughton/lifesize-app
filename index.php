@@ -68,6 +68,6 @@ if (method_exists($controller, $actionName)) {
 	$controller = new errorController();
 	$controller->errorAction($ctrl, $actn);
 }
-if (NEW_RELIC)
+if (NEW_RELIC) 
 			newrelic_name_transaction($controllerName . '/' . $actionName);
 $db = null;

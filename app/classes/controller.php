@@ -65,7 +65,6 @@ class Controller {
 			$data['app']['quick_expire'] =time() + 15;
 			$string = $this->access_id . chr(0x0D) . $data['app']['quick_expire'];
 			$data['app']['quick_sig'] = urlencode(base64_encode(hash_hmac('sha1', $string, $this->secret, true)));
-
 			$data['app']['long_expire'] =time() + 300;
 			$string = $this->access_id . chr(0x0D) . $data['app']['long_expire'];
 			$data['app']['long_sig'] = urlencode(base64_encode(hash_hmac('sha1', $string, $this->secret, true)));
@@ -78,7 +77,14 @@ class Controller {
 			$data['flash'][] = $flash;
 		unset($_SESSION['flash']);
 		$data['app']['session'] = $_SESSION;
-		$data['app']['db_data'] = $this->db->printLog();
+		if($this->user->getLevel() == 4){
+			$data['app']['new_relic'] = NEW_RELIC;
+			if(NEW_RELIC){
+
+			}
+
+			$data['app']['db_data'] = $this->db->printLog();
+		}
 		ksort($data['app']);ksort($data);
 
 		echo $twig->render($file, $data);
