@@ -99,7 +99,7 @@ class userController extends Controller {
 	public function viewAction($id) {
 		$data = array('title'=>"User");
 		$res = $this->user->getUserInfo($id);
-		if ($res === false && $this->user->getLevel() < 4) {
+		if ($res === false && $this->user->getLevel() < 3) {
 			$_SESSION['error'][] = l('no_permission');
 			session_write_close();
 			header("Location: /user/view/" . $this->user->getID());
@@ -129,8 +129,11 @@ class userController extends Controller {
 			}
 		}
 		if ($this->user->getID() == $id) {
-			$this->render('users/edit.html.twig', $data);
+			
+		} else {
+
 		}
+		$this->render('users/edit.html.twig', $data);
 	}
 	public function logoutAction() {
 		$this->user->logout();
