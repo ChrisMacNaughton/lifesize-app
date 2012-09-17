@@ -1,5 +1,5 @@
 <?php
-if(function_exists('newrelic_disable_autorun')){
+if(extension_loaded('newrelic')){
 	newrelic_disable_autorun();
 	//newrelic_ignore_transaction();
 	newrelic_background_job();

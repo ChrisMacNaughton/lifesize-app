@@ -1,7 +1,7 @@
 <?php
 $arr = array();
 $app['start'] = microtime();
-if(function_exists('newrelic_name_transaction')){
+if(extension_loaded('newrelic')){
 	define('NEW_RELIC', true);
 	newrelic_capture_params();
 } else {
