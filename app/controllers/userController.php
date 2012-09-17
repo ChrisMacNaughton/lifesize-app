@@ -131,6 +131,7 @@ class userController extends Controller {
 		if ($this->user->getID() == $id) {
 			$page = 'users/edit.html.twig';
 		} else {
+			$data['user'] = $this->user->getUserInfo($id);
 			$page = 'users/editOther.html.twig';
 		}
 		$this->render($page, $data);
