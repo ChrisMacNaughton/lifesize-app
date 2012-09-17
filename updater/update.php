@@ -1,5 +1,5 @@
 <?php
-
+error_reporting(E_ALL);
 define('START', time());
 ignore_user_abort(true);set_time_limit(0);
 
