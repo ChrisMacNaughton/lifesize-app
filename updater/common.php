@@ -1,7 +1,8 @@
 <?
 if(function_exists('newrelic_ignore_transaction')){
 	newrelic_disable_autorun();
-	newrelic_ignore_transaction();
+	//newrelic_ignore_transaction();
+	newrelic_background_job();
 }
 require_once 'vendor/autoload.php';
 date_default_timezone_set('UTC');

@@ -3,6 +3,7 @@ $arr = array();
 $app['start'] = microtime();
 if(function_exists('newrelic_name_transaction')){
 	define('NEW_RELIC', true);
+	newrelic_capture_params();
 } else {
 	define('NEW_RELIC', false);
 }
