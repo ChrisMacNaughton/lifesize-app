@@ -13,6 +13,34 @@ class apiController {
 	public function beforeAction() {
 		
 	}
+	public function deviceAction() {
+		$action = $this->init(3);
+		$id = $_POST['id'];
+		switch($_GET['action']) {
+			case "delete":
+				$options = array(':id'=>$id);
+				$stmt = $this->db->prepare("DELETE FROM devices WHERE id = :id");
+				$stmt->execute($options);
+				$errors[] = $stmt->errorInfo();
+				$stmt = $this->db->prepare("DELETE FROM devices_alarms WHERE device_id = :id");
+				$stmt->execute($options);
+				$errors[] = $stmt->errorInfo();
+				$stmt = $this->db->prepare("DELETE FROM devices_history WHERE device_id = :id");
+				$stmt->execute($options);
+				$errors[] = $stmt->errorInfo();
+				$stmt = $this->db->prepare("DELETE FROM device_updates WHERE device_id = :id");
+				$stmt->execute($options);
+				$errors[] = $stmt->errorInfo();
+				//echo json_encode($errors);
+				foreach($errors  as $err) {
+					if ($err[1] != null){
+						echo json_encode(array("Error"=>$err));
+						die();
+					}
+				}
+				echo "true";
+		}
+	}
 	public function alarmsAction() {
 		$action = $this->init(1);
 		$user_id = $this->user->getID();
@@ -24,14 +52,18 @@ class apiController {
 			$active = 0;
 		switch($action) {
 			case "toggle":
-				$stmt = $this->db->prepare("SELECT * FROM devices_alarms WHERE user_id = :id AND alarm_id = :alarm LIMIT 1");
-				$stmt->execute(array(':id'=>$user_id, ':alarm'=>$alarm_id));
-				$res = $stmt->rowCount();
-				if ($res == 0) {
-					$query = "INSERT INTO devices_alarms (alarm_id, device_id, user_id, active) VALUES (:alarm, :device, :user, :active)";
+				$stmt = $this->db->prepare("SELECT * FROM devices_alarms WHERE user_id = :id AND alarm_id = :alarm AND device_id = :device_id LIMIT 1");
+				$stmt->execute(array(':id'=>$user_id, ':alarm'=>$alarm_id, ':device_id'=>$device_id));
+				$res = $stmt->fetch(PDO::FETCH_ASSOC);
+
+				$errors[] = $stmt->errorInfo();
+				//echo json_encode($_POST);
+				if ($res === false) {
+					$query = "INSERT INTO devices_alarms (alarm_id, device_id, user_id, enabled) VALUES (:alarm, :device, :user, :active)";
 				} else {
-					$query = "UPDATE devices_alarms SET active = :active WHERE alarm_id = :alarm AND device_id = :device AND user_id = :user";
+					$query = "UPDATE devices_alarms SET enabled = :active WHERE (alarm_id = :alarm AND device_id = :device AND user_id = :user)";
 				}
+				//echo json_encode($query);
 				$stmt = $this->db->prepare($query);
 				//print_r($stmt);
 				$options = array(
@@ -40,9 +72,11 @@ class apiController {
 					':alarm'=>$alarm_id,
 					':device'=>$device_id
 					);
-				//print_r($options);
+				echo json_encode($options);
 				$stmt->execute($options);
+				$errors[] = $stmt->errorInfo();
 				$ret = $stmt->rowCount();
+				echo json_encode($errors);
 				if($ret == 1) {
 					echo "True";
 				} else {
@@ -96,7 +130,7 @@ class apiController {
 			);
 		}
 		$action = isset($_GET['action']) ? $_GET['action'] : false;
-		if (!$action) {
+		if (!$action && !isset($errors)) {
 			if (!isset($errors))
 			$errors = array(
 				'code'=>'400: BAD REQUEST',
@@ -104,7 +138,7 @@ class apiController {
 				);
 			
 		}
-		if (count($_POST) == 0) {
+		if (count($_POST) == 0 && !isset($errors)) {
 			if (!isset($errors))
 			$errors = array(
 				'code'=>'400: BAD REQUEST',

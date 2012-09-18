@@ -1,5 +1,8 @@
 {% extends 'base.html.twig' %}
-
+{% block afternav %}
+<a href="{{app.system.protocol}}://{{app.system.path}}/company/devices" class="btn" style="display: inline-block;">Manage Devices</a>
+<a href="{{app.system.protocol}}://{{app.system.path}}/devices/new" class="btn" style="display: inline-block;">New Device</a>
+{% endblock %}
 {% block body %}
 <h2>{{company.name}}</h2>
 <p>Card on File:

@@ -2,6 +2,10 @@
 
 class Controller {
 	protected $controller, $action, $app, $db, $user;
+	protected $status = array(
+		'200'=>'OK',
+		'404'=>'Not Found'
+	);
 	public function beforeAction() {
 		$table = null;
 		switch ($this->controller)  {
@@ -28,13 +32,16 @@ class Controller {
 		//$res = $db->query("SELECT app_key FROM apps WHERE id='app-controlVC' AND active=1 LIMIT 1");
 		//$res = $res->fetch(PDO::FETCH_ASSOC);
 		//$this->app_key = $res['app_key'];
+		//echo "<!--" . $this->controller . '-' . $this->action . "-->";
 		$res = $this->db->prepare("SELECT access_id, secret FROM api_keys WHERE user_id = :userid AND active=1 LIMIT 1");
 		$res->execute(array(':userid'=>$this->user->getID()));
 		$res = $res->fetch(PDO::FETCH_ASSOC);
 		$this->access_id = $res['access_id']; $this->secret = $res['secret'];
 		
 	}
-	public function render($file, ARRAY $data = null) {
+	public function render($file, ARRAY $data = null, $code = "200") {
+		header("HTTP/1.0 " .$code . ' '.$this->status[$code]);
+		echo"<!-- header sent : $code-->";
 		$this->app['controller'] = $this->controller;
 		$this->app['action'] = $this->action;
 		global $app, $path;
@@ -88,7 +95,6 @@ class Controller {
 			$data['app']['db_data'] = $this->db->printLog();
 		}
 		ksort($data['app']);ksort($data);
-
 		echo $twig->render($file, $data);
 	}
 }

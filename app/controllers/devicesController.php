@@ -22,19 +22,44 @@ class devicesController extends Controller {
 		if($dev_id != "") {
 			$data = array('title'=>"Alarms");
 			$data['device_id']=$dev_id;
-			$stmt = $this->db->prepare("SELECT devices.name, codes.name AS status FROM devices LEFT JOIN codes ON devices.status = codes.code WHERE active = 1 AND id = :id LIMIT 1");
+			$stmt = $this->db->prepare("SELECT devices.name, devices.id, codes.name AS status FROM devices LEFT JOIN codes ON devices.status = codes.code WHERE active = 1 AND id = :id LIMIT 1");
 			$stmt->execute(array(':id'=>$dev_id));
 			$data['device'] = $stmt->fetch(PDO::FETCH_ASSOC);
 			$data['db_errors'][] = $stmt->errorInfo();
-			$data['alarm_list'] = $this->db->query("SELECT * FROM alarms")->fetchAll(PDO::FETCH_ASSOC);
-			$stmt = $this->db->prepare("SELECT D.user_id, D.device_id, D.alarm_id, D.last_notified, D.n, D.active, D.enabled, A.name, A.description FROM devices_alarms AS D LEFT JOIN alarms AS A ON D.alarm_id = A.id WHERE user_id = :user AND device_id = :device");
+			$list = $this->db->query("SELECT * FROM alarms")->fetchAll(PDO::FETCH_ASSOC);
+
+			$stmt = $this->db->prepare("SELECT D.user_id, D.device_id, D.alarm_id, D.last_notified, D.n, D.active, D.enabled, A.name, A.description FROM devices_alarms AS D RIGHT JOIN alarms AS A ON D.alarm_id = A.id WHERE user_id = :user AND device_id = :device");
 			$stmt->execute(array(':user'=>$this->user->getID(), ':device'=>$dev_id));
-			$data['alarms'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+			$alarms = $stmt->fetchAll(PDO::FETCH_ASSOC);
+			//echo "<!--";print_r($alarms);echo"-->";
+			$i=0;
+			foreach ($list as $alarm) {
+				//echo "<!--" . $alarm['id'] . "-->";
+				foreach ($alarms as $device){
+					$id = array_search($alarm['id'], $device);
+					//echo "<!-- ID: $id -->";
+					if ($id){
+						//echo "<!-- Device: ";print_r($device);echo " -->";
+
+						$list[$i]['enabled'] = $device['enabled'];
+						$list[$i]['last_notified'] = $device['last_notified'];
+					} else {
+						if(!isset($list[$i]['enabled']))
+							$list[$i]['enabled'] = 0;
+						if(!isset($list[$i]['last_notified']))
+							$list[$i]['last_notified'] = null;
+					}
+				}
+				$list[$i]['device_id'] = $dev_id;
+				$i++;
+			}
+			$data['alarms'] = $list;
+			//$data['alarms'] = $alarms;
 			$data['db_errors'][] = $stmt->errorInfo();
 			echo $this->render('devices/alarms/device.html.twig', $data);
 		} else {
 			$data = array('title'=>"Alarms");
-			$stmt = $this->db->prepare("SELECT D.user_id, D.device_id, D.alarm_id, D.last_notified, D.n, D.active, D.enabled, A.name, A.description FROM devices_alarms AS D LEFT JOIN alarms AS A ON D.alarm_id = A.id WHERE user_id = :user");
+			$stmt = $this->db->prepare("SELECT D.user_id, D.device_id, D.alarm_id, D.last_notified, D.n, D.active, D.enabled, A.name, A.description, devices.name FROM devices_alarms AS D LEFT JOIN alarms AS A ON D.alarm_id = A.id LEFT JOIN devices AS devices ON devices.id = D.device_id WHERE user_id = :user AND D.enabled = 1");
 			$stmt->execute(array(':user'=>$this->user->getID()));
 			$data['alarms']= $stmt->fetchAll(PDO::FETCH_ASSOC);			
 			echo $this->render('devices/alarms/index.html.twig', $data);

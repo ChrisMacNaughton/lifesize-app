@@ -1,7 +1,5 @@
 {% extends 'base.html.twig' %}
-{% block afternav %}
-<button id="add_alarm">Add Alarm</button>
-{% endblock %}
+
 {% block body %}
 <table>
 	<tr>
@@ -15,16 +13,13 @@
 		<td style="border-right: 1px solid #ccc;margin-right: 10px; padding-right: 10px;">{{alarm.name}}</td>
 		<td style="padding-left: 10px;border-right: 1px solid #ccc;margin-right: 10px; padding-right: 10px;">{{alarm.description}}</td>
 		<td style="padding-left: 10px;border-right: 1px solid #ccc;margin-right: 10px; padding-right: 10px;">{{alarm.n}}</td>
-		<td style="padding-left: 10px;border-right: 1px solid #ccc;margin-right: 10px; padding-right: 10px;">{{alarm.last_notified|date("m-d-Y h:i:s")}}</td>
-		<td style="padding-left: 10px;"><div class="span2" style="padding-top: 5px;"><input type="checkbox" id="{{alarm.alarm_id}}" {% if alarm.enabled %}checked="checked"{%endif%}/>
+		<td style="padding-left: 10px;border-right: 1px solid #ccc;margin-right: 10px; padding-right: 10px;">{% if alarm.last_notified == 0%}Never{%else%}{{alarm.last_notified|date("m-d-Y h:i:s")}}{%endif%}</td>
+		<td style="padding-left: 10px;"><div class="span2" style="padding-top: 5px;"><input type="checkbox" name='{{alarm.id}}' id="{{alarm.id}}" {% if alarm.enabled %}checked="checked"{%endif%}/>
 		</div></td>
 	</tr>
 {% endfor %}
 </table>
-<br /><br />
-<pre>
-{{dump()}}
-</pre>
+<a href="{{app.system.protocol}}://{{app.system.path}}/devices/view/{{device.id}}">Back to {{device.name}}</a>
 {% endblock %}
 
 {% block stylesheets %}
@@ -36,15 +31,17 @@
 <script src="/assets/js/easing.js"></script>
 <script src="/assets/js/jquery.ibutton.js"></script>
 <script type="text/javascript">
+
 $(document).ready(function() {
 {% for alarm in alarms %}
 	
-	$('#{{alarm.alarm_id}}').iButton({
+	$('#{{alarm.id}}').iButton({
 	labelOn: "Active",
 	labelOff: "Inactive",
 		change: function($input) {
 			var checkbox = $input.is(":checked") ? true : false;
-			var id = $input.attr("id");
+			var id = $input.attr("name");
+			console.log(id);
 			$.post(
 				'{{app.system.protocol}}://{{app.system.path}}/api/alarms?action=toggle',
 				{id: id, active: checkbox, device: '{{alarm.device_id}}'},
@@ -63,5 +60,6 @@ $(document).ready(function() {
 
 	var alarms = [{% for alarm in alarm_list %}{id:'{{alarm.id}}', name:'{{alarm.name}}', description : '{{alarm.description}}'},{% endfor %}];
 });
+
 </script>
 {% endblock %}

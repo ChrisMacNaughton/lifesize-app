@@ -17,7 +17,7 @@ $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, 'localhost/updater/update.php');
 curl_setopt($ch, CURLOPT_TIMEOUT_MS, 1);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-$app['updater_path'] = 'localhost/updater/update.php';
+//$app['updater_path'] = 'localhost/updater/update.php';
 curl_exec($ch);
 curl_close($ch);
 $ch = curl_init();
@@ -25,7 +25,7 @@ curl_setopt($ch, CURLOPT_URL, 'localhost/updater/maintainer.php');
 curl_setopt($ch, CURLOPT_TIMEOUT_MS, 1);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_exec($ch);
-$app['maintainer_path'] = 'localhost/updater/maintainer.php';
+//$app['maintainer_path'] = 'localhost/updater/maintainer.php';
 
 $user = new User();
 $ctrl = ($uri->seg(0) == '' || $uri->seg[0] == 'home') ? 'default' : $uri->seg(0);
@@ -58,21 +58,24 @@ $redir = true;
 $app['page'] = $ctrl;
 define('TRANSACTION',$controllerName . '/' . $actionName);
 
-if (class_exists($controllerName))
+if (class_exists($controllerName)){
 	$controller = new $controllerName($ctrl, $actn, $app, $db);
-else
-	$controller = new errorController($ctrl, $actn, $app, $db);
-	
-if (method_exists($controller, $actionName)) {
-	$controller->beforeAction();
-	if (is_null($id))
-		$controller->$actionName();
-	else
-		$controller->$actionName($id);
-} else {
-	$controller = new errorController();
-	$controller->errorAction($ctrl, $actn);
+	if (method_exists($controller, $actionName)) {
+		$controller->beforeAction();
+		if (is_null($id))
+			$controller->$actionName();
+		else
+			$controller->$actionName($id);
+	} else {
+		$controller = new errorController('Error', null, $app, $db);
+		$controller->errorAction($ctrl, $actn);
+	}
 }
+else {
+	$controller = new errorController('Error', null, $app, $db);
+}
+	
+
 if (NEW_RELIC) 
 	newrelic_name_transaction(TRANSACTION);
 

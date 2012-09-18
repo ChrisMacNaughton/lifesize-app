@@ -1,4 +1,7 @@
 {% extends 'base.html.twig' %}
+{% block afternav %}
+	<a href="{{app.system.protocol}}://{{app.system.path}}/devices/alarms/{{device.id}}" class="btn">Alarms</a>
+{% endblock %}
 {% block body %}
 <h1 style="display: inline-block;">{{device.name}}</h1><a href="{{app.system.protocol}}://{{app.system.path}}/devices/edit/{{device.id}}">Edit</a><br />
 <div class="row">
@@ -12,6 +15,7 @@
 		<strong>Call Length:</strong> {{device.duration}} Hours
 	</div>
 </div>
+{#
 <div class="row">
 <div id="statsTable" class="span11"></div>
 </div>
@@ -33,6 +37,7 @@
 	{% endfor %}
 </table>
 </div>
+#}
 {#
 <pre>
 {{dump(worst_calls)}}
@@ -41,6 +46,7 @@
 {% endblock %}
 {% block javascripts %}
 {{parent()}}
+{#
 <script type="text/javascript">
 var chart;
 	$(document).ready(function() {
@@ -134,5 +140,6 @@ Old data:
 	});
 
 	});
+#}
 </script>
 {% endblock %}

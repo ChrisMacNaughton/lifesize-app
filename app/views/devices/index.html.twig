@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
-
+{% block afternav %}
+	<a href="{{app.system.protocol}}://{{app.system.path}}/devices/alarms" class="btn">All Alarms</a>
+{% endblock %}
 {% block body %}
 <div class="span10">
 	{% for device in devices %}

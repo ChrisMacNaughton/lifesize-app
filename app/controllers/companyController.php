@@ -14,6 +14,13 @@ class companyController extends Controller {
 		//$this->stripe = Stripe_Customer::retrieve($this->company['customer_id']);
 		}
 	}
+	public function devicesAction() {
+		$data = array('title'=>"Manage Devices");
+		$stmt = $this->db->prepare("SELECT * FROM devices WHERE company_id = :company");
+		$stmt->execute(array(':company'=>$this->company['id']));
+		$data['devices'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$this->render('company/devices/index.html.twig', $data);
+	}
 	public function indexAction () {
 		$data = array(
 			'title'=>$this->user->getCompany(),
