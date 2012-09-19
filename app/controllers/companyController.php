@@ -16,7 +16,7 @@ class companyController extends Controller {
 	}
 	public function devicesAction() {
 		$data = array('title'=>"Manage Devices");
-		$stmt = $this->db->prepare("SELECT * FROM devices WHERE company_id = :company");
+		$stmt = $this->db->prepare("SELECT * FROM devices WHERE company_id = :company ORDER BY added, name, ip");
 		$stmt->execute(array(':company'=>$this->company['id']));
 		$data['devices'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		$this->render('company/devices/index.html.twig', $data);
