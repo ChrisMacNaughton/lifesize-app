@@ -223,8 +223,8 @@ protected $company = array();
 				$secure = true;
 			else
 				$secure = false;
-			setcookie('userid', $user['id'], $expires,'/', $secure);
-			setcookie('hash', $hash, $expires,'/', $secure);
+			setcookie('userid', $user['id'], $expires,'/', PATH, $secure);
+			setcookie('hash', $hash, $expires,'/', PATH, $secure);
 
 			$this->authenticatedFully = true;
 			$stmt = $this->db->prepare("SELECT * FROM companies WHERE id = :id");
