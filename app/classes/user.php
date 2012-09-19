@@ -196,7 +196,7 @@ protected $company = array();
 			$stmt->execute(array(':email'=>$email, ':id'=>$company));
 			$user = $stmt->fetch(PDO::FETCH_ASSOC);
 			//create sesshash
-			if(is_null($user['sesshash'])){
+			if(is_null($user['sesshash']) || $user['sesshash'] == ''){
 				$hashing = $this->db->prepare("UPDATE users SET sesshash = :sesshash WHERE `id` = :id");
 				$hash = hash('sha512', $user['password'].time().$user['email']);
 				$res = $hashing->execute(array(
@@ -219,8 +219,13 @@ protected $company = array();
 			} else {
 				$expires = 0;
 			}
-			setcookie('userid', $user['id'], $expires,'/');
-			setcookie('hash', $hash, $expires,'/');
+			if(DEV_ENV)
+				$secure = true;
+			else
+				$secure = false;
+			setcookie('userid', $user['id'], $expires,'/', $secure);
+			setcookie('hash', $hash, $expires,'/', $secure);
+
 			$this->authenticatedFully = true;
 			$stmt = $this->db->prepare("SELECT * FROM companies WHERE id = :id");
 			$stmt->execute(array(':id'=>$this->company_id));
@@ -239,7 +244,7 @@ protected $company = array();
 		session_destroy();
 		setcookie('userid', '', 0,'/');
 		setcookie('hash', '', 0,'/');
-		$this->db->query("UPDATE users SET sesshash = null WHERE userid = '" . $this->id . "'");
-		header("Location: /user/login");
+		$this->db->query("UPDATE users SET sesshash = null WHERE id = '" . $this->id . "'");
+		header("Location: /user/login?errors=" . urlencode($this->db->errorInfo()));
 	}
 }
