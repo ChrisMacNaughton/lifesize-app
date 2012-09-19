@@ -2,7 +2,7 @@
 
 if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == "http")
 	header("Location: https://".$_SERVER['HTTP_HOST'].$_SERVER['PATH_INFO']);
-print_r($_SERVER);die();
+//print_r($_SERVER);die();
 error_reporting(E_ALL);
 $arr = array();
 $app['start'] = microtime();
