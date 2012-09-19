@@ -196,12 +196,17 @@ protected $company = array();
 			$stmt->execute(array(':email'=>$email, ':id'=>$company));
 			$user = $stmt->fetch(PDO::FETCH_ASSOC);
 			//create sesshash
-			$hashing = $this->db->prepare("UPDATE users SET sesshash = :sesshash WHERE `id` = :id");
-			$hash = hash('sha512', $user['password'].time().$user['email']);
-			$res = $hashing->execute(array(
-				':id'=>$user['id'],
-				':sesshash'=>$hash
-			));
+			if(is_null($user['sesshash'])){
+				$hashing = $this->db->prepare("UPDATE users SET sesshash = :sesshash WHERE `id` = :id");
+				$hash = hash('sha512', $user['password'].time().$user['email']);
+				$res = $hashing->execute(array(
+					':id'=>$user['id'],
+					':sesshash'=>$hash
+				));
+			} else {
+				$hash = $user['sesshash'];
+				$res = true;
+			}
 			if ($res){
 				//$_COOKIE['hash'] = $hash;
 				
