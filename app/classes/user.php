@@ -220,9 +220,9 @@ protected $company = array();
 				$expires = 0;
 			}
 			if(DEV_ENV)
-				$secure = true;
-			else
 				$secure = false;
+			else
+				$secure = true;
 			setcookie('userid', $user['id'], $expires,'/', PATH, $secure);
 			setcookie('hash', $hash, $expires,'/', PATH, $secure);
 
