@@ -1,5 +1,5 @@
 <?php
-print_r($server);die();
+print_r($_SERVER);die();
 if ($_SERVER['HTTP_X_FORWARDED_PROTO'] == "http")
 	header("Location: https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
 error_reporting(E_ALL);
