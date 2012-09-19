@@ -245,6 +245,6 @@ protected $company = array();
 		setcookie('userid', '', 0,'/');
 		setcookie('hash', '', 0,'/');
 		$this->db->query("UPDATE users SET sesshash = null WHERE id = '" . $this->id . "'");
-		header("Location: /user/login?errors=" . urlencode($this->db->errorInfo()));
+		header("Location: /user/login");
 	}
 }
