@@ -72,10 +72,10 @@ class devicesController extends Controller {
 				':company'=>$this->company['id']
 		));
 		$img = $stmt->fetch(PDO::FETCH_ASSOC);
-		print_r($img);
+		//print_r($img);
 		$im = imagecreatefromstring(base64_decode($img['screenshot']));
-		echo $im;
-		//header('Content-Type: image/png');
+		//echo $im;
+		header('Content-Type: image/png');
 		imagepng($im);
 		imagedestroy($im);
 		//echo $image;
