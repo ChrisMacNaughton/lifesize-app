@@ -1,7 +1,8 @@
 <?php
-print_r($_SERVER);die();
+
 if ($_SERVER['HTTP_X_FORWARDED_PROTO'] == "http")
 	header("Location: https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+print_r($_SERVER);die();
 error_reporting(E_ALL);
 $arr = array();
 $app['start'] = microtime();
