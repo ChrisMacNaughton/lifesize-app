@@ -1,4 +1,6 @@
 <?php
+if ($_SERVER['HTTP_X_FORWARDED_PROTO'] == "http")
+	header("Location: https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
 error_reporting(E_ALL);
 $arr = array();
 $app['start'] = microtime();
@@ -8,8 +10,7 @@ if(extension_loaded('newrelic')){
 } else {
 	define('NEW_RELIC', false);
 }
-if ($_SERVER['HTTP_X_FORWARDED_PROTO'] == "http")
-	header("Location: https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+
 define("COMPANY_NAME", 'ControlVC');
 include 'bootstrap.php';
 
