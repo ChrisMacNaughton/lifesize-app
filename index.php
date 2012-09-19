@@ -53,6 +53,7 @@ $redir = true;
 			$_SESSION['flash'][] = l("error_need_to_login");
 		session_write_close();
 		header("Location:/user/login");
+		exit();
 	}
 }
 $app['page'] = $ctrl;
