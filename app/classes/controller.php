@@ -40,8 +40,10 @@ class Controller {
 		
 	}
 	public function render($file, ARRAY $data = null, $code = "200") {
-		header("HTTP/1.0 " .$code . ' '.$this->status[$code]);
-		echo"<!-- header sent : $code-->";
+		if($code != '200') {
+			header("HTTP/1.0 " .$code . ' '.$this->status[$code]);
+			echo"<!-- header sent : $code-->";
+		}
 		$this->app['controller'] = $this->controller;
 		$this->app['action'] = $this->action;
 		global $app, $path;

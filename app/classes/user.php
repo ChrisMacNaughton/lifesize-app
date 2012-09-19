@@ -25,7 +25,7 @@ protected $company = array();
 		foreach ($user as $key=>$val) {
 			$this->$key = $val;
 		}
-		if ($this->id != 0) {
+		if ($this->id != 0 && $this->id != null) {
 			$this->authenticatedFully = true;
 			$stmt = $this->db->prepare("SELECT * FROM companies WHERE id = :id");
 			$stmt->execute(array(':id'=>$this->company_id));
@@ -113,7 +113,8 @@ protected $company = array();
 			'email'=>$this->email,
 			'level'=>$this->level,
 			'phone'=>$this->phone,
-			'company'=>$this->company
+			'company'=>$this->company,
+			'auth'=>$this->authenticatedFully
 		);
 		return $user;
 	}
