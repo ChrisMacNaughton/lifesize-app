@@ -8,7 +8,8 @@ class userController extends Controller {
 		}
 		$data = array('title'=>'Login');
 		if (isset($_POST['action']) && $_POST['action'] == 'login') {
-			if ($this->user->login($_POST['email'], $_POST['password'], $_POST['company'])) {
+			$rememberme = (isset($_POST['rememberme']))? true: false;
+			if ($this->user->login($_POST['email'], $_POST['password'], $_POST['company'], $rememberme)) {
 				
 				if ($this->user->reset()) {
 					$_SESSION['flash'][] = l('reset_password');

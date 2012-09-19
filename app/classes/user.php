@@ -12,8 +12,8 @@ protected $company = array();
 		global $db;
 		$this->hasher = new PasswordHash(12,false);
 		$this->db = $db;
-		$id = (isset($_SESSION['userid'])) ? $_SESSION['userid'] : 0;
-		$hash = (isset($_SESSION['hash'])) ? $_SESSION['hash'] : 0;
+		$id = (isset($_COOKIE['userid'])) ? $_COOKIE['userid'] : 0;
+		$hash = (isset($_COOKIE['hash'])) ? $_COOKIE['hash'] : 0;
 		
 		//echo "<!--";print_r($_SESSION);echo"-->";
 		$stmt = $this->db->prepare("SELECT * FROM users WHERE id=:id AND sesshash = :hash");
@@ -185,7 +185,7 @@ protected $company = array();
 		else
 			return false;
 	}
-	public function login($email, $password, $company) {
+	public function login($email, $password, $company, $rememberme = false) {
 		$stmt = $this->db->prepare("SELECT password FROM users WHERE email = :email AND company_id = :id");
 		$stmt->execute(array(':email'=>$email, ':id'=>$company));
 		$res = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -203,14 +203,19 @@ protected $company = array();
 				':sesshash'=>$hash
 			));
 			if ($res){
-				$_SESSION['hash'] = $hash;
+				//$_COOKIE['hash'] = $hash;
 				
 			//set local object vars
 			foreach ($user as $key=>$val) {
 				$this->$key = $val;
 			}
-			$_SESSION['userid'] = $user['id'];
-			
+			if($rememberme){
+				$expires = time() + 60*60*24*7*2;
+			} else {
+				$expires = 0;
+			}
+			setcookie('userid', $user['id'], $expires,'/');
+			setcookie('hash', $hash, $expires,'/');
 			$this->authenticatedFully = true;
 			$stmt = $this->db->prepare("SELECT * FROM companies WHERE id = :id");
 			$stmt->execute(array(':id'=>$this->company_id));
@@ -227,6 +232,9 @@ protected $company = array();
 	}
 	public function logout() {
 		session_destroy();
+		setcookie('userid', '', 0,'/');
+		setcookie('hash', '', 0,'/');
+		$this->db->query("UPDATE users SET sesshash = null WHERE userid = '" . $this->id . "'");
 		header("Location: /user/login");
 	}
 }

@@ -66,6 +66,20 @@ class devicesController extends Controller {
 		}
 	}
 	public function imgAction($id) {
+		if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE']))
+			$modified = strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']);
+		else
+			$modified = 0;
+
+		if ($modified > time() - 60){
+			header("HTTP/1.0 304 Not Modified");
+			header('Pragma: public');
+			header('Cache-Control: private max-age=' . $modified);
+			header('Expires: ' . gmdate('D, d M Y H:i:s', $modified + 60) . ' GMT');
+			header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $modified) . ' GMT');
+			echo"<!-- test $modified-->";
+			exit();
+		}
 		$stmt = $this->db->prepare("SELECT screenshot FROM devices WHERE id = :id AND company_id = :company");
 		$stmt->execute(array(
 				':id'=>$id,
@@ -78,12 +92,13 @@ class devicesController extends Controller {
 		$expire=60;// seconds, minutes, hours, days
 
 		header('Pragma: public');
-		header('Cache-Control: private');
+		header('Cache-Control: private max-age=' . $expire);
 		header('Expires: ' . gmdate('D, d M Y H:i:s', time()+$expire) . ' GMT');
 		header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
 		header('Content-Type: image/png');
 		imagepng($im);
 		imagedestroy($im);
+		
 		//echo $image;
 	}
 	public function editAction($id) {
