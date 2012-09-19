@@ -76,8 +76,10 @@ if (class_exists($controllerName)){
 else {
 	$controller = new errorController('Error', null, $app, $db);
 }
-	
-
+if($user->getLevel() == 4){
+echo"<!--";
+print_r($_SERVER);
+}
 
 
 $db = null;
