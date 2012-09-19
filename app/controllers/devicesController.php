@@ -75,6 +75,10 @@ class devicesController extends Controller {
 		//print_r($img);
 		$im = imagecreatefromstring(base64_decode($img['screenshot']));
 		//echo $im;
+		$expire=60;// seconds, minutes, hours, days
+		header('Cache-Control: maxage='.$expire);
+		header('Expires: ' . gmdate('D, d M Y H:i:s', time()+$expire) . ' GMT');
+		header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
 		header('Content-Type: image/png');
 		imagepng($im);
 		imagedestroy($im);
