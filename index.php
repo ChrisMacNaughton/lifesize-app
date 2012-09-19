@@ -8,10 +8,11 @@ if(extension_loaded('newrelic')){
 } else {
 	define('NEW_RELIC', false);
 }
-define("COMPANY_NAME", 'ControlVC');
-include 'bootstrap.php';
 if ($_SERVER['HTTP_X_FORWARDED_PROTO'] == "http")
 	header("Location: https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+define("COMPANY_NAME", 'ControlVC');
+include 'bootstrap.php';
+
 $protocol = (DEV_ENV == true) ? 'http' : "https";
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, 'localhost/updater/update.php');
