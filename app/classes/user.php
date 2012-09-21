@@ -10,10 +10,10 @@ protected $company = array();
 
 	public function __construct() {
 		global $db;
-		$this->hasher = new PasswordHash(12,false);
+		$this->hasher = new PasswordHash(16,false);
 		$this->db = $db;
-		$id = (isset($_COOKIE['userid'])) ? $_COOKIE['userid'] : 0;
-		$hash = (isset($_COOKIE['hash'])) ? $_COOKIE['hash'] : 0;
+		$id = (isset($_COOKIE['userid'])) ? $_COOKIE['userid'] : null;
+		$hash = (isset($_COOKIE['hash'])) ? $_COOKIE['hash'] : null;
 		
 		//echo "<!--";print_r($_SESSION);echo"-->";
 		$stmt = $this->db->prepare("SELECT * FROM users WHERE id=:id AND sesshash = :hash");
