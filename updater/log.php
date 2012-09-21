@@ -1,5 +1,5 @@
 <?php
-include 'config.php';
+include '../config.php';
 $ips = array(
 	'',
 	'4.26.209.14',

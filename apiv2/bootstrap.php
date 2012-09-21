@@ -39,7 +39,7 @@ foreach($user as $check) {
 		throw new Exception("User Details are required (access_id, expires, and signature)", 403);
 	}
 }
-require_once 'config.php';
+require_once '../config.php';
 require_once 'loggedPDO.php';
 try {
 		$db_start = microtime(true);

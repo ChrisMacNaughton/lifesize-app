@@ -12,7 +12,7 @@ define("COMPANY_NAME", 'ControlVC');
 define('UPDATER_ID', sha1($type . ' ' . rand(1,1000) . microtime(true)));
 ulog(false, "Starting up!");
 #echo "Updater: " . UPDATER_ID;
-include 'config.php';
+include '../config.php';
 set_include_path(get_include_path() . PATH_SEPARATOR . 'phpseclib');
 require_once 'Net/SSH2.php';
 error_reporting(E_ALL^E_NOTICE^E_USER_NOTICE);
