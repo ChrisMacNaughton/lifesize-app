@@ -1,5 +1,5 @@
 <?php
-define('VERSION_ID', '0.0.0.5');
+define('VERSION_ID', '0.0.0.6');
 $options = array(
 	'certificate_authority'=>true,
 	'default_cache_config' => '',

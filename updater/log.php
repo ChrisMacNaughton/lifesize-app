@@ -4,7 +4,7 @@ $ips = array(
 	'',
 	'4.26.209.14',
 );
-if($_SERVER['SERVER_ADDR'] != '127.0.0.1' || (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && array_search($_SERVER['HTTP_X_FORWARDED_FOR'], $ips) ) ){
+if($_SERVER['SERVER_ADDR'] != '127.0.0.1' && !(isset($_SERVER['HTTP_X_FORWARDED_FOR']) && array_search($_SERVER['HTTP_X_FORWARDED_FOR'], $ips) ) ){
 	header("Status: 404");
 	?>
 	<!-- <?php echo VERSION_ID; ?> -->
