@@ -108,7 +108,7 @@ while(true){
 			$alarms_stmt->closeCursor();
 			//exit();
 		}
-		$db->query("UPDATE devices SET updated = $time, online = 0 WHERE id = '" . $device['id'] . "'");
+		$db->query("UPDATE devices SET updated = $time, online = 0, status = 10 WHERE id = '" . $device['id'] . "'");
 	} else {
 		$alarms_disable->execute(array(
 							':alarm'=>'alarm-jfu498hf',
