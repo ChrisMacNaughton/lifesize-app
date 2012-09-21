@@ -32,7 +32,7 @@ $logs = $db->query("SELECT * FROM updater_log ORDER BY `timestamp` DESC LIMIT 10
 foreach($logs as $u) {
 	$updaters[$u['updater_id']] = substr($u['updater_id'],0,5);
 }
-echo"<!--";print_r($updaters);echo"-->";
+//echo"<!--";print_r($updaters);echo"-->";
 $colors = array(
 	'#006633',
 	'#6699cc',
@@ -87,7 +87,7 @@ echo "<h1>Log Analysis</h1>";
 	<tbody>
 <?php $i = 1;
 foreach ($logs as $action) { $id = substr($action['updater_id'],0,5); ?>
-	<tr><!-- <?php print_r($action); ?>-->
+	<tr>
 		<td style="border-bottom: 1px solid #ccc;" class="updater-<?php echo $id ?>"><span title="<?php echo $action['updater_id']; ?>"><?php echo $id; ?></span></td>
 		<td style="border-bottom: 1px solid #ccc;"><?php echo $action['type']; ?></td>
 		<td style="border-bottom: 1px solid #ccc;"><?php echo date('m/d/Y H:i:s',$action['timestamp']/* - 60 * 60 * 7*/); ?></td>
@@ -96,18 +96,9 @@ foreach ($logs as $action) { $id = substr($action['updater_id'],0,5); ?>
 	</tr>
 	<?php $i++;
 }
-//echo "<pre>";print_r($logs);echo"</pre>";
 ?>
 </tbody>
 </table>
-<script type="text/javascript">
-  var sorter = new TINY.table.sorter("sorter");
-	sorter.head = "head";
-	sorter.asc = "asc";
-	sorter.desc = "desc";
-	sorter.currentid = "currentpage";
-	sorter.limitid = "pagelimit";
-	sorter.init("sortable",0);
-  </script>
+
 </body>
 </html>
