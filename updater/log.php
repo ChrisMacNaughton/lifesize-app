@@ -5,6 +5,8 @@ $ips = array(
 if($_SERVER['SERVER_ADDR'] != '127.0.0.1' || (isset($_SERVER['X-FORWARDED-FOR']) && array_search($_SERVER['X-FORWARDED-FOR'], $ips) ) ){
 	header("Status: 404");
 	?>
+	<!-- <?php print_r($_SERVER); ?> -->
+	<!-- <?php print_r($ips); ?> -->
 	<div id="error404" class="content">
 		<div class="block">
 		<h1><span>Error 404</span></h1>
