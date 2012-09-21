@@ -1,4 +1,6 @@
 <?php
+if(!isset($argc))
+	die("Only allowed from the command line");
 include 'app/classes/passwordhash.php';
 set_time_limit(0);
 $random_pass = substr(sha1(microtime(true) . rand(1,1000)), 2, 10);
