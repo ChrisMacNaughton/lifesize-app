@@ -10,7 +10,7 @@ protected $company = array();
 
 	public function __construct() {
 		global $db;
-		$this->hasher = new PasswordHash(16,false);
+		$this->hasher = new PasswordHash(14,false);
 		$this->db = $db;
 		$id = (isset($_COOKIE['userid'])) ? $_COOKIE['userid'] : null;
 		$hash = (isset($_COOKIE['hash'])) ? $_COOKIE['hash'] : null;
