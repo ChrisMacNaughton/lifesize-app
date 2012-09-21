@@ -10,7 +10,7 @@ protected $company = array();
 
 	public function __construct() {
 		global $db;
-		$this->hasher = new PasswordHash(12,false);
+		$this->hasher = new PasswordHash(13,false);
 		$this->db = $db;
 		$id = (isset($_COOKIE['userid'])) ? $_COOKIE['userid'] : null;
 		$hash = (isset($_COOKIE['hash'])) ? $_COOKIE['hash'] : null;
@@ -31,6 +31,9 @@ protected $company = array();
 			$stmt->execute(array(':id'=>$this->company_id));
 			$this->company = $stmt->fetch(PDO::FETCH_ASSOC);
 			unset($this->password);
+		} else {
+			setcookie('userid', '', time()-3600,'/');
+			setcookie('hash', '', time()-3600,'/');
 		}
 	}
 	public function hashPass($pass) {
@@ -242,8 +245,8 @@ protected $company = array();
 	}
 	public function logout() {
 		session_destroy();
-		setcookie('userid', '', 0,'/');
-		setcookie('hash', '', 0,'/');
+		setcookie('userid', '', time()-3600,'/');
+		setcookie('hash', '', time()-3600,'/');
 		$this->db->query("UPDATE users SET sesshash = null WHERE id = '" . $this->id . "'");
 		header("Location: /user/login");
 	}
