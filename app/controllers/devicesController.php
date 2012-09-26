@@ -97,13 +97,18 @@ class devicesController extends Controller {
 		header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
 		header('Content-Type: image/png');
 		list($width, $height) = getimagesize($im);
+		$resize = false;
 		if(isset($_GET['width']) && isset($_GET['height'])){
 			$width = (int)$_GET['width']; $height = (int)$_GET['height'];
+			$resize = true;
 		}
-		$image = imagecreatetruecolor($width, $height);
-		imagecopyresampled($image, $im, 0,0,0,0,$width, $height, 416, 234);
-		imagepng($image);
-		imagedestroy($image);
+		if($resize) {
+			$image = imagecreatetruecolor($width, $height);
+			imagecopyresampled($image, $im, 0,0,0,0,$width, $height, 416, 234);
+			$im = $image;
+		}
+		imagepng($im);
+		imagedestroy($im);
 		
 		//echo $image;
 	}
