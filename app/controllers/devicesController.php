@@ -77,7 +77,7 @@ class devicesController extends Controller {
 			header('Cache-Control: private max-age=' . $modified);
 			header('Expires: ' . gmdate('D, d M Y H:i:s', $modified + 60) . ' GMT');
 			header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $modified) . ' GMT');
-			echo"<!-- test $modified-->";
+			//echo"<!-- test $modified-->";
 			exit();
 		}
 		$stmt = $this->db->prepare("SELECT screenshot FROM devices WHERE id = :id AND company_id = :company");
@@ -96,8 +96,14 @@ class devicesController extends Controller {
 		header('Expires: ' . gmdate('D, d M Y H:i:s', time()+$expire) . ' GMT');
 		header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
 		header('Content-Type: image/png');
-		imagepng($im);
-		imagedestroy($im);
+		list($width, $height) = getimagesize($im);
+		if(isset($_GET['width']) && isset($_GET['height'])){
+			$width = (int)$_GET['width']; $height = (int)$_GET['height'];
+		}
+		$image = imagecreatetruecolor($width, $height);
+		imagecopyresampled($image, $im, 0,0,0,0,$width, $height, 416, 234);
+		imagepng($image);
+		imagedestroy($image);
 		
 		//echo $image;
 	}

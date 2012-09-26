@@ -42,7 +42,7 @@ class Controller {
 	public function render($file, ARRAY $data = null, $code = "200") {
 		if($code != '200') {
 			header("HTTP/1.0 " .$code . ' '.$this->status[$code]);
-			echo"<!-- header sent : $code-->";
+			//echo"<!-- header sent : $code-->";
 		}
 		$this->app['controller'] = $this->controller;
 		$this->app['action'] = $this->action;
@@ -79,7 +79,6 @@ class Controller {
 			$data['app']['long_expire'] =time() + 300;
 			$string = $this->access_id . chr(0x0D) . $data['app']['long_expire'];
 			$data['app']['long_sig'] = urlencode(base64_encode(hash_hmac('sha1', $string, $this->secret, true)));
-			
 		} 
 		foreach ($_SESSION['errors'] as $err) 
 			$data['errors'][] = $err;

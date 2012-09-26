@@ -13,7 +13,7 @@
 		
 		</div>
 		<div class="span1">{# /apiV2/devices/{{device.id}}/screenshot.png?accessId={{app.accessId}}&expires={{app.quick_expire}}&signature={{app.quick_sig}}&app_key={{app.app_key}} #}
-			<img src="{% if device.online == 1 %}{% if device.status == 'In a call'%}/devices/img/{{device.id}}{%else %}assets/img/online.png{%endif %}{% else %}assets/img/offline.png{% endif %}" alt="{% if device.online == 1 %}online{% else %}offline{% endif %}" width="50px" {% if device.status == 'In a call'%} style="margin-top: 11px;" {%endif%}title="{% if device.online == 1 %}{% if device.status == 'In a call'%}In a call{%else %}Online{%endif %}{% else %}Offline{% endif %}"/>
+			<img src="{% if device.online == 1 %}{% if device.status == 'In a call'%}/devices/img/{{device.id}}?width=50&height=28{%else %}assets/img/online.png{%endif %}{% else %}assets/img/offline.png{% endif %}" alt="{% if device.online == 1 %}online{% else %}offline{% endif %}" width="50px" {% if device.status == 'In a call'%} style="margin-top: 11px;" {%endif%}title="{% if device.online == 1 %}{% if device.status == 'In a call'%}In a call{%else %}Online{%endif %}{% else %}Offline{% endif %}"/>
 		</div>
 	</div>
 	{% else %}
