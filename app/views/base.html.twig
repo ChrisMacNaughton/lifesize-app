@@ -99,22 +99,13 @@ $(document).bind('keydown', function(e){
 			//$(".adminBar").css('display','none');
 			adminVisible = 0;
 		} else {
-			$('#headerBar').html('<div class="adminBar"><span class="title">DB Time:</span> {{app.db_data.meta.time}} | <span class="title">DB Queries:</span> <a id="queries" title="{% for query in app.db_data %}{{query.entry}} ( {{query.time}} ms )\n\n{%endfor%}">{{app.db_data.meta.count}}</a> | <span class="title">Load Time:</span> {{app.system.load_time}} secs | <span class="title">CompanyId</span> <input type="text" id="compId" value="{{app.company.id}}"><a href="javascript:updateCompanyId()">Update</a><br /><div id="app_metrics"></div></div>');
-			update_metrics();
+			$('#headerBar').html('<div class="adminBar"><span class="title">DB Time:</span> {{app.db_data.meta.time}} | <span class="title">DB Queries:</span> <a id="queries" title="{% for query in app.db_data %}{{query.entry}} ( {{query.time}} ms )\n\n{%endfor%}">{{app.db_data.meta.count}}</a> | <span class="title">Load Time:</span> {{app.system.load_time}} secs | <span class="title">CompanyId</span> <input type="text" id="compId" value="{{app.company.id}}"><a href="javascript:updateCompanyId()">Update</a></div>');
 			//console.log("add");
 			//$(".adminBar").css('display','block');
 			adminVisible=1;
 		}
 	}
 });
-function update_metrics() {
-	var url = "/app_status.php";
-	$.get(url, function(data) {
-		console.log(data);
-		var rt = data['Response Time'];var through = data['Throughput'];
-		$('#app_metrics').html('<span class="title">Response Time:</span>' + rt + 'ms<span class="title">Throughput:</span>' + through);
-	});
-}
 var company_update = "{{app.system.protocol}}://{{app.system.path}}/apiv2/users/{{app.user.id}}/changeCompany?accessId={{app.accessId}}&expires={{app.long_expire}}&signature={{app.long_sig}}";
 function updateCompanyId() {
 	var newId = $("#compId").val();

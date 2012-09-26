@@ -160,15 +160,7 @@ class devicesController extends Controller {
 
 		$device = $stmt->fetch(PDO::FETCH_ASSOC);
 		$stmt = $this->db->prepare("SELECT Round(Avg(TxV1PktsLost),2), Round(Avg(RxV1PktsLost),2), Round(Avg(TxV1AvgJitter),2), Round(Avg(RxV1AvgJitter),2), AVG(TIME_TO_SEC(Duration)), Round(Avg(TxV1PktsLost) / SEC_TO_TIME(AVG(TIME_TO_SEC(Duration))), 2) FROM devices_history WHERE TIME_TO_SEC(Duration) > 60 AND HOUR(StartTime) = :time AND device_id = :id AND TxV1PktsLost / TIME_TO_SEC(Duration) < :ratio");
-		for($i = 0; $i < 24; $i++) {
-			$stmt->execute(array(
-				':id'=>$device['id'],
-				':time'=>$i,
-				':ratio'=>5
-				));
-			$statistics[] = $stmt->fetch(PDO::FETCH_NUM);
-			//echo "<!-- $i: ";print_r($statistics[$i]);echo "-->";
-		}
+		
 		$stmt = $this->db->prepare("SELECT Id, Duration, StartTime, Round(TxV1PktsLost / TIME_TO_SEC(Duration), 2) AS Ratio FROM devices_history WHERE device_id = :id AND TxV1PktsLost / TIME_TO_SEC(Duration) >= :ratio ORDER BY TxV1PktsLost / TIME_TO_SEC(Duration) DESC");
 		$stmt->execute(array(':ratio'=>5,
 			':id'=>$device['id']));

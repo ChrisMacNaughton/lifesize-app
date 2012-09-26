@@ -39,17 +39,17 @@ function to_seconds($duration) {
 }
 
 function ulog($updater_log, $action, $detail = '') {
-	global $type;
+	global $type; $time = time();
 	if($updater_log) {
 		$updater_log->execute(array(
 			':id'=>UPDATER_ID,
 			'type'=>$type,
-			':time'=>time(),
+			':time'=>$time,
 			':action'=>$action,
 			':detail'=>$detail
 			));
 	} else {
-		$message = $action . " " . $detail;
+		$message = $time . ' | ' . substr(UPDATER_ID, 0, 8) . "($type): " . $action . " " . $detail . "\n";
 		echo $message;
 	}
 }
