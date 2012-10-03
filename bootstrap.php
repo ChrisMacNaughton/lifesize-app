@@ -1,7 +1,7 @@
 <?php
 session_start();
 $app = array(
-	"Start" => microtime(true)
+	"start" => microtime(true)
 );
 /*
 *	Incliude config / class for db
@@ -48,7 +48,9 @@ $app['detail'] = isset($uri[2])?$uri[2]:"";
 
 if(isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == "http"){
 	header("Location: https://".$_SERVER['HTTP_HOST'] . "/" . $app['controller'] . "/" . $app['action'] . "/" . $app['action']);
-}
+	define('PROTOCOL', 'https://');
+} else
+	define('PROTOCOL','http://');
 
 if($redirect){
 	if($app['controller'] == 'login')
@@ -58,7 +60,7 @@ if($redirect){
 
 	if($redirect){
 		session_write_close();
-		header("Location: /".BASE_DIR."/login");
+		header("Location: ".PROTOCOL.ROOT."/login");
 	}
 }
 $req = null; $key = null; $file = null;

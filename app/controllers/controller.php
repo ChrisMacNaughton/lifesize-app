@@ -15,8 +15,9 @@ class Controller{
 		$twig = new Twig_Environment($loader,$options);
 		if(DEV_ENV)
 			$twig->addExtension(new Twig_Extension_Debug());
-		array_merge($data, $this->app);
-
+		$this->app['run-time'] = microtime(true) - $this->app['start'];
+		unset($this->app['start']);
+		$data['app'] = $this->app;
 		echo $twig->render($file, $data);
 	}
 }
