@@ -54,6 +54,7 @@ class Controller {
 		$data['flash'] = array();
 		if (!isset($data['errors']))
 		$data['errors'] = array();
+		$data['server'] = $_SERVER;
 		//echo "<!-- Controller: " . $this->app['controller'] . "  :  Action: " . $this->app['action'] . " -->";
 		if($this->app['controller'] == 'user' && $this->app['action'] == 'login') {
 			$login = true;
