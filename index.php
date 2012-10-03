@@ -1,6 +1,8 @@
 <?php
 require_once 'bootstrap.php';
 require_once 'app/controllers/controller.php';
+$controllerName = "dashboardController";
+$actionName = "indexAction";
 if(file_exists('app/controllers/' . strtolower($app['controller']) . 'Controller.php')){
 	include 'app/controllers/' . strtolower($app['controller']) . 'Controller.php';
 	$controllerName = strtolower($app['controller']) . 'Controller';
@@ -16,5 +18,5 @@ if(file_exists('app/controllers/' . strtolower($app['controller']) . 'Controller
 	$controllerName = "errorController";
 }
 
-$controller = new $controllerName($app);
+$controller = new $controllerName($app, $db);
 $controller->$actionName();

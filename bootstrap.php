@@ -63,6 +63,10 @@ if($redirect){
 		header("Location: ".PROTOCOL.ROOT."/login");
 	}
 }
+if($app['controller'] == 'login'){
+	header("Location: ".PROTOCOL.ROOT);
+}
+$app['active'] = $app['controller'];
 $req = null; $key = null; $file = null;
 
 if($app['controller'] == "login"){
