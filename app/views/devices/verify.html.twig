@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+{% block title%}{% if device.name == null%}Verify: {{device.id}}{%else%}{{device.name}}{%endif%}{% endblock %}
+{% block afterbrand %}
+	<a class="right btn btn-small btn-info" href="{{root}}devices/view/{{device.id}}">Return</a>
+{% endblock %}
+{% block name %}Verify <small>{% if device.name == null%}{{device.id}}{% else %}{{device.name}}{%endif%}</small>{% endblock %}
+{% block body %}
+{% if device.verify_sent == 0 %}
+Continuing will send a message to your devices that will show on the screen.  To continue, click below!
+<form method="post">
+	<input type="hidden" name="confirm" value="true">
+	<input type="submit" value="Confirm validation">
+</form>
+{% else %}
+A code will appear on your device's screen shortly, please enter that code here!
+<form method="post">
+	<input type="hidden" name="verify" value="true">
+	<input type="text" name="code" placeholder="Validation Code">
+	<input type="submit" value="Confirm">
+</form>
+<form method="post">
+	<input type="hidden" name="confirm" value="true">
+	<input type="submit" value="Re-send">
+</form>
+{% endif %}
+{% endblock %}

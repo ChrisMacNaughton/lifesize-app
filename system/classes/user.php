@@ -31,7 +31,11 @@ class User {
 			$stmt->execute(array(':id'=>$this->info['id']));
 			$this->companies = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-			$stmt = $this->db->prepare("SELECT devices.* 
+			$this->updateDevices();
+		}
+	}
+	public function updateDevices(){
+		$stmt = $this->db->prepare("SELECT devices.* , companies_devices.own, companies_devices.verified, companies_devices.verify_sent, companies_devices.verify_code
 FROM devices
 INNER JOIN companies_devices ON devices.id = companies_devices.device_id
 INNER JOIN companies ON companies_devices.company_id = companies.id
@@ -45,7 +49,6 @@ WHERE users.id =:id AND companies_devices.company_id = :company");
 				$devices[$dev['id']] = $dev;
 			}
 			$this->devices = $devices;
-		}
 	}
 	public function getCompany(){
 		return $this->info['as'];

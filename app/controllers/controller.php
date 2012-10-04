@@ -2,10 +2,11 @@
 
 class Controller{
 	public function __construct($app, $db){
-		global $user;
+		global $user, $options;
 		$this->user = $user;
 		$this->app = $app;
 		$this->db = $db;
+		$this->sqs = new AmazonSQS($options);
 	}
 	protected function render($file, $data = array()){
 		$loader = new Twig_Loader_Filesystem('/var/www/' . BASE_DIR . '/app/views');

@@ -16,6 +16,75 @@ class devicesController extends Controller {
 		$data['device'] = $this->user->devices[$id];
 		$this->render('devices/view.html.twig', $data);
 	}
+	public function verifyAction($id){
+		$data = array(
+			'headercolor'=>'00ff00'
+		);
+		$data['device'] = $this->user->devices[$id];
+		if($data['device']['verified'] == 1){
+			header("Location: ".PROTOCOL.ROOT .'/devices/view/' . $id);
+			exit(0);
+		}
+		if(isset($_POST['confirm']) && $_POST['confirm'] == 'true'){
+			$confirm = substr( sha1($id . $this->user->getCompany() . microtime(true)), 0,8);
+			$options = array(
+				'code'=>$confirm,
+				'id'=>$id
+			);
+			$this->sqs->send_message(VERIFY_URL, json_encode($options));
+			$stmt = $this->db->prepare("UPDATE companies_devices SET verify_code = :confirm, verify_sent = 1 WHERE device_id = :device AND company_id = :company");
+			$stmt->execute(array(
+				':confirm'=>$confirm,
+				':device'=>$id,
+				':company'=>$this->user->getCompany()
+			));
+			$this->user->updateDevices();
+			$data['device'] = $this->user->devices[$id];
+		}
+		if(isset($_POST['verify']) && $_POST['verify'] == 'true'){
+			if($_POST['code'] == $data['device']['verify_code']){
+				$stmt = $this->db->prepare("UPDATE companies_devices SET verified = 1 WHERE company_id = :comp AND device_id = :dev");
+				$res = $stmt->execute(array(
+					':comp'=>$this->user->getCompany(),
+					':dev'=>$id
+				));
+				if($res){
+					$this->user->updateDevices();
+					$data['device'] = $this->user->devices[$id];
+				}
+			}
+		}
+		$this->render("devices/verify.html.twig", $data);
+	}
+	public function editAction($id){
+		$data = array(
+			'headercolor'=>'66ff66'
+		);
+		if(isset($_POST['action']) && $_POST['action'] == 'edit'){
+			unset($_POST['action']);
+			$edited = false;
+			foreach($_POST as $key=>$edit){
+				if($edit != ''){
+					$edited = true;
+					switch($key){
+						case "location":
+							$stmt = $this->db->prepare("UPDATE devices SET location = :value WHERE id = :id");
+							$stmt->execute(array(
+								':value'=>$edit,
+								':id'=>$id
+							));
+							break;
+					}
+				}
+			}
+			if($edited) {
+				$this->user->updateDevices();
+				$data['device'] = $this->user->devices[$id];
+			}
+		}
+		$data['device'] = $this->user->devices[$id];
+		$this->render('devices/edit.html.twig', $data);
+	}
 	public function addAction(){
 		$data = array(
 			'headercolor'=>'339933'

@@ -1,6 +1,56 @@
 {
-    "hash": "61d84d69f6eea3fe603230eb002ce37c",
+    "hash": "abba884c33be8113489238f601eb477f",
     "packages": [
+        {
+            "name": "amazonwebservices/aws-sdk-for-php",
+            "version": "1.5.15",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/amazonwebservices/aws-sdk-for-php.git",
+                "reference": "1.5.15"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/amazonwebservices/aws-sdk-for-php/zipball/1.5.15",
+                "reference": "1.5.15",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2.0"
+            },
+            "time": "2012-09-26 23:28:26",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "classmap": [
+                    "authentication/",
+                    "extensions/",
+                    "lib/",
+                    "services/",
+                    "utilities/",
+                    "sdk.class.php"
+                ]
+            },
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Amazon Web Services",
+                    "homepage": "http://aws.amazon.com"
+                }
+            ],
+            "description": "AWS SDK for PHP",
+            "homepage": "http://aws.amazon.com/sdkforphp/",
+            "keywords": [
+                "amazon",
+                "s3",
+                "sdk",
+                "aws",
+                "dynamodb",
+                "ec2"
+            ]
+        },
         {
             "name": "twig/twig",
             "version": "v1.10.0",

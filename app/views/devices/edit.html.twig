@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+{% block title%}{% if device.name == null%}Edit: {{device.id}}{%else%}{{device.name}}{%endif%}{% endblock %}
+{% block afterbrand %}
+	<a class="right btn btn-small btn-info" href="{{root}}devices/view/{{device.id}}">Return</a>
+{% endblock %}
+{% block name %}Edit <small>{% if device.name == null%}{{device.id}}{% else %}{{device.name}}{%endif%}</small>{% endblock %}
+{% block body %}
+<form method="post">
+	<input type="hidden" name="action" value="edit" />
+	<label>Name</label><input type="text" name="name" placeholder="{{device.name}}" />
+	<label>Location</label><input type="text" name="location" placeholder="{% if device.location != null %}{{device.location}}{%else%}Where am I?{% endif %}" />
+	<label><input type="submit" value="Save" /></label>
+</form>
+{% endblock %}
