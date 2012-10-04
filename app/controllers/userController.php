@@ -12,12 +12,16 @@ class userController extends Controller{
 			$email = $_POST['email'];
 			$rememberme = (isset($_POST['rememberme'])) ? true : false;
 			if($this->login($email, $password, $rememberme)){
-
+				header("Location: " . PROTOCOL . ROOT);
 			} else {
 				$_SESSION['errors'][] = $this->error;
 			}
 		}
 		$this->render("user/login.html.twig");
+	}
+	public function logoutAction(){
+		$this->logout();
+		header("Location: ".PROTOCOL . ROOT . "/login");
 	}
 	protected function login($email, $password, $rememberme){
 		$stmt = $this->db->prepare("SELECT users.*, levels.name as levelName, levels.level as level FROM users INNER JOIN levels ON users.level = levels.id WHERE email = :email LIMIT 1");
@@ -57,5 +61,10 @@ class userController extends Controller{
 			$return = false;
 		}
 		return $return;
+	}
+	protected function logout(){
+		session_destroy();
+		setcookie('controlVC_uid', '', time()-3600,'/', ROOT);
+		setcookie('controlVC_hash', '', time()-3600,'/', ROOT);
 	}
 }

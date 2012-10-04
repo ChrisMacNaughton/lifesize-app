@@ -20,13 +20,20 @@ class Controller{
 			$twig->addExtension(new Twig_Extension_Debug());
 		
 		$data['user'] = $this->user;
+		$data['perms'] = $this->user->permissions;
 		$data['active'] = $this->app['active'];
 		$data['root'] = PROTOCOL.ROOT."/";
 
-		$errors = (isset($_SESSION['errors'])) ? $_SESSION['errors'] : null;
-
+		$errors = (isset($_SESSION['errors'])) ? $_SESSION['errors'] : array();
+		unset($_SESSION['errors']);
 		foreach($errors as $err){
 			$data['errors'][] = $err;
+		}
+
+		$flash = (isset($_SESSION['flash'])) ? $_SESSION['flash'] : array();
+		unset($_SESSION['flash']);
+		foreach($flash as $fl){
+			$data['flash'][] = $fl;
 		}
 		$data['db_info'] = $this->db->printlog();
 		$this->app['run-time'] = round((microtime(true) - $this->app['start']) * 1000, 3);

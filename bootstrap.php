@@ -18,7 +18,9 @@ try {
 
 require 'system/classes/user.php';
 $user = new User($db);
+
 $redirect = ($user->is_logged_in())?false:true;
+
 require 'vendor/autoload.php';
 /*
 *	building URI array
@@ -46,9 +48,12 @@ $app['controller'] = isset($uri[0])?$uri[0]:"dashboard";
 $app['action'] = isset($uri[1])?$uri[1]:"index";
 $app['detail'] = isset($uri[2])?$uri[2]:"";
 
-if(isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == "http"){
-	header("Location: https://".$_SERVER['HTTP_HOST'] . "/" . $app['controller'] . "/" . $app['action'] . "/" . $app['action']);
+if(isset($_SERVER['HTTP_X_FORWARDED_PROTO'])){
 	define('PROTOCOL', 'https://');
+	if($_SERVER['HTTP_X_FORWARDED_PROTO'] == "http"){
+		header("Location: https://".$_SERVER['HTTP_HOST'] . "/" . $app['controller'] . "/" . $app['action'] . "/" . $app['action']);
+		exit(0);
+	}
 } else
 	define('PROTOCOL','http://');
 
@@ -63,7 +68,7 @@ if($redirect){
 		header("Location: ".PROTOCOL.ROOT."/login");
 	}
 }
-if($app['controller'] == 'login'){
+if($app['controller'] == 'login' && $user->is_logged_in()){
 	header("Location: ".PROTOCOL.ROOT);
 }
 $app['active'] = $app['controller'];
@@ -77,3 +82,28 @@ if($app['controller'] == "register"){
 	$app['controller'] = "company";
 	$app['action'] = "register";
 }
+if($app['controller'] == 'logout'){
+	$app['controller'] = "user";
+	$app['action'] = "logout";
+}
+
+$perms = $db->query("SELECT * FROM permissions")->fetchAll(PDO::FETCH_ASSOC);
+foreach($perms as $perm){
+	$name = explode(' ',$perm['name']);
+	$name = array_reverse($name);
+	$name = array(
+		strtolower($name[0]),
+		strtolower($name[1])
+	);
+	$name = implode('/',$name);
+	$permissions[$name] = (int)$perm['id'];
+}
+if($user->permissions == 0){
+	$user->permissions = array_sum($permissions);
+}
+if(isset($permissions[$app['controller'].'/'.$app['action']]) AND !($user->permissions & $permissions[$app['controller'].'/'.$app['action']])){
+	die("You don't have permissions!");
+}
+$app['permissions'] = $permissions;
+
+//$app['debug'] = true;

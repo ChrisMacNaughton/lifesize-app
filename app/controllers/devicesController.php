@@ -1,0 +1,89 @@
+<?php
+
+class devicesController extends Controller {
+	public function indexAction(){
+		$data = array(
+			'title'=>"Devices"
+		);
+		$data['headercolor'] = '99ff99';
+		$data['devices'] = $this->user->devices;
+		$this->render('devices/index.html.twig', $data);
+	}
+	public function viewAction($id){
+		$data=array(
+			'headercolor'=>'66cc66',
+		);
+		$data['device'] = $this->user->devices[$id];
+		$this->render('devices/view.html.twig', $data);
+	}
+	public function addAction(){
+		$data = array(
+			'headercolor'=>'339933'
+		);
+		if(isset($_POST['action']) && $_POST['action'] == 'add'){
+
+			$options = array(
+				':ip'=>$_POST['ip'],
+				':password'=>$_POST['device_pass'],
+				':time'=>time()
+			);
+
+			$options[':id'] = 'dev-' . substr(hash('sha512', $options[':ip'] . microtime(true)), 0,10);
+			$stmt = $this->db->prepare("INSERT INTO devices (`id`,`ip`,`password`, `added`) VALUES (:id, :ip, :password, :time)");
+			$res = $stmt->execute($options);
+			if(!$res){
+				$_SESSION['errors'][] = "Failed to add the device";
+				$stmt = $this->db->prepare("DELETE FROM devices WHERE id = :id");
+				$stmt->execute(array(':id'=>$options[':id']));
+			}
+			$id = $options[':id'];
+			$stmt = $this->db->prepare("INSERT INTO companies_devices (`company_id`,`device_id`,`own`) VALUES (:company, :id, 1)");
+			$res = $stmt->execute(array(
+				':company'=>$this->user->getCompany(),
+				':id'=>$id
+			));
+			if(!$res){
+				$_SESSION['errors'][] = "Failed to add the device";
+				$stmt = $this->db->prepare("DELETE FROM devices WHERE id = :id");
+				$stmt->execute(array(':id'=>$options[':id']));
+				$stmt = $this->db->prepare("DELETE FROM companies_devices WHERE device_id = :id");
+				$stmt->execute(array(':id'=>$options[':id']));
+			}
+			if(!isset($_SESSION['errors'])){
+				$_SESSION['flash'][] = "Successfully added the device!";
+			}
+			//echo"<!--";print_r($options);echo"-->";
+		}
+		$this->render('devices/add.html.twig', $data);
+	}
+	public function deleteAction(){
+		$data = array(
+			'headercolor'=>'cc6666'
+		);
+		if(isset($_POST['id'])){
+			//delete the device if my company owns it
+			$id = $_POST['id'];
+			echo "<!-- Deleting $id -->";
+
+			$stmt = $this->db->prepare("DELETE FROM companies_devices WHERE device_id = :id AND company_id = :company AND own = 1");
+			$stmt->execute(array(':id'=>$id, ':company'=>$this->user->getCompany()));
+			$affected = $stmt->rowCount();
+			if($affected > 0){
+				$stmt = $this->db->prepare("DELETE FROM companies_devices WHERE device_id = :id");
+				$stmt->execute(array(':id'=>$id));
+				$stmt = $this->db->prepare("DELETE FROM devices WHERE id = :id");
+				$stmt->execute(array(':id'=>$id));
+			} else {
+				$stmt = $this->db->prepare("DELETE FROM companies_devices WHERE device_id = :id AND company_id = :company");
+				$stmt->execute(array(':id'=>$id, ':company'=>$this->user->getCompany()));
+			}
+			header("Location: ".PROTOCOL.ROOT . "/devices/delete");
+				
+			//redirect to clear post
+
+		}
+
+		$data['devices'] = $this->user->devices;
+		$this->render('devices/delete.html.twig', $data);
+	}
+}

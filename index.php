@@ -16,7 +16,8 @@ if(file_exists('app/controllers/' . strtolower($app['controller']) . 'Controller
 } else {
 	include 'app/controllers/error.php';
 	$controllerName = "errorController";
+	$actionName = "NotFoundAction";
 }
 
 $controller = new $controllerName($app, $db);
-$controller->$actionName();
+$controller->$actionName($app['detail']);

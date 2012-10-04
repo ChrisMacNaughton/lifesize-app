@@ -1,0 +1,95 @@
+{% extends 'base.html.twig'%}
+{% block afterbrand %}
+	{% if perms b-and app.permissions['devices/delete'] %}
+		<a class="right btn btn-small btn-danger" href="{{root}}devices/delete">Delete Devices</a>
+	{% endif %}
+	{% if perms b-and app.permissions['devices/add'] %}
+		<a class="right btn btn-small btn-success" href="{{root}}devices/add">New Device</a>
+	{% endif %}
+{% endblock %}
+{% block title %}Devices {% endblock %}
+{% block name %}Devices{% endblock %}
+{% block body%}
+<div class="row">
+	<div class="row span12">
+		<div class="status span1">
+			<h4>Status</h4>
+		</div>
+		<div class="make span1">
+			<h4>Make</h4>
+		</div>
+		<div class="model span2">
+			<h4>Model</h4>
+		</div><div class="ip span2">
+			<h4>IP Address</h4>
+		</div>
+		<div class="name span2">
+			<h4>Name</h4>
+		</div>
+		<div class="version span2">
+			<h4>Software Version</h4>
+		</div>
+		<div class="type span1">
+			<h4>Type</h4>
+		</div>
+	</div>
+	{%for device in devices %}
+	<div class="row span12">
+		<div class="status span1">
+			<img src="assets/img/devices/
+			{% if device.online == 1%}
+				{% if device.in_call == 1%}
+				Calling
+				{% else %}
+				Online
+				{% endif %}
+			{% else %}
+			Offline
+			{% endif %}.png" />
+		</div>
+		<div class="make span1">
+			{% if device.make != null%}
+			{{device.make}}
+			{% else %}
+			Unknown
+			{% endif %}
+		</div>
+		<div class="model span2">
+			{% if device.model != null%}
+			{{device.model}}
+			{% else %}
+			Unknown
+			{% endif %}
+		</div>
+		<div class="ip span2">
+			{{device.ip}}
+		</div>
+		<div class="name span2">
+			{% if device.serial != null %}
+				<a href="{{root}}devices/view/{{device.id}}">{% if device.name == null %}Unknown{% else %}{{device.name}}{% endif%}</a>
+			{% else %}
+				{% if device.name == null %}Unknown{% else %}{{device.name}}{% endif%}
+			{% endif %}
+		</div>
+		<div class="version span2">
+			{% if device.version != null%}
+			device.version
+			{% else %}
+			Unknown
+			{% endif %}
+		</div>
+		<div class="type span1">
+			{% if device.type != null%}
+			<img src="assets/img/devices/{{device.type}}.png" />
+			{% else %}
+			?
+			{% endif %}
+		</div>
+	</div>
+	{% else %}
+	<div class="row span12">
+		<p>No devices found</p>
+	</div>
+	{% endfor %}
+</div>
+{% endblock %}

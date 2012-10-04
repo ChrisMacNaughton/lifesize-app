@@ -1,0 +1,7 @@
+{% extends 'base.html.twig' %}
+{% block title%}{% if device.name == null%}ID: {{device.id}}{%else%}{{device.name}}{%endif%}{% endblock %}
+
+{% block name %}Device <small>{% if device.name == null%}{{device.id}}{% else %}{{device.name}}{%endif%}</small>{% endblock %}
+{% block body %}
+
+{% endblock %}
