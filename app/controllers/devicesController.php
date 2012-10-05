@@ -43,7 +43,7 @@ class devicesController extends Controller {
 		}
 		if(isset($_POST['verify']) && $_POST['verify'] == 'true'){
 			if($_POST['code'] == $data['device']['verify_code']){
-				$stmt = $this->db->prepare("UPDATE companies_devices SET verified = 1 WHERE company_id = :comp AND device_id = :dev");
+				$stmt = $this->writedb->prepare("UPDATE companies_devices SET verified = 1 WHERE company_id = :comp AND device_id = :dev");
 				$res = $stmt->execute(array(
 					':comp'=>$this->user->getCompany(),
 					':dev'=>$id
@@ -68,11 +68,14 @@ class devicesController extends Controller {
 					$edited = true;
 					switch($key){
 						case "location":
-							$stmt = $this->db->prepare("UPDATE devices SET location = :value WHERE id = :id");
+							$stmt = $this->writedb->prepare("UPDATE devices SET location = :value WHERE id = :id");
 							$stmt->execute(array(
 								':value'=>$edit,
 								':id'=>$id
 							));
+							break;
+						case "licensekey":
+							echo "<!-- License Update-->";
 							break;
 					}
 				}
@@ -98,24 +101,24 @@ class devicesController extends Controller {
 			);
 
 			$options[':id'] = 'dev-' . substr(hash('sha512', $options[':ip'] . microtime(true)), 0,10);
-			$stmt = $this->db->prepare("INSERT INTO devices (`id`,`ip`,`password`, `added`) VALUES (:id, :ip, :password, :time)");
+			$stmt = $this->writedb->prepare("INSERT INTO devices (`id`,`ip`,`password`, `added`) VALUES (:id, :ip, :password, :time)");
 			$res = $stmt->execute($options);
 			if(!$res){
 				$_SESSION['errors'][] = "Failed to add the device";
-				$stmt = $this->db->prepare("DELETE FROM devices WHERE id = :id");
+				$stmt = $this->writedb->prepare("DELETE FROM devices WHERE id = :id");
 				$stmt->execute(array(':id'=>$options[':id']));
 			}
 			$id = $options[':id'];
-			$stmt = $this->db->prepare("INSERT INTO companies_devices (`company_id`,`device_id`,`own`) VALUES (:company, :id, 1)");
+			$stmt = $this->writedb->prepare("INSERT INTO companies_devices (`company_id`,`device_id`,`own`) VALUES (:company, :id, 1)");
 			$res = $stmt->execute(array(
 				':company'=>$this->user->getCompany(),
 				':id'=>$id
 			));
 			if(!$res){
 				$_SESSION['errors'][] = "Failed to add the device";
-				$stmt = $this->db->prepare("DELETE FROM devices WHERE id = :id");
+				$stmt = $this->writedb->prepare("DELETE FROM devices WHERE id = :id");
 				$stmt->execute(array(':id'=>$options[':id']));
-				$stmt = $this->db->prepare("DELETE FROM companies_devices WHERE device_id = :id");
+				$stmt = $this->writedb->prepare("DELETE FROM companies_devices WHERE device_id = :id");
 				$stmt->execute(array(':id'=>$options[':id']));
 			}
 			if(!isset($_SESSION['errors'])){
@@ -134,16 +137,16 @@ class devicesController extends Controller {
 			$id = $_POST['id'];
 			echo "<!-- Deleting $id -->";
 
-			$stmt = $this->db->prepare("DELETE FROM companies_devices WHERE device_id = :id AND company_id = :company AND own = 1");
+			$stmt = $this->writedb->prepare("DELETE FROM companies_devices WHERE device_id = :id AND company_id = :company AND own = 1");
 			$stmt->execute(array(':id'=>$id, ':company'=>$this->user->getCompany()));
 			$affected = $stmt->rowCount();
 			if($affected > 0){
-				$stmt = $this->db->prepare("DELETE FROM companies_devices WHERE device_id = :id");
+				$stmt = $this->writedb->prepare("DELETE FROM companies_devices WHERE device_id = :id");
 				$stmt->execute(array(':id'=>$id));
-				$stmt = $this->db->prepare("DELETE FROM devices WHERE id = :id");
+				$stmt = $this->writedb->prepare("DELETE FROM devices WHERE id = :id");
 				$stmt->execute(array(':id'=>$id));
 			} else {
-				$stmt = $this->db->prepare("DELETE FROM companies_devices WHERE device_id = :id AND company_id = :company");
+				$stmt = $this->writedb->prepare("DELETE FROM companies_devices WHERE device_id = :id AND company_id = :company");
 				$stmt->execute(array(':id'=>$id, ':company'=>$this->user->getCompany()));
 			}
 			header("Location: ".PROTOCOL.ROOT . "/devices/delete");

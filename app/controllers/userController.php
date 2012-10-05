@@ -1,10 +1,54 @@
 <?php
 
 class userController extends Controller{
-	public function __construct($app, $db){
-		parent::__construct($app, $db);
+	public function __construct($app, $db, $writedb){
+		parent::__construct($app, $db, $writedb);
 		require 'system/classes/passwordHash.php';
 		$this->hasher = new PasswordHash(14,false);
+	}
+	public function viewAction($id){
+		$data = array(
+			'headercolor'=>'9966cc',
+		);
+		$data['companies'] = $this->user->getCompanies($id);
+		if(isset($_POST['update'])){
+			switch($_POST['update']){
+				case "as":
+					$stmt = $this->writedb->prepare("UPDATE users SET `as` = :as WHERE id = :id");
+					$stmt->execute(array(':as'=>$_POST['as'], ':id'=>$id));
+					break;
+				case "password":
+					if($_POST['password'] == $_POST['password2']){
+						$stmt = $this->db->prepare("SELECT password FROM users WHERE id =:id LIMIT 1");
+						$stmt->execute(arraY(':id'=>$id));
+						$res = $stmt->fetch(PDO::FETCH_ASSOC);
+						$p = $res['password'];
+						$result = $this->hasher->CheckPassword($_POST['old_pass'], $p);
+						$result = true;
+						if($result){
+							$new_pass = $this->hasher->hashPassword($_POST['password']);
+							$stmt = $this->db->prepare("update users SET password = :password WHERE id = :id");
+							if($stmt->execute(array(':password'=>$new_pass, ':id'=>$id))){
+								$_SESSION['flash'][] = "Success!";
+							} else {
+								$_SESSION['errors'][] = "Error updating password";
+							}
+						}else {
+							$_SESSION['errors'][] = "Old Password was incorrect";
+						}
+					} else {
+						$_SESSION['errors'][] = "Password and Confirm don't match!";
+					}
+					break;
+			}
+		}
+		if($id == $this->user->getID()){
+			$data['me'] = $this->user->getInfo();
+			$template = "users/profile.html.twig";
+		} else {
+			$template = "users/view.html.twig";
+		}
+		$this->render($template, $data);
 	}
 	public function loginAction(){
 		if(isset($_POST['action']) && $_POST['action'] == 'login'){
@@ -17,7 +61,7 @@ class userController extends Controller{
 				$_SESSION['errors'][] = $this->error;
 			}
 		}
-		$this->render("user/login.html.twig");
+		$this->render("users/login.html.twig");
 	}
 	public function logoutAction(){
 		$this->logout();
@@ -31,7 +75,7 @@ class userController extends Controller{
 		$result = $this->hasher->CheckPassword($password, $user['password']);
 		if($result === true){
 			if(is_null($user['sesshash']) || $user['sesshash'] == ''){
-				$hashing = $this->db->prepare("UPDATE users SET sesshash = :sesshash WHERE `id` = :id");
+				$hashing = $this->writedb->prepare("UPDATE users SET sesshash = :sesshash WHERE `id` = :id");
 				$hash = hash('sha512', $user['password'].microtime(true).$user['email']);
 				$res = $hashing->execute(array(
 					':id'=>$user['id'],

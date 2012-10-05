@@ -57,7 +57,7 @@
 					Devices with no calls
 				</div>
 				<div class="span1">
-					0
+					{{unused_devices}}
 				</div>
 			</div>
 			<div class="row even">
@@ -99,7 +99,7 @@
 			</div>
 		</div>
 	</div>
-	{% if alarm.count == 1%}
+	{% if alarm.ip != null %}
 	<div class="span12">
 		Latest Alarm: {{alarm.ip}} - {{alarm.name}} - {{alarm.description}}
 	</div>

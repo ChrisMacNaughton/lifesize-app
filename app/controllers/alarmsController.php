@@ -7,8 +7,8 @@ class alarmsController extends Controller {
 		);
 		if(isset($_POST['action']) && $_POST['action'] == 'update'){
 			unset($_POST['action']);
-			$stmt = $this->db->prepare("INSERT INTO devices_alarms (`alarm_id`,`device_id`) VALUES (:alarm, :device)");
-			$user = $this->db->prepare("INSERT INTO users_alarms (`user_id`,`alarm_id`,`device_id`, `enabled`) VALUES (:user, :alarm, :device,:enabled) ON DUPLICATE KEY UPDATE `enabled` = :enabled");
+			$stmt = $this->writedb->prepare("INSERT INTO devices_alarms (`alarm_id`,`device_id`) VALUES (:alarm, :device)");
+			$user = $this->writedb->prepare("INSERT INTO users_alarms (`user_id`,`alarm_id`,`device_id`, `enabled`) VALUES (:user, :alarm, :device,:enabled) ON DUPLICATE KEY UPDATE `enabled` = :enabled");
 			foreach($_POST as $key=>$value){
 				$name = explode('|', $key);
 				$alarm = $name[0];
@@ -31,12 +31,12 @@ class alarmsController extends Controller {
 				$user->execute($options);
 			}
 		}
-		$stmt = $this->db->prepare("SELECT alarms.id as id, alarms.name as alarmname, alarms.description as description, devices.name as devicename, devices.id as deviceid
+		$stmt = $this->db->prepare("SELECT alarms.id as id, alarms.name as alarmname, alarms.description as description, devices.name as devicename, devices.id as deviceid, devices.ip as deviceip
 FROM alarms
 INNER JOIN companies_devices
 INNER JOIN devices ON companies_devices.device_id = devices.id
 WHERE companies_devices.company_id =:id
-ORDER BY alarms.name");
+ORDER BY alarms.name, devices.online DESC, devices.name, devices.id");
 		$stmt->execute(array(':id'=>$this->user->getCompany()));
 		$alarms = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		$devices_alarms_stmt = $this->db->prepare("SELECT active FROM devices_alarms WHERE device_id = :device AND alarm_id = :alarm");

@@ -1,0 +1,30 @@
+{% extends 'base.html.twig'%}
+{% block title%}Profile{% endblock %}
+{% block name %}Profile{% endblock %}
+
+{% block body %}
+<div class="row">
+	<div class="span12">
+		<form method="post" class="form form-inline">
+			<input type="hidden" name="update" value="password">
+			<input type="password" name="old_pass" placeholder="Old Password">
+			<input type="password" name="password" placeholder="Password">
+			<input type="password" name="password2" placeholder="Confirm">
+			<input type="submit" value="Save">
+		</form>
+	</div>
+	{% if companies|length > 1%}
+	<div class="span12">
+		<form method="post" class="form form-inline">
+			<input type="hidden" name="update" value="as">
+			<select name="as">
+				{% for comp in companies %}
+					<option{% if comp.id == me.as %} selected="selected"{% endif %} value="{{comp.id}}">{{comp.name}}</option>
+				{% endfor %}
+			</select>
+			<input type="submit" value="Update" />
+		</form>
+	</div>
+	{% endif %}
+</div>
+{% endblock %}

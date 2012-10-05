@@ -2,11 +2,27 @@
 if(!isset($argv))
 	die("Must be run from the command line");
 
+$worker_id = getmypid().'-'.substr(sha1(rand(-1000,1000)), 0,5);
 require_once 'mySSH.php';
+error_reporting(E_ALL^E_USER_NOTICE);
+/* used functions*/
+function clean($command){
+	$res = explode(chr(0x0a), $command);
+	
+	if($res[2] == 'ok,00')
+		return $res[0];
+	else
+		return false;
+}
+function to_seconds($duration) {
+	$i = explode(':', $duration);
+	return ($i[0] * 60 * 60) + ($i[1] * 60) + $i[2];
+}
+
 
 $start = time();
 $max_runtime = (60 * 60) + rand(60,600);
-
+$end = $start + $max_runtime;
 
 require '../system/config.php';
 require '../system/classes/loggedPDO.php';
@@ -16,23 +32,266 @@ try {
     //$app['errors'][]= $e->getMessage();
     throw new Exception('Service is unavailable', 513);
 }
+
+$res = $db->query("SELECT value FROM settings WHERE setting = 'max_updaters'")->fetch(PDO::FETCH_ASSOC);
+$max_updaters = $res['value'];
+$time = (int)time() - 60;
+$query = "SELECT count(distinct worker_id) AS count FROM updater_log WHERE `type` = 'updater' AND `time` > " . $time;
+//echo "\n$query\n";
+$res = $db->query($query)->fetch(PDO::FETCH_ASSOC);
+$current_devices = $res["count"];
+
+if ($current_devices == $max_updaters OR $current_devices > $max_updaters){
+	die('Already at max updaters of ' . $max_updaters . " ( $current_devices )\n");
+}
+
 $res = $db->query("SELECT value AS version FROM `settings` WHERE `setting` = 'worker_version'")->fetch(PDO::FETCH_ASSOC);
-$version = $res['version'];
+$worker_version = $res['version'];
 
-$stmt = $db->prepare("SELECT devices.* FROM devices INNER JOIN companies_devices ON devices.id = companies_devices.device_id INNER JOIN companies ON companies.id = companies_devices.company_id WHERE devices.updated <= (:now - companies.interval * 60) AND companies.active = 1 AND updating < :updating ORDER BY updated LIMIT 1");
+$stmt = $db->prepare("SELECT devices.*, companies_devices.company_id FROM devices INNER JOIN companies_devices ON devices.id = companies_devices.device_id INNER JOIN companies ON companies.id = companies_devices.company_id WHERE devices.updated <= (:now - companies.interval * 60) AND companies.active = 1 AND updating < :updating ORDER BY updated LIMIT 1");
 $rsrv = $db->prepare("UPDATE devices SET updating = :time WHERE id = :id AND updating = :updating");
+$offline_stmt = $db->prepare("UPDATE devices SET online = 0, updated = :time WHERE id = :id");
+$serial_stmt = $db->prepare("SELECT * FROM devices WHERE `serial` = :serial");
+$new_serial = $db->prepare("UPDATE devices SET `serial` = :serial WHERE id = :id");
+$new_license = $db->prepare("UPDATE devices SET `licensekey` = :license WHERE id = :id");
+$change_stmt = $db->prepare("UPDATE companies_devices SET device_id = :id WHERE device_id = :old_id AND company_id = :company");
+$remove_stmt = $db->prepare("DELETE FROM devices WHERE id = :id");
+$remove_stmt2 = $db->prepare("DELETE FROM companies_devices WHERE device_id = :id");
+$update_stmt = $db->prepare("UPDATE devices 
+	SET name = :name,
+	make=:make,
+	model=:model,
+	in_call=:call,
+	version=:version,
+	licensekey=:license,
+	updated=:updated,
+	type=:type,
+	online=:online
+	WHERE id = :id");
+$log_stmt = $db->prepare("INSERT INTO updater_log (time, worker_id, message, detail, type) VALUES (:time, :id, :message, :detail, 'updater')");
+$history_start_stmt = $db->prepare("SELECT id FROM devices_history WHERE device_id = :id ORDER BY id DESC limit 1");
+$history_stmt = $db->prepare("INSERT INTO devices_history VALUES(:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46,:47,:48,:49, :50)");
 
-while(time() < $start + $max_runtime){
+$log_stmt->execute(array(
+		':time'=>time(),
+		':id'=>$worker_id,
+		':message'=>"Initialized",
+		':detail'=>''
+	));
+$offline_alarm = $db->prepare("UPDATE devices_alarms SET active = :active WHERE device_id = :id AND alarm_id = 'alarm-jfu498hf'");
+$high_loss_stmt = $db->prepare("UPDATE devices_alarms SET active = :active WHERE device_id = :id AND alarm_id = 'alarm-abwo7froseb'");
+while(time() <= $end){
 	$res = $db->query("SELECT value AS version FROM `settings` WHERE `setting` = 'worker_version'")->fetch(PDO::FETCH_ASSOC);
 	$current_version = $res['version'];
-	if($version != $current_version){
+	if($worker_version != $current_version){
 		print("New worker version\n");
 		exit(0);
 	}
 	$time = time();
-	$stmt->execute(array(':now'=>$time, ':updating'=>$time - 30));
+	$log_stmt->execute(array(
+		':time'=>$time,
+		':id'=>$worker_id,
+		':message'=>"Checking for available device",
+		':detail'=>''
+	));
+	$stmt->execute(array(':now'	=>$time, ':updating'=>$time - 30));
 	$device = $stmt->fetch(PDO::FETCH_ASSOC);
 
-	print_r($device);
-	exit(0);
+	if(empty($device)){
+		sleep(5);
+		continue;
+	}
+	print("Trying to reserve " . $device['id'] . "\n");
+	$rsrv->execute(array(
+		':time'=>$time,
+		':id'=>$device['id'],
+		':updating'=>$device['updating']
+		));
+	$res = $rsrv->rowCount();
+	if ($res) {
+		print("Succeeded!\n");
+		$ssh = new mySSH($device['ip']);
+		if(!$ssh->login('auto', $device['password'])){
+			$offline_stmt->execute(array(':id'=>$device['id'], ':time'=>$time));
+			$log_stmt->execute(array(
+						':time'=>$time,
+						':id'=>$worker_id,
+						':message'=>"Tried",
+						':detail'=>$device['id']
+					));
+			if($device['online'] == 0){
+				$offline_alarm->execute(array(
+					':id'=>$device['id'],
+					':active'=>1
+				));
+			}
+		} else {
+			$res = explode(chr(0x0a), $ssh->exec("get system serial"));
+			$serial = $res[0];
+
+			if($serial != $device['serial']){
+				if(is_null($device['serial'])){
+					//add serial to device
+					$serial_stmt->execute(array(':serial'=>$serial));
+					print_r($serial_stmt->errorInfo());
+					$count = $serial_stmt->rowCount();
+					if($count > 0){
+						$dev = $serial_stmt->fetch(PDO::FETCH_ASSOC);
+						$change_stmt->execute(array(
+							':id'=>$dev['id'],
+							':old_id'=>$device['id'],
+							':company'=>$device["company_id"],
+						));
+						$remove_stmt->execute(array(':id'=>$device['id']));
+						$remove_stmt2->execute(array(':id'=>$device['id']));
+					} else {
+						$new_serial->execute(array(':serial'=>$serial, ':id'=>$device['id']));
+					}
+				} else {
+					$serial_stmt->execute(array(':serial'=>$serial));
+					$dev = $serial_stmt->fetch(PDO::FETCH_ASSOC);
+					$change_stmt->execute(array(
+						':id'=>$dev['id'],
+						':old_id'=>$device['id'],
+						':company'=>$device["company_id"]
+					));
+					$remove_stmt->execute(array(':id'=>$device['id']));
+					$remove_stmt2->execute(array(':id'=>$device['id']));
+
+				}
+			} else {
+				$online = 1;
+				//get licensekey from device
+				$res = clean($ssh->exec('get system licensekey -t maint'));
+				if($res){
+					$licensekey = $res;
+					$new_license->execute(array(':license'=>$licensekey,':id'=>$device['id']));
+				}
+				//get name from device
+				$res = clean($ssh->exec('get system name'));
+				if($res){
+					$name = $res;
+				} else {
+					$name = $device['name'];
+				}
+				$res = clean($ssh->exec('get system model'));
+				if($res){
+					$dev = explode(',', $res);
+					$make = $dev[0]; $model = $dev[1];
+				} else {
+					$make = $device['make'];
+					$model = $device['model'];
+				}
+				$res = explode(chr(0x0a), $ssh->exec('get system version'));
+				if(array_search('ok,00', $res)){
+					$res = explode(',', $res[0]);
+					$version = $res[1];
+				} else {
+					$version = $device['version'];
+				}
+				$res = explode(chr(0x0a), $ssh->exec('status call active'));
+				if(array_search('ok,00', $res)){
+					$in_call = ($res[0] == '')?0 : 1;
+					$high_loss_stmt->execute(array(
+						':id'=>$device['id'],
+						':active'=>0
+					));
+				} else {
+					$in_call = $device['in_call'];
+					$active_call = explode(chr(0x0a), $ssh->exec('status call active'));
+					$active_call = explode(',',$active_call[0]);
+					$call_time = to_seconds($active_call[10]);
+
+					$call_stats = explode(chr(0x0a), $ssh->exec('status call statistics'));
+					$call_stats = explode(',',$call_stats[0]);
+
+					$cumu_pkt_loss = $call_stats[12] + $call_stats[17] + $call_stats[21] + $call_stats[27];
+
+					$pkt_loss = $call_stats[11] + $call_stats[16] + $call_stats[20] + $call_stats[26];
+
+					$loss_per_sec = $cumu_pkt_loss / $call_time;
+
+					if($loss_per_sec > 5){
+						$high_loss_stmt->execute(array(
+							':id'=>$device['id'],
+							':active'=>1
+						));
+					} else {
+						$high_loss_stmt->execute(array(
+							':id'=>$device['id'],
+							':active'=>0
+						));
+					}
+				}
+
+				/*
+				get call history
+				*/
+				$locale = explode(chr(0x0a), $ssh->exec('get locale gmt-offset'));
+				$change = str_split($locale[0]);
+				//print_r($change);
+				$timezone['direction'] = $change[0];
+				$timezone['change'] = $change[2] * 60 * 60;
+				$hist = explode(chr(0x0a), $ssh->exec("status call history -f -X -D |"));
+				//print_r($hist);
+				$print = false;
+				$history_start_stmt->execute(array(':id'=>$device['id']));
+				$start = $history_start_stmt->fetch(PDO::FETCH_ASSOC);
+				$start = $start['id'];
+				foreach ($hist as $call) {
+					$history = explode("|", $call);
+					if (count($history) > 5) {
+						if ($history[0] > $start) {
+							array_unshift($history, $device['id']);
+
+							foreach ($history as $key=>$value) {
+								//echo $key . " : " . $value . "\n";
+								$id = ':' . ($key + 1);
+								//echo $id."\n\n";
+								$data[$id] = $value;
+							}
+							$tmp = ($timezone['direction'] == '-') ? strtotime($data[':9']) + $timezone['change'] :strtotime($data[':9']) - $timezone['change'];
+							$data[':9'] = date('Y-m-d H:i:s',$tmp);
+							$tmp = ($timezone['direction'] == '-') ? strtotime($data[':10']) + $timezone['change'] :strtotime($data[':10']) - $timezone['change'];
+							$data[':10'] = date('Y-m-d H:i:s',$tmp);
+							$data[':11'] = to_seconds($data[':11']);
+							$history_stmt->execute($data);
+							//print_r($data);
+						}	
+						//print_r($history_stmt->errorInfo());echo"\n";
+					}
+					$print = false;
+				}
+				$type = "camera";
+				//print(sprintf("New data for %s is\n\tOnline: %s\n\tName: %s\n\tMake: %s\n\tModel: %s\n\tIn Call:%s\n\tVersion:%s\n", $device['name'], $online, $name, $make, $model, $in_call, $version));
+				$options = array(
+					':id'=>$device['id'],					
+					':name'=>$name,
+					':make'=>$make,
+					':model'=>$model,
+					':call'=>$in_call,
+					':version'=>$version,
+					':license'=>$licensekey,
+					':updated'=>$time,
+					':type'=>$type,
+					':online'=>$online
+				);
+				$res = $update_stmt->execute($options);
+				//print("Updated: " . $name . " at " . time() . "(quitting at " . $end . ")\n");
+				if($res){
+					//print(sprintf("%s:%s| Updated %s (%s)\n", $time, $worker_id,$device['id'], $name));
+					$log_stmt->execute(array(
+						':time'=>$time,
+						':id'=>$worker_id,
+						':message'=>"Updated",
+						':detail'=>$device['id']
+					));
+				} else{
+					//print(sprintf("Error updating %s:\n", $device['id']));print_r($update_stmt->errorInfo());
+				}
+			}
+			//echo $licensekey . "\n";
+		}
+		$ssh = null;
+	}
 }

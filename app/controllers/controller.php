@@ -1,9 +1,10 @@
 <?php
 
 class Controller{
-	public function __construct($app, $db){
+	public function __construct($app, $db, $writedb){
 		global $user, $options;
 		$this->user = $user;
+		$this->writedb = $writedb;
 		$this->app = $app;
 		$this->db = $db;
 		$this->sqs = new AmazonSQS($options);
@@ -36,10 +37,10 @@ class Controller{
 		foreach($flash as $fl){
 			$data['flash'][] = $fl;
 		}
-		$data['db_info'] = $this->db->printlog();
+		$data['db_data'] = $this->db->printlog();
 		$this->app['run-time'] = round((microtime(true) - $this->app['start']) * 1000, 3);
 		unset($this->app['start']);
-
+		//$data['app']['db_data'] = $this->db->printog();
 		$data['app'] = $this->app;
 		echo $twig->render($file, $data);
 	}

@@ -9,6 +9,7 @@
 	<input type="hidden" name="action" value="edit" />
 	<label>Name</label><input type="text" name="name" placeholder="{{device.name}}" />
 	<label>Location</label><input type="text" name="location" placeholder="{% if device.location != null %}{{device.location}}{%else%}Where am I?{% endif %}" />
+	<label>License Key</label><textarea name="licensekey" placeholder="{% if device.licensekey != null %}{{device.licensekey}}{% endif %}"></textarea>
 	<label><input type="submit" value="Save" /></label>
 </form>
 {% endblock %}

@@ -12,4 +12,9 @@ class mySSH extends NET_SSH2{
 		$res.=$this->read();
 		return $res;
 	}
+	public function get($str){
+		$res = explode(chr(0x0a), $this->exec("get" . $str));
+
+		return $res[0];
+	}
 }

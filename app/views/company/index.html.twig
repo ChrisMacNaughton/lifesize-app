@@ -1,0 +1,9 @@
+{% extends 'base.html.twig'%}
+{% block title%}Company{% endblock %}
+{% block name %}Company<small>{{company.name}}</small>{% endblock %}
+
+{% block body %}
+<div class="row">
+Current Subscription: {{company.plan}}{% if perms b-and app.permissions['company/edit'] %}<a class="btn btn-success" href="company/edit/plan">Change</a>{% endif %}
+</div>
+{% endblock %}

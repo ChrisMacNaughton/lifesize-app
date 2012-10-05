@@ -11,15 +11,6 @@ class LoggedPDO extends PDO
         parent::__construct($dsn, $username, $password);
     }
     
-    /**
-     * Print out the log when we're destructed. I'm assuming this will
-     * be at the end of the page. If not you might want to remove this
-     * destructor and manually call LoggedPDO::printLog();
-     */
-    public function __destruct() {
-        //self::printLog();
-    }
-    
     public function query($query) {
         $start = microtime(true);
         $result = parent::query($query);

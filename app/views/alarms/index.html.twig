@@ -29,7 +29,7 @@
 			{{alarm.alarmname}}
 		</div>
 		<div class="span2">
-			{{alarm.devicename}}
+			{% if alarm.devicename != null %}{{alarm.devicename}}{% else %}{{alarm.deviceip}}{%endif%}
 		</div>
 		<div class="span5">
 			{{alarm.description}}

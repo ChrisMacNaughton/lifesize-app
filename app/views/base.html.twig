@@ -9,6 +9,7 @@
 	<link href="{{root}}assets/css/main.css" rel="stylesheet">
 {% endblock %}
 <style>
+
 {% if headercolor == null%}
 	{% set headercolor = "99ccff"%}
 {%endif %}
@@ -25,8 +26,24 @@
 		box-shadow: inset 0 3px 7px rgba(0,0,0,.2), inset 0 -3px 7px rgba(0,0,0,.2);
 	}
 	</style>
+	{% if app.user.level == 0 %}
+<style>
+	.adminBar{
+		min-height: 30px;
+		background: #ccc;
+		margin-left: 5px;
+		margin-right: 5px;
+		padding-top: 10px;
+		padding-bottom: 10px;
+		padding-left: 5px;
+		border: 1px solid #000;
+	}
+</style>
+{% endif %}
 </head>
-<body>
+<body>{% if app.user.level == 0 %}
+	<div id="headerBar"></div>
+	{% endif %}
 <div class="navbar navbar-inverse navbar-fixed-top">
 	<div class="navbar-inner">
 		<div class="container">
@@ -44,6 +61,14 @@
 					<li class="{% if active == 'alarms' %}active{%endif%}">
 						<a href="{{root}}alarms">Alarms</a>
 					</li>
+					<li class="{% if active == 'me' %}active{%endif%}">
+						<a href="{{root}}me">Profile</a>
+					</li>
+					{% if perms b-and app.permissions['company/view'] %}
+					<li class="{% if active == 'company' %}active{%endif%}">
+						<a href="{{root}}company">Company</a>
+					</li>
+					{% endif %}
 					<li>
 						<a href="{{root}}logout">Logout</a>
 					</li>
@@ -65,20 +90,22 @@
 		</div>
 	</div>
 </div>
-{%for err in errors %}
-	<div class="span10 offset1">
-		<div class="error">
-			<p>{{err}}</p>
+<div class="container">
+	{%for err in errors %}
+		<div class="span1- offset1">
+			<div class="error">
+				<p>{{err}}</p>
+			</div>
 		</div>
-	</div>
-{% endfor %}
-{%for err in flash %}
-	<div class="span10 offset1">
-		<div class="flash">
-			<p>{{err}}</p>
+	{% endfor %}
+	{%for err in flash %}
+		<div class="span10 offset1">
+			<div class="flash">
+				<p>{{err}}</p>
+			</div>
 		</div>
-	</div>
-{% endfor %}
+	{% endfor %}
+</div>
 <div class="container" id="body">
 {% block body %}
 Hello World!<br/>You haven't overridden the body block!
@@ -94,5 +121,29 @@ Hello World!<br/>You haven't overridden the body block!
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
 	<script src="{{root}}assets/bootstrap/js/bootstrap.min.js"></script>
 {% endblock %}
+{% if app.user.level == 0 %}
+ <script src="https://dlewcy1lx1kqi.cloudfront.net/js/jquery.hotkey.js"></script>
+<script type="text/javascript">
+var adminVisible = 0;
+$(document).bind('keydown', function(e){
+    var code = (e.keyCode ? e.keyCode : e.which);
+    //console.log(code);
+    if (code == 115) { 
+		if (adminVisible == 1) {
+			//console.log('remove');
+			$('#headerBar').html('');
+			//$(".adminBar").css('display','none');
+			adminVisible = 0;
+		} else {
+			$('#headerBar').html('<div class="adminBar navbar-fixed-bottom"><span style="font-weight: bold;font-size: 1.1em;">DB Time:</span> {{db_data.meta.time}} | <span style="font-weight: bold;font-size: 1.1em;">DB Queries:</span> {{db_data.meta.count}} | <span style="font-weight: bold;font-size: 1.1em;">Load Time:</span> {{app.run_time}} secs</div>');
+			//console.log("add");
+			//$(".adminBar").css('display','block');
+			adminVisible=1;
+		}
+	}
+});
+</script>
+{% endif %}
+
 </body>
 </html>

@@ -15,9 +15,14 @@ try {
     //$app['errors'][]= $e->getMessage();
     throw new Exception('Service is unavailable', 513);
 }
-
+try {
+	$writedb = new loggedPDO('mysql:dbname=' . $write_dbname . ';host=' . $write_dbhost, $write_dbuser, $write_dbpass);
+} catch (PDOException $e) {
+    //$app['errors'][]= $e->getMessage();
+    throw new Exception('Service is unavailable', 513);
+}
 require 'system/classes/user.php';
-$user = new User($db);
+$user = new User($db, $writedb);
 
 $redirect = ($user->is_logged_in())?false:true;
 
@@ -86,7 +91,11 @@ if($app['controller'] == 'logout'){
 	$app['controller'] = "user";
 	$app['action'] = "logout";
 }
-
+if($app['controller'] == 'me'){
+	$app['controller'] = "user";
+	$app['action'] = "view";
+	$app['detail'] = $user->getID();
+}
 $perms = $db->query("SELECT * FROM permissions")->fetchAll(PDO::FETCH_ASSOC);
 foreach($perms as $perm){
 	$name = explode(' ',$perm['name']);

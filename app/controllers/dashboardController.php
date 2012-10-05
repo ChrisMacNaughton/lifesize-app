@@ -20,17 +20,17 @@ INNER JOIN companies_devices ON devices_history.device_id = companies_devices.de
 INNER JOIN companies ON companies_devices.company_id = companies.id
 INNER JOIN users_companies ON companies.id = users_companies.company_id
 INNER JOIN users ON users.id = users_companies.user_id
-WHERE users.id = :id");
+WHERE users.id = :id AND companies.id = users.as");
 		$stmt->execute(array(':id'=>$this->user->getID()));
 		$res = $stmt->fetch(PDO::FETCH_ASSOC);
 		$data['call_count'] = $res['count'];
-		$stmt = $this->db->prepare("SELECT SUM(TIME_TO_SEC(duration)) AS sum
+		$stmt = $this->db->prepare("SELECT SUM(duration) AS sum
 FROM devices_history
 INNER JOIN companies_devices ON devices_history.device_id = companies_devices.device_id
 INNER JOIN companies ON companies_devices.company_id = companies.id
 INNER JOIN users_companies ON companies.id = users_companies.company_id
 INNER JOIN users ON users.id = users_companies.user_id
-WHERE users.id = :id");
+WHERE users.id = :id AND companies.id = users.as");
 		$stmt->execute(array(':id'=>$this->user->getID()));
 		$res = $stmt->fetch(PDO::FETCH_ASSOC);
 		$time = ($res['sum'] / 60);
@@ -51,11 +51,12 @@ INNER JOIN companies_devices ON devices_history.device_id = companies_devices.de
 INNER JOIN companies ON companies_devices.company_id = companies.id
 INNER JOIN users_companies ON companies.id = users_companies.company_id
 INNER JOIN users ON users.id = users_companies.user_id
-WHERE users.id = :id");
+WHERE users.id = :id AND companies.id = users.as");
 		$stmt->execute(array(':id'=>$this->user->getID()));
 		$res = $stmt->fetch(PDO::FETCH_ASSOC);
 		$data['devices_used'] = $res['sum'];
 		
+		$data['unused_devices'] = $data['devices_count'] - $data['devices_used'];
 
 		$stmt = $this->db->prepare("SELECT count(*) AS sum FROM `devices_alarms`
 INNER JOIN companies_devices ON devices_alarms.device_id = companies_devices.device_id
@@ -63,7 +64,7 @@ INNER JOIN companies ON companies_devices.company_id = companies.id
 INNER JOIN users_companies ON companies.id = users_companies.company_id
 INNER JOIN users ON users.id = users_companies.user_id
 WHERE users.id = :id
-AND devices_alarms.active = 1");
+AND devices_alarms.active = 1 AND companies.id = users.as");
 		$stmt->execute(array(':id'=>$this->user->getID()));
 		$res = $stmt->fetch(PDO::FETCH_ASSOC);
 		$data['all_alarms'] = $res['sum'];
@@ -73,6 +74,7 @@ FROM users_alarms
 INNER JOIN devices_alarms ON users_alarms.device_id = devices_alarms.device_id
 AND users_alarms.alarm_id = devices_alarms.alarm_id
 WHERE users_alarms.user_id = :id
+AND users_alarms.enabled = 1
 AND devices_alarms.active =1");
 		$stmt->execute(array(':id'=>$this->user->getID()));
 		$res = $stmt->fetch(PDO::FETCH_ASSOC);
