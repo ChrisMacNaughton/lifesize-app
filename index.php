@@ -1,4 +1,6 @@
 <?php
+
+error_reporting(E_ALL);
 require_once 'bootstrap.php';
 require_once 'app/controllers/controller.php';
 $controllerName = "dashboardController";
