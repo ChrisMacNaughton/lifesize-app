@@ -68,9 +68,14 @@ html {
 					<li class="{% if active == 'me' %}active{%endif%}">
 						<a href="{{root}}me">Profile</a>
 					</li>
-					{% if perms b-and app.permissions['company/view'] %}
+					{% if perms b-and app.permissions['company/index'] %}
 					<li class="{% if active == 'company' %}active{%endif%}">
 						<a href="{{root}}company">Company</a>
+					</li>
+					{% endif %}
+					{% if perms b-and app.permissions['admin/index'] %}
+					<li class="{% if active == 'admin' %}active{%endif%}">
+						<a href="{{root}}admin">Admin</a>
 					</li>
 					{% endif %}
 					<li>
@@ -121,7 +126,7 @@ Hello World!<br/>You haven't overridden the body block!
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
 	<script src="{{root}}assets/bootstrap/js/bootstrap.min.js"></script>
 {% endblock %}
-{% if app.user.level == 0 %}
+{%  if perms b-and app.permissions['admin/index']%}
  <script src="https://dlewcy1lx1kqi.cloudfront.net/js/jquery.hotkey.js"></script>
 <script type="text/javascript">
 var adminVisible = 0;

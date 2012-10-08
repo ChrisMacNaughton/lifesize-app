@@ -58,7 +58,7 @@ if ($current_devices == $max_updaters OR $current_devices > $max_updaters){
 $res = $db->query("SELECT value AS version FROM `settings` WHERE `setting` = 'worker_version'")->fetch(PDO::FETCH_ASSOC);
 $worker_version = $res['version'];
 
-$stmt = $db->prepare("SELECT devices.*, companies_devices.company_id FROM devices INNER JOIN companies_devices ON devices.id = companies_devices.device_id INNER JOIN companies ON companies.id = companies_devices.company_id WHERE devices.updated <= (:now - companies.interval * 60) AND companies.active = 1 AND updating < :updating ORDER BY updated LIMIT 1");
+$stmt = $db->prepare("SELECT devices.*, companies_devices.company_id FROM devices INNER JOIN companies_devices ON devices.id = companies_devices.device_id INNER JOIN companies ON companies.id = companies_devices.company_id WHERE devices.updated <= (:now - ((companies.interval * 60) -5) AND companies.active = 1 AND updating < :updating ORDER BY updated LIMIT 1");
 $rsrv = $db->prepare("UPDATE devices SET updating = :time WHERE id = :id AND updating = :updating");
 $offline_stmt = $db->prepare("UPDATE devices SET online = 0, updated = :time WHERE id = :id");
 $serial_stmt = $db->prepare("SELECT * FROM devices WHERE `serial` = :serial");

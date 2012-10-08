@@ -8,7 +8,7 @@ class userController extends Controller{
 	}
 	public function viewAction($id){
 		$data = array(
-			'headercolor'=>'9966cc',
+			'headercolor'=>'6666ff',
 		);
 		$data['companies'] = $this->user->getCompanies($id);
 		if(isset($_POST['update'])){
