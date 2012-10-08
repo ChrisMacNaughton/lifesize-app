@@ -115,7 +115,8 @@ if($user->permissions == 0){
 if(isset($permissions[$app['controller'].'/'.$app['action']]) AND !($user->permissions & $permissions[$app['controller'].'/'.$app['action']])){
 	$_SESSION['errors'][] = "You don't have permission to view that page!";
 	session_write_close();
-	header("Locatiobn: ".PROTOCOL.ROOT."/me");
+	header("Location: ".PROTOCOL.ROOT."/me");
+	exit(0);
 }
 $app['permissions'] = $permissions;
 
