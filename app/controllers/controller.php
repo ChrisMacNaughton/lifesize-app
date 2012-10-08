@@ -40,6 +40,7 @@ class Controller{
 		$data['db_data'] = $this->db->printlog();
 		$this->app['run-time'] = round((microtime(true) - $this->app['start']) * 1000, 3);
 		unset($this->app['start']);
+		$twig->getExtension('core')->setTimezone(TIMEZONE);
 		//$data['app']['db_data'] = $this->db->printog();
 		$data['app'] = $this->app;
 		echo $twig->render($file, $data);

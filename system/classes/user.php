@@ -20,7 +20,7 @@ class User {
 		$this->updateUser();
 	}
 	public function updateUser(){
-		$stmt = $this->db->prepare("SELECT users.*, levels.name as levelName, levels.level as level, L.permission AS permissions FROM users INNER JOIN levels ON users.level = levels.id INNER JOIN levels_permissions AS L ON L.level_id = users.level WHERE users.id = :id AND users.sesshash = :hash LIMIT 1");
+		$stmt = $this->db->prepare("SELECT users.*, levels.name as levelName, levels.level as level, L.permission AS permissions, users.timezone as timezone FROM users INNER JOIN levels ON users.level = levels.id INNER JOIN levels_permissions AS L ON L.level_id = users.level WHERE users.id = :id AND users.sesshash = :hash LIMIT 1");
 		$stmt->execute(array(
 			':id'=>$_COOKIE['controlVC_uid'],
 			':hash'=>$_COOKIE['controlVC_hash']
@@ -37,6 +37,9 @@ class User {
 
 			$this->updateDevices();
 		}
+	}
+	public function getTimezone(){
+		return $this->info['timezone'];
 	}
 	public function updateDevices(){
 		$stmt = $this->db->prepare("SELECT devices.* , companies_devices.own, companies_devices.verified, companies_devices.verify_sent, companies_devices.verify_code

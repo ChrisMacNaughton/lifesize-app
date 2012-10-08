@@ -7,7 +7,7 @@ $app = array(
 *	Incliude config / class for db
 *	Initialize DB
 */
-date_default_timezone_set("Europe/London");
+
 require 'system/config.php';
 require 'system/classes/loggedPDO.php';
 try {
@@ -24,7 +24,8 @@ try {
 }
 require 'system/classes/user.php';
 $user = new User($db, $writedb);
-
+define('TIMEZONE',$user->getTimezone());
+date_default_timezone_set(TIMEZONE);
 $redirect = ($user->is_logged_in())?false:true;
 
 require 'vendor/autoload.php';

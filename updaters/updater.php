@@ -34,8 +34,8 @@ $start = time();
 $max_runtime = (60 * 60) + rand(60,600);
 $end = $start + $max_runtime;
 
-require '../system/config.php';
-require '../system/classes/loggedPDO.php';
+require dirname(__FILE__).'/../system/config.php';
+require dirname(__FILE__).'/../system/classes/loggedPDO.php';
 try {
 	$db = new loggedPDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass);
 } catch (PDOException $e) {

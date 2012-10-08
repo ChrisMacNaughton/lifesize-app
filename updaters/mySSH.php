@@ -1,5 +1,5 @@
 <?php
-set_include_path(get_include_path() . PATH_SEPARATOR . 'phpseclib' . PATH_SEPARATOR . __DIR__ . '/');
+set_include_path(get_include_path() . PATH_SEPARATOR .dirname(__FILE__).'/phpseclib' . PATH_SEPARATOR . __DIR__ . '/');
 require_once 'Net/SSH2.php';
 class mySSH extends NET_SSH2{
 	public function updateLicense($licensekey){
