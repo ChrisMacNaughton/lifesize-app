@@ -114,11 +114,7 @@ html {
 {% block body %}
 Hello World!<br/>You haven't overridden the body block!
 {% endblock %}
-{% if app.debug %}
-<pre>
-	{{dump()}}
-</pre>
-{% endif %}
+
 </div>
 {% block javascripts %}
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
