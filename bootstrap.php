@@ -113,7 +113,9 @@ if($user->permissions == 0){
 	$user->permissions = array_sum($permissions);
 }
 if(isset($permissions[$app['controller'].'/'.$app['action']]) AND !($user->permissions & $permissions[$app['controller'].'/'.$app['action']])){
-	die("You don't have permissions!");
+	$_SESSION['errors'][] = "You don't have permission to view that page!";
+	session_write_close();
+	header("Locatiobn: ".PROTOCOL.ROOT."/me");
 }
 $app['permissions'] = $permissions;
 
