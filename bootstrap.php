@@ -86,7 +86,7 @@ if($app['controller'] == "login"){
 	$app['action'] = "login";
 }
 if($app['controller'] == "register"){
-	$app['controller'] = "company";
+	$app['controller'] = "user";
 	$app['action'] = "register";
 }
 if($app['controller'] == 'logout'){

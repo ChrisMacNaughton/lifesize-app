@@ -181,6 +181,8 @@ class devicesController extends Controller {
 				$stmt->execute(array(':id'=>$id));
 				$stmt = $this->writedb->prepare("DELETE FROM devices WHERE id = :id");
 				$stmt->execute(array(':id'=>$id));
+				$stmt = $this->writedb->prepare("DELETE FROM devices_history WHERE device_id = :id");
+				$stmt->execute(array(':id'=>$id));
 			} else {
 				$stmt = $this->writedb->prepare("DELETE FROM companies_devices WHERE device_id = :id AND company_id = :company");
 				$stmt->execute(array(':id'=>$id, ':company'=>$this->user->getCompany()));

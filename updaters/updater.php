@@ -1,7 +1,7 @@
 <?php
 if(!isset($argv))
 	die("Must be run from the command line");
-
+date_default_timezone_set("Europe/London");
 $worker_id = getmypid().'-'.substr(sha1(rand(-1000,1000)), 0,5);
 require_once 'mySSH.php';
 error_reporting(E_ALL^E_USER_NOTICE);
@@ -138,7 +138,8 @@ while(time() <= $end){
 	if ($res) {
 		print("Succeeded!\n");
 		$ssh = new mySSH($device['ip']);
-		if(!$ssh->login('auto', $device['password'])){
+		$pw = ($device['password'] != '')?$device['password'] : 'lifesize';
+		if(!$ssh->login('auto', $pw)){
 			$offline_stmt->execute(array(':id'=>$device['id'], ':time'=>$time));
 			$log_stmt->execute(array(
 						':time'=>$time,
