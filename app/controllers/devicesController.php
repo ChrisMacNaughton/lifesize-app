@@ -60,31 +60,67 @@ class devicesController extends Controller {
 		$data = array(
 			'headercolor'=>'66ff66'
 		);
-		if(isset($_POST['action']) && $_POST['action'] == 'edit'){
-			unset($_POST['action']);
+		$data['device'] = $this->user->devices[$id];
+		if(isset($_POST['section'])){
+			$section = $_POST['section'];
+			unset($_POST['section']);
+			$time = time();
 			$edited = false;
-			foreach($_POST as $key=>$edit){
-				if($edit != ''){
-					$edited = true;
-					switch($key){
-						case "location":
-							$stmt = $this->writedb->prepare("UPDATE devices SET location = :value WHERE id = :id");
-							$stmt->execute(array(
-								':value'=>$edit,
-								':id'=>$id
-							));
-							break;
-						case "licensekey":
-							echo "<!-- License Update-->";
-							break;
+			$edit_stmt = $this->db->prepare("INSERT INTO edits (id, device_id, verb, object, target, details,added) VALUES (:id, :device, :verb, :object, :target, :details, :added)");
+			switch($section){
+				case "calls":
+					echo "<!--";print_r($_POST);echo "-->";
+					$options = array(
+						':device'=>$id,
+						':verb'=>'set',
+						':object'=>'call',
+					);
+					foreach($_POST as $key=>$var){
+						if($data['device'][$key] != $var){
+							$options[':id']='edit-' . substr(hash('sha512', $id . microtime(true)), 0,10);
+							$options[':details']=$var;
+							$options[':added']=$time;
+							$edited = true;
+							switch($key){
+								case "outgoing_call_bandwidth":
+									$options[':target']='max-speed -o';
+									break;
+								case "incoming_call_bandwidth":
+									$options[':target']='max-speed -i';
+									break;
+								case "outgoing_total_bandwidth":
+									$options[':target']='total-bw -o';
+									break;
+								case "incoming_total_bandwidth":
+									$options[':target']='total-bw -i';
+									break;
+								case "auto_bandwidth":
+									$options[':target'] = 'auto-bandwidth';
+									break;
+								case "max_calltime":
+									$options[':target'] = 'max-time';
+									break;
+								case "max_redials":
+									$options[':target'] = 'max-redial-entries';
+									break;
+								case "auto_answer":
+									$options[':target'] = 'auto-answer';
+									break;
+								case "auto_answer_mute":
+									$options[':target'] = 'auto-mute';
+									break;
+								case "auto_answer_multiway":
+									$options[':target'] = 'auto-multiway';
+									break;
+							}
+							echo"<!--";print_r($options);echo"-->";
+							$edit_stmt->execute($options);
+						}
 					}
-				}
+					break;
 			}
-			if($edited) {
-				$this->user->updateDevices();
-				$data['device'] = $this->user->devices[$id];
-			}
-		}
+		}			
+		
 		$data['device'] = $this->user->devices[$id];
 		$this->render('devices/edit.html.twig', $data);
 	}

@@ -13,7 +13,11 @@
 {% if headercolor == null%}
 	{% set headercolor = "99ccff"%}
 {%endif %}
+html {
+	-webkit-print-color-adjust: exact;
+}
 	.jumbotron{
+
 		background: -moz-linear-gradient(45deg,  #2B1B17 0%, #{{headercolor}} 100%); /* FF3.6+ */
 		background: -webkit-gradient(linear, left bottom, right top, color-stop(0%,#2B1B17), color-stop(100%,#{{headercolor}})); /* Chrome,Safari4+ */
 		background: -webkit-linear-gradient(45deg,  #2B1B17 0%,#{{headercolor}} 100%); /* Chrome10+,Safari5.1+ */

@@ -14,6 +14,16 @@ function clean($command){
 	else
 		return false;
 }
+function assign($clean, $name, $device){
+	global $ssh;
+	$res = clean($ssh->exec($clean));
+	if($res){
+		$ret = $res;
+	} else {
+		$ret = $device[$name];
+	}
+	return $ret;
+}
 function to_seconds($duration) {
 	$i = explode(':', $duration);
 	return ($i[0] * 60 * 60) + ($i[1] * 60) + $i[2];
@@ -66,8 +76,19 @@ $update_stmt = $db->prepare("UPDATE devices
 	licensekey=:license,
 	updated=:updated,
 	type=:type,
-	online=:online
+	online=:online,
+	auto_answer=:auto_answer,
+	auto_answer_mute=:auto_answer_mute,
+	incoming_call_bandwidth=:incoming_call,
+	outgoing_call_bandwidth=:outgoing_call,
+	incoming_total_bandwidth=:incoming_total,
+	outgoing_total_bandwidth=:outgoing_total,
+	auto_bandwidth=:auto_bw,
+	max_calltime=:max_calltime,
+	max_redials=:max_redials,
+	auto_answer_multiway=:auto_multiway
 	WHERE id = :id");
+
 $log_stmt = $db->prepare("INSERT INTO updater_log (time, worker_id, message, detail, type) VALUES (:time, :id, :message, :detail, 'updater')");
 $history_start_stmt = $db->prepare("SELECT id FROM devices_history WHERE device_id = :id ORDER BY id DESC limit 1");
 $history_stmt = $db->prepare("INSERT INTO devices_history VALUES(:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46,:47,:48,:49, :50)");
@@ -78,16 +99,22 @@ $log_stmt->execute(array(
 		':message'=>"Initialized",
 		':detail'=>''
 	));
+
+$cleanup_log_stmt = $db->prepare("DELETE FROM updater_log WHERE `time` < (:time - 86400)");
 $offline_alarm = $db->prepare("UPDATE devices_alarms SET active = :active WHERE device_id = :id AND alarm_id = 'alarm-jfu498hf'");
 $high_loss_stmt = $db->prepare("UPDATE devices_alarms SET active = :active WHERE device_id = :id AND alarm_id = 'alarm-abwo7froseb'");
+$get_edits_stmt = $db->prepare("SELECT * FROM edits WHERE device_id = :id AND completed = 0 ORDER BY added");
+$edit_completed_stmt = $db->prepare("UPDATE edits SET completed = 1 WHERE id = :id");;
 while(time() <= $end){
+
+	$time = time();
+	$cleanup_log_stmt->execute(array(':time'=>$time));
 	$res = $db->query("SELECT value AS version FROM `settings` WHERE `setting` = 'worker_version'")->fetch(PDO::FETCH_ASSOC);
 	$current_version = $res['version'];
 	if($worker_version != $current_version){
 		print("New worker version\n");
 		exit(0);
 	}
-	$time = time();
 	$log_stmt->execute(array(
 		':time'=>$time,
 		':id'=>$worker_id,
@@ -160,20 +187,27 @@ while(time() <= $end){
 
 				}
 			} else {
-				$online = 1;
+				$get_edits_stmt->execute(array(':id'=>$device['id']));
+				$edits = $get_edits_stmt->fetchAll(PDO::FETCH_ASSOC);
+				foreach($edits as $edit){
+					$command = $edit['verb'] . ' ' . $edit['object'] . ' ' . $edit['target'] . ' ' . $edit['details'];
+					$res = explode(chr(0x0a), $ssh->exec($command));
+					print("Edit: ".$command . "\n");
+					if(array_search('ok,00', $res)){
+						$edit_completed_stmt->execute(array(':id'=>$edit['id']));
+					}
+				}
+				//print_r($edits);
+				$online = 1;	
 				//get licensekey from device
-				$res = clean($ssh->exec('get system licensekey -t maint'));
+				$res = ($ssh->exec('get system licensekey -t maint'));
 				if($res){
 					$licensekey = $res;
 					$new_license->execute(array(':license'=>$licensekey,':id'=>$device['id']));
 				}
 				//get name from device
-				$res = clean($ssh->exec('get system name'));
-				if($res){
-					$name = $res;
-				} else {
-					$name = $device['name'];
-				}
+				$name = assign('get system name', 'name', $device);
+				
 				$res = clean($ssh->exec('get system model'));
 				if($res){
 					$dev = explode(',', $res);
@@ -223,6 +257,45 @@ while(time() <= $end){
 						));
 					}
 				}
+				//get auto-answer from device
+				$auto_answer = assign('get call auto-answer', 'auto_answer', $device);
+
+				$auto_answer_mute = assign('get call auto-mute', 'auto_answer_mute', $device);
+				//get max-call-speed-mute from device
+				$res = clean($ssh->exec('get call max-speed'));
+				if($res){
+					$res = explode(',', $res);
+					$incoming_call_bandwidth = ($res[0] != "auto")?$res[0]:0;
+					$outgoing_call_bandwidth = ($res[1] != "auto")?$res[1]:0;
+				} else {
+					$incoming_call_bandwidth = $device['incoming_call_bandwidth'];
+					$outgoing_call_bandwidth = $device['outgoing_call_bandwidth'];
+				}
+				//get max-bw from device
+				$res = clean($ssh->exec('get call total-bw'));
+				if($res){
+					$res = explode(',', $res);
+					$incoming_total_bandwidth = ($res[0] != "")?$res[0]:0;
+					$outgoing_total_bandwidth = ($res[1] != "")?$res[1]:0;
+				} else {
+					$incoming_total_bandwidth = $device['incoming_total_bandwidth'];
+					$outgoing_total_bandwidth = $device['outgoing_total_bandwidth'];
+				}
+				//auto-bandwitdh
+				$res = clean($ssh->exec('get call auto-bandwidth'));
+				if($res){
+					$auto_bandwidth = ($res == 'on')?'on':'off';
+				} else {
+					$auto_bandwidth = $device['auto_bandwidth'];
+				}
+				//max_calltime
+				$max_calltime = assign('get call max-time', 'max_calltime', $device);
+
+				//max_redials
+				$max_redials = assign('get call max-redial-entries','max_redials', $device);
+				
+				//auto_multiway
+				$auto_multiway = assign('get call auto-multiway', 'auto_multiway', $device);
 
 				/*
 				get call history
@@ -274,7 +347,17 @@ while(time() <= $end){
 					':license'=>$licensekey,
 					':updated'=>$time,
 					':type'=>$type,
-					':online'=>$online
+					':online'=>$online,
+					':auto_answer'=>$auto_answer,
+					':auto_answer_mute'=>$auto_answer_mute,
+					':incoming_call'=>$incoming_call_bandwidth,
+					':outgoing_call'=>$outgoing_call_bandwidth,
+					':incoming_total'=>$incoming_total_bandwidth,
+					':outgoing_total'=>$outgoing_total_bandwidth,
+					':auto_bw'=>$auto_bandwidth,
+					':max_calltime'=>$max_calltime,
+					':max_redials'=>$max_redials,
+					':auto_multiway'=>$auto_multiway
 				);
 				$res = $update_stmt->execute($options);
 				//print("Updated: " . $name . " at " . time() . "(quitting at " . $end . ")\n");
