@@ -1,7 +1,7 @@
 <?php
 if(!isset($argv))
 	die("Must be run from the command line");
-date_default_timezone_set("Europe/London");
+date_default_timezone_set("UTC");
 $worker_id = getmypid().'-'.substr(sha1(rand(-1000,1000)), 0,5);
 require_once 'mySSH.php';
 error_reporting(E_ALL^E_USER_NOTICE);
