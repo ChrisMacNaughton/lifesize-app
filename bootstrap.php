@@ -7,6 +7,7 @@ $app = array(
 *	Incliude config / class for db
 *	Initialize DB
 */
+date_default_timezone_set("Europe/London");
 require 'system/config.php';
 require 'system/classes/loggedPDO.php';
 try {
