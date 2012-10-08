@@ -26,7 +26,7 @@
 				    <div class="controls">
 						<div class="input-append">
 							<select name="outgoing_call_bandwidth">
-								<option {% if device.outgoing_call_bandwidth == 0%}selected="selected" {%endif%}value="0">Auto</option>
+								<option {% if device.outgoing_call_bandwidth == 'auto'%}selected="selected" {%endif%}value="auto">Auto</option>
 								<option {% if device.outgoing_call_bandwidth == 4000%}selected="selected" {%endif%}value="4000">4000</option>
 								<option {% if device.outgoing_call_bandwidth == 3000%}selected="selected" {%endif%}value="3000">3000</option>
 								<option {% if device.outgoing_call_bandwidth == 2500%}selected="selected" {%endif%}value="2500">2500</option>
@@ -55,7 +55,7 @@
 				    <div class="controls">
 						<div class="input-append">
 							<select name="incoming_call_bandwidth">
-								<option {% if device.incoming_call_bandwidth == 0%}selected="selected" {%endif%}value="0">Auto</option>
+								<option {% if device.incoming_call_bandwidth == 'auto'%}selected="selected" {%endif%}value="auto">Auto</option>
 								<option {% if device.incoming_call_bandwidth == 4000%}selected="selected" {%endif%}value="4000">4000</option>
 								<option {% if device.incoming_call_bandwidth == 3000%}selected="selected" {%endif%}value="3000">3000</option>
 								<option {% if device.incoming_call_bandwidth == 2500%}selected="selected" {%endif%}value="2500">2500</option>
@@ -84,7 +84,7 @@
 				    <div class="controls">
 						<div class="input-append">
 							<select name="outgoing_total_bandwidth">
-								<option {% if device.outgoing_total_bandwidth == 0%}selected="selected" {%endif%}value="0">Auto</option>
+								<option {% if device.outgoing_total_bandwidth == 'auto'%}selected="selected" {%endif%}value="auto">Auto</option>
 								<option {% if device.outgoing_total_bandwidth == 10000%}selected="selected" {%endif%}value="1000">10000</option>
 								<option {% if device.outgoing_total_bandwidth == 9000%}selected="selected" {%endif%}value="9000">9000</option>
 								<option {% if device.outgoing_total_bandwidth == 8000%}selected="selected" {%endif%}value="8000">8000</option>
@@ -121,7 +121,7 @@
 				    <div class="controls">
 						<div class="input-append">
 							<select name="incoming_total_bandwidth">
-								<option {% if device.incoming_total_bandwidth == 0%}selected="selected" {%endif%}value="0">Auto</option>
+								<option {% if device.incoming_total_bandwidth == 'auto'%}selected="selected" {%endif%}value="auto">Auto</option>
 								<option {% if device.incoming_total_bandwidth == 10000%}selected="selected" {%endif%}value="1000">10000</option>
 								<option {% if device.incoming_total_bandwidth == 9000%}selected="selected" {%endif%}value="9000">9000</option>
 								<option {% if device.incoming_total_bandwidth == 8000%}selected="selected" {%endif%}value="8000">8000</option>
