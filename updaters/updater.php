@@ -58,7 +58,7 @@ if ($current_devices == $max_updaters OR $current_devices > $max_updaters){
 $res = $db->query("SELECT value AS version FROM `settings` WHERE `setting` = 'worker_version'")->fetch(PDO::FETCH_ASSOC);
 $worker_version = $res['version'];
 
-$stmt = $db->prepare("SELECT devices.*, companies_devices.company_id FROM devices INNER JOIN companies_devices ON devices.id = companies_devices.device_id INNER JOIN companies ON companies.id = companies_devices.company_id WHERE devices.updated <= (:now - ((companies.interval * 60) -5) AND companies.active = 1 AND updating < :updating ORDER BY updated LIMIT 1");
+$stmt = $db->prepare("SELECT devices.*, companies_devices.company_id FROM devices INNER JOIN companies_devices ON devices.id = companies_devices.device_id INNER JOIN companies ON companies.id = companies_devices.company_id WHERE devices.updated <= (:now - (companies.interval * 60 -5)) AND companies.active = 1 AND updating < :updating ORDER BY updated LIMIT 1");
 $rsrv = $db->prepare("UPDATE devices SET updating = :time WHERE id = :id AND updating = :updating");
 $offline_stmt = $db->prepare("UPDATE devices SET online = 0, updated = :time WHERE id = :id");
 $serial_stmt = $db->prepare("SELECT * FROM devices WHERE `serial` = :serial");
@@ -112,7 +112,12 @@ while(time() <= $end){
 	$res = $db->query("SELECT value AS version FROM `settings` WHERE `setting` = 'worker_version'")->fetch(PDO::FETCH_ASSOC);
 	$current_version = $res['version'];
 	if($worker_version != $current_version){
-		print("New worker version\n");
+		$log_stmt->execute(array(
+						':time'=>$time,
+						':id'=>$worker_id,
+						':message'=>"Closing",
+						':detail'=>"New worker version"
+					));
 		exit(0);
 	}
 	$log_stmt->execute(array(
@@ -121,9 +126,11 @@ while(time() <= $end){
 		':message'=>"Checking for available device",
 		':detail'=>''
 	));
+	print("Checking for available device\n");
 	$stmt->execute(array(':now'	=>$time, ':updating'=>$time - 30));
 	$device = $stmt->fetch(PDO::FETCH_ASSOC);
-
+	print_r($device);
+	print_r($stmt->errorInfo());
 	if(empty($device)){
 		sleep(5);
 		continue;
@@ -203,7 +210,8 @@ while(time() <= $end){
 				//get licensekey from device
 				$res = ($ssh->exec('get system licensekey -t maint'));
 				if($res){
-					$licensekey = $res;
+					$licensekey = explode(chr(0x0a), $res);
+					$licensekey = $licensekey[0];
 					$new_license->execute(array(':license'=>$licensekey,':id'=>$device['id']));
 				}
 				//get name from device
@@ -379,3 +387,10 @@ while(time() <= $end){
 		$ssh = null;
 	}
 }
+
+$log_stmt->execute(array(
+						':time'=>$time,
+						':id'=>$worker_id,
+						':message'=>"Closing",
+						':detail'=>"Max Execution time reached"
+					));
