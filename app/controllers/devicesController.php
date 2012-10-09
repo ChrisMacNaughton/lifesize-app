@@ -118,6 +118,9 @@ class devicesController extends Controller {
 						}
 					}
 					break;
+				case "audio":
+					echo"<!--";print_r($_POST);echo"-->";
+					break;
 			}
 		}			
 		

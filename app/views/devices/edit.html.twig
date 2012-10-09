@@ -246,11 +246,18 @@
 				<div class="control-group">
 				    <label class="control-label" for="audio_codec_order">Audio Codec Order</label>
 				    <div class="controls">
-				    	<select name="audio_codec_order" multiple="multiple">
-				    		<option {% if device.audio_codec_order == 'on'%}selected="selected" {%endif%}value="on">Enabled</option>
+				    	<select name="audio_codec_order[]" multiple="multiple" id="audio_codec_order">
+				    		{% for codec in device.audio_codecs %}
+				    		<option value="{{codec}}" selected="selected">{{codec}}</option>
+				    		{% endfor %}
 			    		</select>
+			    		<a href="JavaScript:void(0);" id="btn-up">Up</a>
+    <a href="JavaScript:void(0);" id="btn-down">Down</a>
 			    	</div>
 			    </div>
+			    {% for codec in device.audio_codecs %}
+	    		<input type="hidden" name="audio_codec_order[]" value="{{codec}}" />
+	    		{% endfor %}
 				<input type="hidden" name="section" value="audio">
 				<input type="submit" value="Save">
 			</form>
@@ -434,3 +441,30 @@
 	</div>
 </div>
 {% endblock %}
+{% block javascripts %}
+{{parent()}}
+<script type="text/javascript">
+$(document).ready(function(){
+	 $('#btn-up').bind('click', function() {
+        $('#audio_codec_order option:selected').each( function() {
+            var newPos = $('#audio_codec_order option').index(this) - 1;
+            if (newPos > -1) {
+                $('#audio_codec_order option').eq(newPos).before("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
+                $(this).remove();
+            }
+        });
+    });
+    $('#btn-down').bind('click', function() {
+        var countOptions = $('#audio_codec_order option').size();
+        $('#audio_codec_order option:selected').each( function() {
+            var newPos = $('#audio_codec_order option').index(this) + 1;
+            if (newPos < countOptions) {
+                $('#audio_codec_order option').eq(newPos).after("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
+                $(this).remove();
+            }
+        });
+    });
+});
+
+</script>
+{%endblock %}

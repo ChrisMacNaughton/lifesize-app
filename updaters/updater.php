@@ -310,7 +310,7 @@ while(time() <= $end){
 				//audio_codecs
 				$res = clean($ssh->exec('get audio codecs'));
 				if($res){
-					$res = explode(' ', $res);
+					$res = explode(' ', rtrim($res));
 					//$res = 
 					$codecs = json_encode($res);
 				} else {
