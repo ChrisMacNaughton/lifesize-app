@@ -55,6 +55,7 @@ ORDER BY devices.online DESC, devices.name, devices.id");
 			$devices = array();
 			foreach($devs as $dev){
 				$devices[$dev['id']] = $dev;
+				$devices[$dev['id']['audio_codecs']] = json_decode($devices[$dev['id']['audio_codecs']], true);
 			}
 			$this->devices = $devices;
 	}

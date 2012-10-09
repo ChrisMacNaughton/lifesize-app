@@ -130,8 +130,8 @@ while(time() <= $end){
 	print("Checking for available device\n");
 	$stmt->execute(array(':now'	=>$time, ':updating'=>$time - 30));
 	$device = $stmt->fetch(PDO::FETCH_ASSOC);
-	print_r($device);
-	print_r($stmt->errorInfo());
+	//print_r($device);
+	//print_r($stmt->errorInfo());
 	if(empty($device)){
 		sleep(5);
 		continue;
@@ -308,7 +308,7 @@ while(time() <= $end){
 				$auto_multiway = assign('get call auto-multiway', 'auto_multiway', $device);
 
 				//audio_codecs
-				$res = clean($ssh->exec('get call codecs'));
+				$res = clean($ssh->exec('get audio codecs'));
 				if($res){
 					$res = explode(' ', $res);
 					//$res = 
@@ -316,6 +316,8 @@ while(time() <= $end){
 				} else {
 					$codecs = $device['audio_codecs'];
 				}
+
+				//echo $codecs . "\n";
 				/*
 				get call history
 				*/
