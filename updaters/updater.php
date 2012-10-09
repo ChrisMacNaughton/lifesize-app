@@ -406,8 +406,8 @@ while(time() <= $end){
 					':lock'=>$lock,
 					':telepresence'=>$telepresence,
 					':far_control'=>$far_control,
-					':far_use'=>$far_use,
-					':far_set'=>$far_set
+					':far_use'=>$far_use_preset,
+					':far_set'=>$far_set_preset
 				);
 				print_r($options);
 				$res = $update_stmt->execute($options);
