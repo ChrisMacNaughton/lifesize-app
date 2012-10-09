@@ -126,7 +126,13 @@ class devicesController extends Controller {
 						':by'=>$this->user->getID()
 					);
 					foreach($_POST as $key=>$var){
-						if($data['device'][$key] != $var){
+						if($key == 'audio_codecs')
+							$key = 'audio_codecs_short';
+						echo"<!--$key\n";
+						print_r($data['device'][$key]);
+						print_r($var);
+						echo"-->";
+						if($data['device'][$key] != $var AND $data['device'][$key]){
 							$options[':id']='edit-' . substr(hash('sha512', $id . microtime(true)), 0,10);
 							$options[':details']=$var;
 							$options[':added']=$time;
@@ -135,7 +141,7 @@ class devicesController extends Controller {
 								case "audio_active_microphone":
 									$options[':target']='active-mic';
 									break;
-								case "audio_codec_order":
+								case "audio_codecs":
 									$options[':target']='codecs';
 									$options[':details'] = implode(' ',$var);
 									break;

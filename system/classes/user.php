@@ -72,13 +72,16 @@ ORDER BY devices.online DESC, devices.name, devices.id");
 			foreach($devs as $dev){
 				$devices[$dev['id']] = $dev;
 				$codecs = json_decode($devices[$dev['id']]['audio_codecs'], true);
+				$ret_short = array(); $ret = array();
 				if($codecs != ''){
 					foreach($codecs as $codec){
-						
-						$ret[] = array('id'=>$codec, 'name'=>$this->codecs[sha1($codec)]);
+						if(!array_search($codec, $ret_short))
+						$ret_short[] = $codec;
+						$ret[sha1($codec)] = array('id'=>$codec, 'name'=>$this->codecs[sha1($codec)]);
 					}
 				}
 				$devices[$dev['id']]['audio_codecs'] = $ret;
+				$devices[$dev['id']]['audio_codecs_short'] = $ret_short;
 			}
 			$this->devices = $devices;
 	}

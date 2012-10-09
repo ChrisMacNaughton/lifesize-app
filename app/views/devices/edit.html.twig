@@ -242,11 +242,11 @@
 
 		-->
 		<div class="tab-pane" id="audio">
-			<form class="well form-inline" method="post"  onsubmit="selectAllOptions('audio_codec_order');">
+			<form class="well form-inline" method="post"  onsubmit="selectAllOptions('audio_codecs');">
 				<div class="control-group">
-				    <label class="control-label" for="audio_codec_order">Audio Codec Order</label>
+				    <label class="control-label" for="audio_codecs">Audio Codec Order</label>
 				    <div class="controls">
-				    	<select name="audio_codec_order[]" multiple="multiple" id="audio_codec_order" class="input-xxlarge">
+				    	<select name="audio_codecs[]" multiple="multiple" id="audio_codecs" class="input-xxlarge">
 				    		{% for codec in device.audio_codecs %}
 				    		<option value="{{codec.id}}">{{codec.name}}</option>
 				    		{% endfor %}
@@ -493,26 +493,27 @@
 		</div>
 	</div>
 </div>
+
 {% endblock %}
 {% block javascripts %}
 {{parent()}}
 <script type="text/javascript">
 $(document).ready(function(){
 	 $('#btn-up').bind('click', function() {
-        $('#audio_codec_order option:selected').each( function() {
-            var newPos = $('#audio_codec_order option').index(this) - 1;
+        $('#audio_codecs option:selected').each( function() {
+            var newPos = $('#audio_codecs option').index(this) - 1;
             if (newPos > -1) {
-                $('#audio_codec_order option').eq(newPos).before("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
+                $('#audio_codecs option').eq(newPos).before("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
                 $(this).remove();
             }
         });
     });
     $('#btn-down').bind('click', function() {
-        var countOptions = $('#audio_codec_order option').size();
-        $('#audio_codec_order option:selected').each( function() {
-            var newPos = $('#audio_codec_order option').index(this) + 1;
+        var countOptions = $('#audio_codecs option').size();
+        $('#audio_codecs option:selected').each( function() {
+            var newPos = $('#audio_codecs option').index(this) + 1;
             if (newPos < countOptions) {
-                $('#audio_codec_order option').eq(newPos).after("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
+                $('#audio_codecs option').eq(newPos).after("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
                 $(this).remove();
             }
         });
@@ -524,6 +525,7 @@ function selectAllOptions(selStr)
   for (var i=0; i<selObj.options.length; i++) {
     selObj.options[i].selected = true;
   }
+  console.log(selObj);
 }
 </script>
 {%endblock %}
