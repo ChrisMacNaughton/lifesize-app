@@ -11,6 +11,22 @@ class User {
 		);
 	protected $logged_in = false;
 	public $permissions;
+	protected $codecs = array(
+		'2701a82ca08574fe0e53a6d12407eba2b8c5bbfb'=>'Advanced Audio Coding - Low Complexity',
+		'17b327d7aa14436173f7841aacaed1a8665f02ec'=>'Polycom(R) Siren14(TM) @ 24kbps',
+		'cec18da1ae105a20df1e70f3fb469873a78a4dfa'=>'Polycom(R) Siren14(TM) @ 32kbps',
+		'a3d939c5c883578209c775aae7d770f916ad1f50'=>'Polycom(R) Siren14(TM) @ 48kbps',
+		'373977417c79d1e7f147190dcd1b2ad3be65d0dd'=>'Silk 24',
+		'e03bf5e86bd33bc2d1fb75b791c56c5df8d28c63'=>'Silk 16',
+		'aa6296e2608b6440ddd52e4c03840480f96e8baf'=>'Silk 12',
+		'ee46360685063c9795358d51e22f82b23a704b4b'=>'Silk 8',
+		'2243ffca4cf2685af65e8cffb50f36ae6a2a5539'=>'G.722.1',
+		'9660dca981a3708615d438938f9e535199596734'=>'G.722',
+		'a9b450163938b4d4bc8f5db078cd480f9f353f3b'=>'G.728',
+		'954cc4d5b2e8716250bc400eb831827054079a64'=>'G.729',
+		'f905115bad1dd5db8e66768e2a2f680c1e924b2e'=>'G.711 mu-law',
+		'e616f41e091bdbdcaf48b72aa70e2b7d860b30cd'=>'G.711 a-law'
+	);
 	public function __construct($db, $writedb){
 		$this->db = $db;
 		$this->writedb = $writedb;
@@ -55,7 +71,14 @@ ORDER BY devices.online DESC, devices.name, devices.id");
 			$devices = array();
 			foreach($devs as $dev){
 				$devices[$dev['id']] = $dev;
-				$devices[$dev['id']]['audio_codecs'] = json_decode($devices[$dev['id']]['audio_codecs'], true);
+				$codecs = json_decode($devices[$dev['id']]['audio_codecs'], true);
+				if($codecs != ''){
+					foreach($codecs as $codec){
+						
+						$ret[] = array('id'=>$codec, 'name'=>$this->codecs[sha1($codec)]);
+					}
+				}
+				$devices[$dev['id']]['audio_codecs'] = $ret;
 			}
 			$this->devices = $devices;
 	}

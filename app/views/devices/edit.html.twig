@@ -242,22 +242,32 @@
 
 		-->
 		<div class="tab-pane" id="audio">
-			<form class="well form-inline" method="post">
+			<form class="well form-inline" method="post"  onsubmit="selectAllOptions('audio_codec_order');">
 				<div class="control-group">
 				    <label class="control-label" for="audio_codec_order">Audio Codec Order</label>
 				    <div class="controls">
-				    	<select name="audio_codec_order[]" multiple="multiple" id="audio_codec_order">
+				    	<select name="audio_codec_order[]" multiple="multiple" id="audio_codec_order" class="input-xxlarge">
 				    		{% for codec in device.audio_codecs %}
-				    		<option value="{{codec}}" selected="selected">{{codec}}</option>
+				    		<option value="{{codec.id}}">{{codec.name}}</option>
 				    		{% endfor %}
 			    		</select>
-			    		<a href="JavaScript:void(0);" id="btn-up">Up</a>
-    <a href="JavaScript:void(0);" id="btn-down">Down</a>
+			    		<a href="JavaScript:void(0);" id="btn-up"><i class="icon-chevron-up"></i></a>
+    					<a href="JavaScript:void(0);" id="btn-down"><i class="icon-chevron-down"></i></a>
 			    	</div>
 			    </div>
-			    {% for codec in device.audio_codecs %}
-	    		<input type="hidden" name="audio_codec_order[]" value="{{codec}}" />
-	    		{% endfor %}
+			    <div class="control-group">
+				    <label class="control-label" for="audio_active_microphone">Active Microphone</label>
+				    <div class="controls">
+				    	<select name="audio_active_microphone">
+				    		<option {% if device.audio_active_microphone == "auto"%}selected="selected" {%endif%}value="auto">Auto</option>
+				    		<option {% if device.audio_active_microphone == "phone"%}selected="selected" {%endif%}value="phone">Phone</option>
+				    		<option {% if device.audio_active_microphone == "microphone_in"%}selected="selected" {%endif%}value="microphone_in">Microphone In</option>
+				    		<option {% if device.audio_active_microphone == "microphone_in_no_aec"%}selected="selected" {%endif%}value="microphone_in_no_aec">Microphone In (no AEC)</option>
+				    		<option {% if device.audio_active_microphone == "line_in"%}selected="selected" {%endif%}value="line_in">Line In</option>
+				    		<option {% if device.audio_active_microphone == "line_in_no_aec"%}selected="selected" {%endif%}value="line_in_no_aec">Line In (no AEC)</option>
+			    		</select>
+			    	</div>
+			    </div>
 				<input type="hidden" name="section" value="audio">
 				<input type="submit" value="Save">
 			</form>
@@ -465,6 +475,12 @@ $(document).ready(function(){
         });
     });
 });
-
+function selectAllOptions(selStr)
+{
+  var selObj = document.getElementById(selStr);
+  for (var i=0; i<selObj.options.length; i++) {
+    selObj.options[i].selected = true;
+  }
+}
 </script>
 {%endblock %}
