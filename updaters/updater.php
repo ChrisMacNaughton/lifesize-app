@@ -86,7 +86,8 @@ $update_stmt = $db->prepare("UPDATE devices
 	auto_bandwidth=:auto_bw,
 	max_calltime=:max_calltime,
 	max_redials=:max_redials,
-	auto_answer_multiway=:auto_multiway
+	auto_answer_multiway=:auto_multiway,
+	audio_codecs = :codecs
 	WHERE id = :id");
 
 $log_stmt = $db->prepare("INSERT INTO updater_log (time, worker_id, message, detail, type) VALUES (:time, :id, :message, :detail, 'updater')");
@@ -306,6 +307,15 @@ while(time() <= $end){
 				//auto_multiway
 				$auto_multiway = assign('get call auto-multiway', 'auto_multiway', $device);
 
+				//audio_codecs
+				$res = clean($ssh->exec('get call codecs'));
+				if($res){
+					$res = explode(' ', $res);
+					//$res = 
+					$codecs = json_encode($res);
+				} else {
+					$codecs = $device['audio_codecs'];
+				}
 				/*
 				get call history
 				*/
@@ -366,7 +376,8 @@ while(time() <= $end){
 					':auto_bw'=>$auto_bandwidth,
 					':max_calltime'=>$max_calltime,
 					':max_redials'=>$max_redials,
-					':auto_multiway'=>$auto_multiway
+					':auto_multiway'=>$auto_multiway,
+					':codecs'=>$codecs
 				);
 				$res = $update_stmt->execute($options);
 				//print("Updated: " . $name . " at " . time() . "(quitting at " . $end . ")\n");

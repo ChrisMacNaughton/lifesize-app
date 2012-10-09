@@ -1,9 +1,7 @@
 {% extends 'base.html.twig' %}
 {% block title%}{% if device.name == null%}Edit: {{device.id}}{%else%}{{device.name}}{%endif%}{% endblock %}
-{% block afterbrand %}
-	<a class="right btn btn-small btn-info" href="{{root}}devices/view/{{device.id}}">Return</a>
-{% endblock %}
-{% block name %}Edit <small>{% if device.name == null%}{{device.id}}{% else %}{{device.name}}{%endif%}</small>{% endblock %}
+{% block name %}Edit <small>{% if device.name == null%}{{device.id}}{% else %}{{device.name}}{%endif%}</small>
+<a class="btn btn-small btn-inverse" href="{{root}}devices/view/{{device.id}}">Return</a>{% endblock %}
 {% block body %}
 <div class="tabbable"> <!-- Only required for left/right tabs -->
 	<ul class="nav nav-pills">
@@ -238,9 +236,21 @@
 				<input type="submit" value="Save">
 			</form>
 		</div>
+		<!--
+
+		AUDIO
+
+		-->
 		<div class="tab-pane" id="audio">
 			<form class="well form-inline" method="post">
-
+				<div class="control-group">
+				    <label class="control-label" for="audio_codec_order">Audio Codec Order</label>
+				    <div class="controls">
+				    	<select name="audio_codec_order" multiple="multiple">
+				    		<option {% if device.audio_codec_order == 'on'%}selected="selected" {%endif%}value="on">Enabled</option>
+			    		</select>
+			    	</div>
+			    </div>
 				<input type="hidden" name="section" value="audio">
 				<input type="submit" value="Save">
 			</form>
