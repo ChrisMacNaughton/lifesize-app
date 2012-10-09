@@ -88,7 +88,7 @@ $update_stmt = $db->prepare("UPDATE devices
 	max_redials=:max_redials,
 	auto_answer_multiway=:auto_multiway,
 	audio_codecs = :codecs,
-	audio_active_mic = :active_mic
+	audio_active_microphone = :active_mic
 	WHERE id = :id");
 
 $log_stmt = $db->prepare("INSERT INTO updater_log (time, worker_id, message, detail, type) VALUES (:time, :id, :message, :detail, 'updater')");
@@ -320,6 +320,7 @@ while(time() <= $end){
 
 				//audio active mic
 				$active_mic = assign('get audio active-mic', 'audio_active_microphone', $device);
+				print("Active mic: " .$active_mic."\n");
 				/*
 				get call history
 				*/
