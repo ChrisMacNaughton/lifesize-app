@@ -10,6 +10,8 @@ class Controller{
 		$this->sqs = new AmazonSQS($options);
 	}
 	protected function render($file, $data = array()){
+		$maxage = time() + (365 * 24 * 60 * 60);
+		header("Strict-Transport-Security:max-age=$maxage; includeSubDomains");
 		$loader = new Twig_Loader_Filesystem('/var/www/' . BASE_DIR . '/app/views');
 		$options = array();
 		if(DEV_ENV){
