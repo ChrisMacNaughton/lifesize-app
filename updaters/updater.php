@@ -88,7 +88,9 @@ $update_stmt = $db->prepare("UPDATE devices
 	max_redials=:max_redials,
 	auto_answer_multiway=:auto_multiway,
 	audio_codecs = :codecs,
-	audio_active_microphone = :active_mic
+	audio_active_microphone = :active_mic,
+	camera_lock = :lock,
+	telepresence=:telepresence
 	WHERE id = :id");
 
 $log_stmt = $db->prepare("INSERT INTO updater_log (time, worker_id, message, detail, type) VALUES (:time, :id, :message, :detail, 'updater')");
@@ -320,7 +322,10 @@ while(time() <= $end){
 
 				//audio active mic
 				$active_mic = assign('get audio active-mic', 'audio_active_microphone', $device);
-				print("Active mic: " .$active_mic."\n");
+				
+				$telepresence = assign('get system telepresence', 'telepresence', $device);
+
+				$lock = assign("get camera lock", 'camera_lock', $device);
 				/*
 				get call history
 				*/
@@ -383,7 +388,9 @@ while(time() <= $end){
 					':max_redials'=>$max_redials,
 					':auto_multiway'=>$auto_multiway,
 					':codecs'=>$codecs,
-					':active_mic'=>$active_mic
+					':active_mic'=>$active_mic,
+					':lock'=>$lock,
+					':telepresence'=>$telepresence
 				);
 				$res = $update_stmt->execute($options);
 				//print("Updated: " . $name . " at " . time() . "(quitting at " . $end . ")\n");

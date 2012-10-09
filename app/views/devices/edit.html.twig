@@ -274,7 +274,24 @@
 		</div>
 		<div class="tab-pane" id="presence">
 			<form class="well form-inline" method="post">
-
+				<div class="control-group">
+				    <label class="control-label" for="telepresence">Telepresence</label>
+				    <div class="controls">
+				    	<select name="telepresence">
+				    		<option {% if device.auto_answer_multiway == 'on'%}selected="selected" {%endif%}value="on">Enabled</option>
+				    		<option {% if device.auto_answer_multiway == 'off'%}selected="selected" {%endif%}value="off">Disabled</option>
+			    		</select>
+			    	</div>
+			    </div>
+			    <div class="control-group">
+				    <label class="control-label" for="camera_lock">HD Camera 1 Movement</label>
+				    <div class="controls">
+				    	<select name="camera_lock">
+				    		<option {% if device.camera_lock == 'on'%}selected="selected" {%endif%}value="on">Locked</option>
+				    		<option {% if device.camera_lock == 'off'%}selected="selected" {%endif%}value="off">Unlocked</option>
+			    		</select>
+			    	</div>
+			    </div>
 				<input type="hidden" name="section" value="telepresence">
 				<input type="submit" value="Save">
 			</form>
