@@ -261,10 +261,10 @@
 				    	<select name="audio_active_microphone">
 				    		<option {% if device.audio_active_microphone == "auto"%}selected="selected" {%endif%}value="auto">Auto</option>
 				    		<option {% if device.audio_active_microphone == "phone"%}selected="selected" {%endif%}value="phone">Phone</option>
-				    		<option {% if device.audio_active_microphone == "microphone_in"%}selected="selected" {%endif%}value="microphone_in">Microphone In</option>
-				    		<option {% if device.audio_active_microphone == "microphone_in_no_aec"%}selected="selected" {%endif%}value="microphone_in_no_aec">Microphone In (no AEC)</option>
-				    		<option {% if device.audio_active_microphone == "line_in"%}selected="selected" {%endif%}value="line_in">Line In</option>
-				    		<option {% if device.audio_active_microphone == "line_in_no_aec"%}selected="selected" {%endif%}value="line_in_no_aec">Line In (no AEC)</option>
+				    		<option {% if device.audio_active_microphone == "micin"%}selected="selected" {%endif%}value="micin">Microphone In</option>
+				    		<option {% if device.audio_active_microphone == "micin_no_aec"%}selected="selected" {%endif%}value="micin_noaec">Microphone In (no AEC)</option>
+				    		<option {% if device.audio_active_microphone == "linein"%}selected="selected" {%endif%}value="linein">Line In</option>
+				    		<option {% if device.audio_active_microphone == "linein_noaec"%}selected="selected" {%endif%}value="linein_noaec">Line In (no AEC)</option>
 			    		</select>
 			    	</div>
 			    </div>
@@ -278,8 +278,8 @@
 				    <label class="control-label" for="telepresence">Telepresence</label>
 				    <div class="controls">
 				    	<select name="telepresence">
-				    		<option {% if device.auto_answer_multiway == 'on'%}selected="selected" {%endif%}value="on">Enabled</option>
-				    		<option {% if device.auto_answer_multiway == 'off'%}selected="selected" {%endif%}value="off">Disabled</option>
+				    		<option {% if device.telepresence == 'on'%}selected="selected" {%endif%}value="on">Enabled</option>
+				    		<option {% if device.telepresence == 'off'%}selected="selected" {%endif%}value="off">Disabled</option>
 			    		</select>
 			    	</div>
 			    </div>
@@ -306,7 +306,33 @@
 				<div class="tab-content">
 					<div class="tab-pane active" id="video-control">
 						<form class="well form-inline" method="post">
-
+							<div class="control-group">
+							    <label class="control-label" for="camera_far_control">Far Control of Near Camera</label>
+							    <div class="controls">
+							    	<select name="camera_far_control">
+							    		<option {% if device.camera_far_control == 'enabled'%}selected="selected" {%endif%}value="on">Enabled</option>
+							    		<option {% if device.camera_far_control == 'disabled'%}selected="selected" {%endif%}value="off">Disabled</option>
+						    		</select>
+						    	</div>
+						    </div>
+						    <div class="control-group">
+							    <label class="control-label" for="camera_far_set_preset">Far Set of Camera Presets</label>
+							    <div class="controls">
+							    	<select name="camera_far_set_preset">
+							    		<option {% if device.camera_far_set_preset == 'enabled'%}selected="selected" {%endif%}value="on">Enabled</option>
+							    		<option {% if device.camera_far_set_preset == 'disabled'%}selected="selected" {%endif%}value="off">Disabled</option>
+						    		</select>
+						    	</div>
+						    </div>
+						    <div class="control-group">
+							    <label class="control-label" for="camera_far_use_preset">Far Move to Camera Presets</label>
+							    <div class="controls">
+							    	<select name="camera_far_use_preset">
+							    		<option {% if device.camera_far_use_preset == 'enabled'%}selected="selected" {%endif%}value="on">Enabled</option>
+							    		<option {% if device.camera_far_use_preset == 'disabled'%}selected="selected" {%endif%}value="off">Disabled</option>
+						    		</select>
+						    	</div>
+						    </div>
 							<input type="hidden" name="section" value="video-control">
 							<input type="submit" value="Save">
 						</form>

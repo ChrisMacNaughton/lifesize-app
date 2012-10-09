@@ -90,7 +90,10 @@ $update_stmt = $db->prepare("UPDATE devices
 	audio_codecs = :codecs,
 	audio_active_microphone = :active_mic,
 	camera_lock = :lock,
-	telepresence=:telepresence
+	telepresence=:telepresence,
+	camera_far_control = :far_control,
+	camera_far_use_preset = :far_use,
+	camera_far_set_preset = :far_set
 	WHERE id = :id");
 
 $log_stmt = $db->prepare("INSERT INTO updater_log (time, worker_id, message, detail, type) VALUES (:time, :id, :message, :detail, 'updater')");
@@ -326,6 +329,13 @@ while(time() <= $end){
 				$telepresence = assign('get system telepresence', 'telepresence', $device);
 
 				$lock = assign("get camera lock", 'camera_lock', $device);
+
+				$far_control = assign("get camera far-control", 'camera_far_control', $device);
+
+				$far_set_preset = assign("get camera far-set-preset", 'camera_far_set_preset', $device);
+
+				$far_use_preset = assign("get camera far-use-preset", 'camera_far_use_preset', $device);
+
 				if(strpos($lock, ',')){
 					$lock = explode(',',$lock);
 					$lock = $lock[1];
@@ -394,7 +404,10 @@ while(time() <= $end){
 					':codecs'=>$codecs,
 					':active_mic'=>$active_mic,
 					':lock'=>$lock,
-					':telepresence'=>$telepresence
+					':telepresence'=>$telepresence,
+					':far_control'=>$far_control,
+					':far_use'=>$far_use,
+					':far_set'=>$far_set
 				);
 				print_r($options);
 				$res = $update_stmt->execute($options);

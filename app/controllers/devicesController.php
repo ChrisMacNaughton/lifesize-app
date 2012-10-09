@@ -66,14 +66,15 @@ class devicesController extends Controller {
 			unset($_POST['section']);
 			$time = time();
 			$edited = false;
-			$edit_stmt = $this->db->prepare("INSERT INTO edits (id, device_id, verb, object, target, details,added) VALUES (:id, :device, :verb, :object, :target, :details, :added)");
+			$edit_stmt = $this->db->prepare("INSERT INTO edits (id, device_id, verb, object, target, details,added, by) VALUES (:id, :device, :verb, :object, :target, :details, :added, :user)");
 			switch($section){
 				case "calls":
-					echo "<!--";print_r($_POST);echo "-->";
+					//echo "<!--";print_r($_POST);echo "-->";
 					$options = array(
 						':device'=>$id,
 						':verb'=>'set',
 						':object'=>'call',
+						':by'=>$this->user->getID()
 					);
 					foreach($_POST as $key=>$var){
 						if($data['device'][$key] != $var){
@@ -113,13 +114,92 @@ class devicesController extends Controller {
 									$options[':target'] = 'auto-multiway';
 									break;
 							}
-							echo"<!--";print_r($options);echo"-->";
 							$edit_stmt->execute($options);
 						}
 					}
 					break;
 				case "audio":
-					echo"<!--";print_r($_POST);echo"-->";
+					$options = array(
+						':device'=>$id,
+						':verb'=>'set',
+						':object'=>'audio',
+						':by'=>$this->user->getID()
+					);
+					foreach($_POST as $key=>$var){
+						if($data['device'][$key] != $var){
+							$options[':id']='edit-' . substr(hash('sha512', $id . microtime(true)), 0,10);
+							$options[':details']=$var;
+							$options[':added']=$time;
+							$edited = true;
+							switch($key){
+								case "audio_active_microphone":
+									$options[':target']='active-mic';
+									break;
+								case "audio_codec_order":
+									$options[':target']='codecs';
+									$options[':details'] = implode(' ',$var);
+									break;
+							}
+							$edit_stmt->execute($options);
+						}
+					}
+					break;
+				case "telepresence":
+					$options = array(
+						':device'=>$id,
+						':verb'=>'set',
+						':object'=>'system',
+						':by'=>$this->user->getID()
+					);
+					foreach($_POST as $key=>$var){
+						if($data['device'][$key] != $var){
+							$options[':id']='edit-' . substr(hash('sha512', $id . microtime(true)), 0,10);
+							$options[':details']=$var;
+							$options[':added']=$time;
+							$edited = true;
+							switch($key){
+								case "camera_lock":
+									$options[':object']="camera";
+									$options[':target']='lock';
+									break;
+								case "telepresence":
+									$options[':target']='telepresence';
+									break;
+							}
+							$edit_stmt->execute($options);
+						}
+					}
+					break;
+				case "video-control":
+					$options = array(
+						':device'=>$id,
+						':verb'=>'set',
+						':object'=>'video',
+						':by'=>$this->user->getID()
+					);
+					foreach($_POST as $key=>$var){
+						if($data['device'][$key] != $var){
+							$options[':id']='edit-' . substr(hash('sha512', $id . microtime(true)), 0,10);
+							$options[':details']=$var;
+							$options[':added']=$time;
+							$edited = true;
+							switch($key){
+								case "camera_far_control":
+									$options[':object']="camera";
+									$options[':target']='far-control';
+									break;
+								case "camera_far_set_preset":
+									$options[':object']="camera";
+									$options[':target']='far-set-preset';
+									break;
+								case "camera_far_use-preset":
+									$options[':object']="camera";
+									$options[':target']='far-use-preset';
+									break;
+							}
+							$edit_stmt->execute($options);
+						}
+					}
 					break;
 			}
 		}			
