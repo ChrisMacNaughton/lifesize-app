@@ -326,6 +326,10 @@ while(time() <= $end){
 				$telepresence = assign('get system telepresence', 'telepresence', $device);
 
 				$lock = assign("get camera lock", 'camera_lock', $device);
+				if(strpos($lock, ',')){
+					$lock = explode(',',$lock);
+					$lock = $lock[1];
+				}
 				/*
 				get call history
 				*/
@@ -392,7 +396,9 @@ while(time() <= $end){
 					':lock'=>$lock,
 					':telepresence'=>$telepresence
 				);
+				print_r($options);
 				$res = $update_stmt->execute($options);
+				print_r($update_stmt->errorInfo());
 				//print("Updated: " . $name . " at " . time() . "(quitting at " . $end . ")\n");
 				if($res){
 					//print(sprintf("%s:%s| Updated %s (%s)\n", $time, $worker_id,$device['id'], $name));
