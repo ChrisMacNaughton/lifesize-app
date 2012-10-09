@@ -24,7 +24,7 @@ try {
 }
 require 'system/classes/user.php';
 $user = new User($db, $writedb);
-define('TIMEZONE',(!is_null($user->getTimezone())?$user->getTimezone():"GMT"));
+define('TIMEZONE',$user->getTimezone());
 date_default_timezone_set(TIMEZONE);
 $redirect = ($user->is_logged_in())?false:true;
 

@@ -39,7 +39,7 @@ class User {
 		}
 	}
 	public function getTimezone(){
-		return $this->info['timezone'];
+		return (isset($this->info['timezone']))?$this->info['timezone'] : "GMT";
 	}
 	public function updateDevices(){
 		$stmt = $this->db->prepare("SELECT devices.* , companies_devices.own, companies_devices.verified, companies_devices.verify_sent, companies_devices.verify_code
