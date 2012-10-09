@@ -82,19 +82,19 @@ $app['active'] = $app['controller'];
 $req = null; $key = null; $file = null;
 
 if($app['controller'] == "login"){
-	$app['controller'] = "user";
+	$app['controller'] = "users";
 	$app['action'] = "login";
 }
 if($app['controller'] == "register"){
-	$app['controller'] = "user";
+	$app['controller'] = "users";
 	$app['action'] = "register";
 }
 if($app['controller'] == 'logout'){
-	$app['controller'] = "user";
+	$app['controller'] = "users";
 	$app['action'] = "logout";
 }
 if($app['controller'] == 'me'){
-	$app['controller'] = "user";
+	$app['controller'] = "users";
 	$app['action'] = "view";
 	$app['detail'] = $user->getID();
 }
