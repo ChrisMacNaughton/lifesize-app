@@ -67,7 +67,7 @@ $stmt = $db->prepare("SELECT CD.id, CD.ip, CD.password, CD.own, CD.verified, CD.
 FROM companies_devices AS CD
 INNER JOIN devices AS D ON CD.hash = D.id
 INNER JOIN companies ON CD.company_id = companies.id
-WHERE D.updated <= ( UNIX_TIMESTAMP() - companies.interval *60 -5 ) 
+WHERE D.updated <= ( UNIX_TIMESTAMP() - companies.interval * 60 -5 ) 
 AND D.updating < ( UNIX_TIMESTAMP() -30 ) 
 ORDER BY D.updated
 LIMIT 1");
@@ -117,6 +117,36 @@ $update_stmt = $db->prepare("UPDATE devices
 	camera_far_use_preset = :far_use,
 	camera_far_set_preset = :far_set
 	WHERE id = :id");
+$new_device_stmt = $db->prepare("INSERT INTO devices
+	SET id=:id,
+	name = :name,
+	make=:make,
+	model=:model,
+	in_call=:call,
+	version=:version,
+	licensekey=:license,
+	updated=unix_timestamp(),
+	type=:type,
+	serial=:serial,
+	online=:online,
+	auto_answer=:auto_answer,
+	auto_answer_mute=:auto_answer_mute,
+	incoming_call_bandwidth=:incoming_call,
+	outgoing_call_bandwidth=:outgoing_call,
+	incoming_total_bandwidth=:incoming_total,
+	outgoing_total_bandwidth=:outgoing_total,
+	auto_bandwidth=:auto_bw,
+	max_calltime=:max_calltime,
+	max_redials=:max_redials,
+	auto_answer_multiway=:auto_multiway,
+	audio_codecs = :codecs,
+	audio_active_microphone = :active_mic,
+	camera_lock = :lock,
+	telepresence=:telepresence,
+	camera_far_control = :far_control,
+	camera_far_use_preset = :far_use,
+	camera_far_set_preset = :far_set");
+$check_for_hash = $db->prepare("SELECT count(*) AS count FROM devices WHERE id = :id");
 $update_stmt2 = $db->prepare("UPDATE companies_devices SET hash = :hash WHERE id = :id");
 $cleanup = $db->prepare("UPDATE devices SET updated = 0, updating=0 WHERE id = 'da39a3ee5e6b4b0d3255bfef95601890afd80709'");
 $log_stmt = $db->prepare("INSERT INTO updater_log (time, worker_id, message, detail, type) VALUES (:time, :id, :message, :detail, 'updater')");
@@ -197,14 +227,7 @@ while(time() <= $end){
 				));
 			}
 		} else {
-			$offline_alarm->execute(array(
-					':id'=>$device['id'],
-					':active'=>0
-				));
-			$res = explode(chr(0x0a), $ssh->exec("get system serial"));
-			$serial = $res[0];
 
-			$device_id = sha1($serial);
 
 			//echo $serial . " => " . $id;exit("\n\n");
 			
@@ -230,7 +253,7 @@ while(time() <= $end){
 			$hist = explode(chr(0x0a), $ssh->exec("status call history -f -X -D |"));
 			//print_r($hist);
 			$print = false;
-			$history_start_stmt->execute(array(':id'=>$device['id']));
+			$history_start_stmt->execute(array(':id'=>$device['hash']));
 			$start = $history_start_stmt->fetch(PDO::FETCH_ASSOC);
 			$start = $start['id'];
 			foreach ($hist as $call) {
@@ -258,11 +281,7 @@ while(time() <= $end){
 				$print = false;
 			}
 			
-			$options = array(
-				':hash'=>$device_id,
-				':id'=>$device['id']
-			);
-			$update_stmt2->execute($options);
+			
 			//print_r($options);
 			print($device['id'] . "\n");
 			//print(sprintf("New data for %s is\n\tOnline: %s\n\tName: %s\n\tMake: %s\n\tModel: %s\n\tIn Call:%s\n\tVersion:%s\n", $device['name'], $online, $name, $make, $model, $in_call, $version));
@@ -288,7 +307,7 @@ while(time() <= $end){
 				$outgoing_total_bandwidth = ($bw[1] != "auto")?$bw[1]:0;
 			$lock = explode(',', $res[60]);
 			$lock = $lock[1];
-
+			//print_r($res);
 			$options = array(
 				':id'=>sha1($res[9]),					
 				':name'=>$res[1],
@@ -297,7 +316,7 @@ while(time() <= $end){
 				':call'=>(is_null($res[17]))?0:1,
 				':version'=>$version[1],
 				':license'=>$res[76],
-				':type'=>'video',
+				':type'=>'camera',
 				':online'=>1,
 				':auto_answer'=>$res[20],
 				':auto_answer_mute'=>$res[24],
@@ -318,8 +337,22 @@ while(time() <= $end){
 				':far_set'=>$res[72],
 				':serial'=>$res[9]
 			);
-			//print_r($options);
-			$res = $update_stmt->execute($options);
+
+			$update_options = array(
+				':hash'=>$options[':id'],
+				':id'=>$device['id']
+			);
+			$update_stmt2->execute($update_options);
+			$check_for_hash->execute(array(':id'=>$options[':id']));
+			$count = $check_for_hash->fetch(PDO::FETCH_ASSOC);
+			print_r($options);
+			if($count['count'] == 0){
+				$res = $new_device_stmt->execute($options);
+				print("New!\n");
+			} else{
+				$res = $update_stmt->execute($options);
+				print("Updating!\n");
+			}
 			$update_time = microtime(true) - $update_start_time;
 			//print_r($update_stmt->errorInfo());
 			//print("Updated: " . $name . " at " . time() . "(Hash is ".$device['hash'] . " | generated: ".$id.")(quitting at " . $end . ")\n");
