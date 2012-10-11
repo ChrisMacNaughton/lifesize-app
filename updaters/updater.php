@@ -42,12 +42,12 @@ try {
     //$app['errors'][]= $e->getMessage();
     throw new Exception('Service is unavailable', 513);
 }
-/*
-$res = $db->query("SELECT value FROM settings WHERE setting = 'continue")->fetch(PPDO::FETCH_ASSOC);
-$if($res['value'] != 1){
+
+$res = $db->query("SELECT value FROM settings WHERE setting = 'continue'")->fetch(PDO::FETCH_ASSOC);
+if($res['value'] != 1){
 	exit();
 }
-*/
+
 $res = $db->query("SELECT value FROM settings WHERE setting = 'max_updaters'")->fetch(PDO::FETCH_ASSOC);
 $max_updaters = $res['value'];
 $time = (int)time() - 60;
@@ -72,7 +72,7 @@ AND D.updating < ( UNIX_TIMESTAMP( ) -30 )
 ORDER BY D.updated
 LIMIT 1");
 $rsrv = $db->prepare("UPDATE devices SET updating = unix_timestamp() WHERE id = :id AND updating = :updating");
-$offline_stmt = $db->prepare("UPDATE devices SET online = 0, updated = :time WHERE id = :id");
+$offline_stmt = $db->prepare("UPDATE devices SET online = 0, updated = unix_timestamp() WHERE id = :id");
 $serial_stmt = $db->prepare("SELECT * FROM devices WHERE `serial` = :serial");
 $new_serial = $db->prepare("UPDATE devices SET `serial` = :serial WHERE id = :id");
 $new_license = $db->prepare("UPDATE devices SET `licensekey` = :license WHERE id = :id");
@@ -86,7 +86,7 @@ $update_stmt = $db->prepare("UPDATE devices
 	in_call=:call,
 	version=:version,
 	licensekey=:license,
-	updated=:updated,
+	updated=unix_timestamp(),
 	type=:type,
 	online=:online,
 	auto_answer=:auto_answer,
@@ -146,7 +146,7 @@ while(time() <= $end){
 		':message'=>"Checking for available device",
 		':detail'=>''
 	));
-	print("Checking for available device\n");
+	print("$time: Checking for available device\n");
 	$stmt->execute();
 	$device = $stmt->fetch(PDO::FETCH_ASSOC);
 	//print_r($device);
@@ -171,7 +171,8 @@ while(time() <= $end){
 		$ssh = new mySSH($device['ip']);
 		$pw = ($device['password'] != '')?$device['password'] : 'lifesize';
 		if(!$ssh->login('auto', $pw)){
-			$offline_stmt->execute(array(':id'=>$device['id'], ':time'=>$time));
+			$offline_stmt->execute(array(':id'=>$device['hash']));
+			print_r($offline_stmt->errorInfo());
 			$log_stmt->execute(array(
 						':time'=>$time,
 						':id'=>$worker_id,
@@ -382,7 +383,6 @@ while(time() <= $end){
 				':call'=>$in_call,
 				':version'=>$version,
 				':license'=>$licensekey,
-				':updated'=>$time,
 				':type'=>$type,
 				':online'=>$online,
 				':auto_answer'=>$auto_answer,
