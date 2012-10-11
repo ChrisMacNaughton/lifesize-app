@@ -419,7 +419,7 @@ while(time() <= $end){
 					':time'=>$time,
 					':id'=>$worker_id,
 					':message'=>"Updated",
-					':detail'=>$device['id'] . " | Took ". $update_time " seconds"
+					':detail'=>$device['id'] . " | Took ". $update_time ." seconds"
 				));
 			} else{
 				//print(sprintf("Error updating %s:\n", $device['id']));print_r($update_stmt->errorInfo());
