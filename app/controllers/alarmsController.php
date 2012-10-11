@@ -31,10 +31,10 @@ class alarmsController extends Controller {
 				$user->execute($options);
 			}
 		}
-		$stmt = $this->db->prepare("SELECT alarms.id as id, alarms.name as alarmname, alarms.description as description, devices.name as devicename, devices.id as deviceid, devices.ip as deviceip
+		$stmt = $this->db->prepare("SELECT alarms.id as id, alarms.name as alarmname, alarms.description as description, devices.name as devicename, companies_devices.id as deviceid, companies_devices.ip as deviceip
 FROM alarms
-INNER JOIN companies_devices
-INNER JOIN devices ON companies_devices.device_id = devices.id
+INNER JOIN devices
+INNER JOIN companies_devices ON companies_devices.hash = devices.id
 WHERE companies_devices.company_id =:id
 ORDER BY alarms.name, devices.online DESC, devices.name, devices.id");
 		$stmt->execute(array(':id'=>$this->user->getCompany()));

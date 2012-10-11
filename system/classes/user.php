@@ -58,15 +58,11 @@ class User {
 		return (isset($this->info['timezone']))?$this->info['timezone'] : "GMT";
 	}
 	public function updateDevices(){
-		$stmt = $this->db->prepare("SELECT devices.* , companies_devices.own, companies_devices.verified, companies_devices.verify_sent, companies_devices.verify_code
-FROM devices
-INNER JOIN companies_devices ON devices.id = companies_devices.device_id
-INNER JOIN companies ON companies_devices.company_id = companies.id
-INNER JOIN users_companies ON companies.id = users_companies.company_id
-INNER JOIN users ON users.id = users_companies.user_id
-WHERE users.id =:id AND companies_devices.company_id = :company
-ORDER BY devices.online DESC, devices.name, devices.id");
-			$stmt->execute(array(':id'=>$this->info['id'], ':company'=>$this->getCompany()));
+		$stmt = $this->db->prepare("SELECT CD.id, CD.ip, CD.password, CD.own, CD.verified, D.serial, D.online, D.in_call, D.update, D.updated, D.added, D.name, D.make, D.model, D.version, D.type, D.updating, CD.location, D.licensekey, D.outgoing_call_bandwidth, D.incoming_call_bandwidth, D.outgoing_total_bandwidth, D.incoming_total_bandwidth, D.auto_bandwidth, D.max_calltime, D.max_redials, D.auto_answer, D.auto_answer_mute, D.auto_answer_multiway, D.audio_codecs, D.audio_active_microphone, D.telepresence, D.camera_lock, D.camera_far_control, D.camera_far_set_preset, D.camera_far_use_preset
+			FROM `companies_devices` AS CD
+			INNER JOIN devices AS D ON CD.hash = D.id
+			WHERE CD.company_id = :company");
+			$stmt->execute(array(':company'=>$this->getCompany()));
 			$devs=$stmt->fetchAll(PDO::FETCH_ASSOC);
 			$devices = array();
 			foreach($devs as $dev){
