@@ -167,7 +167,7 @@ while(time() <= $end){
 	}
 	if ($res) {
 		//print("Succeeded!\n");
-		$update_start_time = microtine(true);
+		$update_start_time = microtime(true);
 		$ssh = new mySSH($device['ip']);
 		$pw = ($device['password'] != '')?$device['password'] : 'lifesize';
 		if(!$ssh->login('auto', $pw)){
