@@ -88,6 +88,7 @@ $update_stmt = $db->prepare("UPDATE devices
 	licensekey=:license,
 	updated=unix_timestamp(),
 	type=:type,
+	serial=:serial,
 	online=:online,
 	auto_answer=:auto_answer,
 	auto_answer_mute=:auto_answer_mute,
@@ -107,7 +108,7 @@ $update_stmt = $db->prepare("UPDATE devices
 	camera_far_use_preset = :far_use,
 	camera_far_set_preset = :far_set
 	WHERE id = :id");
-$update_stmt2 = $db->prepare("UPDATE companies_devices SET hash=:hash WHERE id = :id");
+$update_stmt2 = $db->prepare("UPDATE companies_devices SET hash = :hash WHERE id = :id");
 $log_stmt = $db->prepare("INSERT INTO updater_log (time, worker_id, message, detail, type) VALUES (:time, :id, :message, :detail, 'updater')");
 $history_start_stmt = $db->prepare("SELECT id FROM devices_history WHERE device_id = :id ORDER BY id DESC limit 1");
 $history_stmt = $db->prepare("INSERT INTO devices_history VALUES(:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46,:47,:48,:49, :50)");
@@ -193,7 +194,7 @@ while(time() <= $end){
 			$res = explode(chr(0x0a), $ssh->exec("get system serial"));
 			$serial = $res[0];
 
-			$id = sha1($serial);
+			$device_id = sha1($serial);
 
 			//echo $serial . " => " . $id;exit("\n\n");
 			
@@ -374,14 +375,16 @@ while(time() <= $end){
 				$print = false;
 			}
 			$type = "camera";
-			$update_stmt2->execute(array(
-				':hash'=>$id,
+			$options = array(
+				':hash'=>$deviceid,
 				':id'=>$device['id']
-			));
+			);
+			$update_stmt2->execute($options);
+			print_r($options);
 			//print(sprintf("New data for %s is\n\tOnline: %s\n\tName: %s\n\tMake: %s\n\tModel: %s\n\tIn Call:%s\n\tVersion:%s\n", $device['name'], $online, $name, $make, $model, $in_call, $version));
 			$update_time = microtime(true) - $update_start_time;
 			$options = array(
-				':id'=>$id,					
+				':id'=>$device_id,					
 				':name'=>$name,
 				':make'=>$make,
 				':model'=>$model,
@@ -389,6 +392,7 @@ while(time() <= $end){
 				':version'=>$version,
 				':license'=>$licensekey,
 				':type'=>$type,
+				':serial'=>$serial,
 				':online'=>$online,
 				':auto_answer'=>$auto_answer,
 				':auto_answer_mute'=>$auto_answer_mute,
