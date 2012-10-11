@@ -42,12 +42,12 @@ try {
     //$app['errors'][]= $e->getMessage();
     throw new Exception('Service is unavailable', 513);
 }
-
+/*
 $res = $db->query("SELECT value FROM settings WHERE setting = 'continue'")->fetch(PDO::FETCH_ASSOC);
 if($res['value'] != 1){
 	exit();
 }
-
+*/
 $res = $db->query("SELECT value FROM settings WHERE setting = 'max_updaters'")->fetch(PDO::FETCH_ASSOC);
 $max_updaters = $res['value'];
 $time = (int)time() - 60;
@@ -146,7 +146,7 @@ while(time() <= $end){
 		':message'=>"Checking for available device",
 		':detail'=>''
 	));
-	print("$time: Checking for available device\n");
+	//print("$time: Checking for available device\n");
 	$stmt->execute();
 	$device = $stmt->fetch(PDO::FETCH_ASSOC);
 	//print_r($device);
@@ -155,7 +155,7 @@ while(time() <= $end){
 		sleep(5);
 		continue;
 	}
-	print("Trying to reserve " . $device['id'] . "\n");
+	//print("Trying to reserve " . $device['id'] . "\n");
 	if($device['serial'] != "New Device"){
 		$rsrv->execute(array(
 			':id'=>$device['hash'],
@@ -166,13 +166,13 @@ while(time() <= $end){
 		$res = 1;
 	}
 	if ($res) {
-		print("Succeeded!\n");
+		//print("Succeeded!\n");
 
 		$ssh = new mySSH($device['ip']);
 		$pw = ($device['password'] != '')?$device['password'] : 'lifesize';
 		if(!$ssh->login('auto', $pw)){
 			$offline_stmt->execute(array(':id'=>$device['hash']));
-			print_r($offline_stmt->errorInfo());
+			//print_r($offline_stmt->errorInfo());
 			$log_stmt->execute(array(
 						':time'=>$time,
 						':id'=>$worker_id,
@@ -202,7 +202,7 @@ while(time() <= $end){
 			foreach($edits as $edit){
 				$command = $edit['verb'] . ' ' . $edit['object'] . ' ' . $edit['target'] . ' ' . $edit['details'];
 				$res = explode(chr(0x0a), $ssh->exec($command));
-				print("Edit: ".$command . "\n");
+				//print("Edit: ".$command . "\n");
 				if(array_search('ok,00', $res)){
 					$edit_completed_stmt->execute(array(':id'=>$edit['id']));
 				}
@@ -406,7 +406,7 @@ while(time() <= $end){
 			//print_r($options);
 			$res = $update_stmt->execute($options);
 			//print_r($update_stmt->errorInfo());
-			//print("Updated: " . $name . " at " . time() . "(quitting at " . $end . ")\n");
+			//print("Updated: " . $name . " at " . time() . "(Hash is ".$device['hash'] . " | generated: ".$id.")(quitting at " . $end . ")\n");
 			if($res){
 				//print(sprintf("%s:%s| Updated %s (%s)\n", $time, $worker_id,$device['id'], $name));
 				$log_stmt->execute(array(
