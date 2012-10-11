@@ -69,7 +69,8 @@ INNER JOIN devices AS D ON CD.hash = D.id
 INNER JOIN companies ON CD.company_id = companies.id
 WHERE D.updated <= ( UNIX_TIMESTAMP() - companies.interval * 60 -5 ) 
 AND D.updating < ( UNIX_TIMESTAMP() -30 ) 
-ORDER BY D.updated
+AND CD.checked < unix_timestamp() - 30
+ORDER BY D.updated, CD.id
 LIMIT 1");
 /*
 SELECT D.online, D.serial, D.updating, cd.ip, cd.password
@@ -82,6 +83,7 @@ ORDER BY D.updated
 */
 $rsrv = $db->prepare("UPDATE devices SET updating = unix_timestamp() WHERE id = :id AND updating = :updating");
 $offline_stmt = $db->prepare("UPDATE devices SET online = 0, updated = unix_timestamp() WHERE id = :id");
+$checked_stmt = $db->prepare("UPDATE companies_devices SET checked = unix_timestamp() WHERE id = :id");
 $serial_stmt = $db->prepare("SELECT * FROM devices WHERE `serial` = :serial");
 $new_serial = $db->prepare("UPDATE devices SET `serial` = :serial WHERE id = :id");
 $new_license = $db->prepare("UPDATE devices SET `licensekey` = :license WHERE id = :id");
@@ -187,15 +189,16 @@ while(time() <= $end){
 		':message'=>"Checking for available device",
 		':detail'=>''
 	));
-	//print("$time: Checking for available device\n");
+	print("$time: Checking for available device\n");
 	$stmt->execute();
 	$device = $stmt->fetch(PDO::FETCH_ASSOC);
-	//print_r($device);
+	print_r($device);
 	//print_r($stmt->errorInfo());
 	if(empty($device)){
 		sleep(5);
 		continue;
 	}
+	$checked_stmt->execute(array(':id'=>$device['id']));
 	//print("Trying to reserve " . $device['id'] . "\n");
 	if($device['serial'] != "New Device"){
 		$rsrv->execute(array(
@@ -207,7 +210,9 @@ while(time() <= $end){
 		$res = 1;
 	}
 	if ($res) {
-		//print("Succeeded!\n");
+		print("Locked!\n");
+
+		print($device['id'] . "\n");
 		$update_start_time = microtime(true);
 		$ssh = new mySSH($device['ip']);
 		$pw = ($device['password'] != '')?$device['password'] : 'lifesize';
@@ -227,7 +232,7 @@ while(time() <= $end){
 				));
 			}
 		} else {
-
+			print("Logged in!\n");
 
 			//echo $serial . " => " . $id;exit("\n\n");
 			
@@ -242,48 +247,10 @@ while(time() <= $end){
 				}
 			}
 			
-			/*
-			get call history
-			*/
-			$locale = explode(chr(0x0a), $ssh->exec('get locale gmt-offset'));
-			$change = str_split($locale[0]);
-			//print_r($change);
-			$timezone['direction'] = $change[0];
-			$timezone['change'] = $change[2] * 60 * 60;
-			$hist = explode(chr(0x0a), $ssh->exec("status call history -f -X -D |"));
-			//print_r($hist);
-			$print = false;
-			$history_start_stmt->execute(array(':id'=>$device['hash']));
-			$start = $history_start_stmt->fetch(PDO::FETCH_ASSOC);
-			$start = $start['id'];
-			foreach ($hist as $call) {
-				$history = explode("|", $call);
-				if (count($history) > 5) {
-					if ($history[0] > $start) {
-						array_unshift($history, $device['id']);
 
-						foreach ($history as $key=>$value) {
-							//echo $key . " : " . $value . "\n";
-							$id = ':' . ($key + 1);
-							//echo $id."\n\n";
-							$data[$id] = $value;
-						}
-						$tmp = ($timezone['direction'] == '-') ? strtotime($data[':9']) + $timezone['change'] :strtotime($data[':9']) - $timezone['change'];
-						$data[':9'] = date('Y-m-d H:i:s',$tmp);
-						$tmp = ($timezone['direction'] == '-') ? strtotime($data[':10']) + $timezone['change'] :strtotime($data[':10']) - $timezone['change'];
-						$data[':10'] = date('Y-m-d H:i:s',$tmp);
-						$data[':11'] = to_seconds($data[':11']);
-						$history_stmt->execute($data);
-						//print_r($data);
-					}	
-					//print_r($history_stmt->errorInfo());echo"\n";
-				}
-				$print = false;
-			}
 			
 			
 			//print_r($options);
-			print($device['id'] . "\n");
 			//print(sprintf("New data for %s is\n\tOnline: %s\n\tName: %s\n\tMake: %s\n\tModel: %s\n\tIn Call:%s\n\tVersion:%s\n", $device['name'], $online, $name, $make, $model, $in_call, $version));
 			$ssh->setTimeout(2);
 			$ssh->write("get system name\nget audio codecs\nget system serial\nget system model\nstatus call active\nget call auto-answer\nget call auto-mute\nget call max-speed\nget call total-bw\nget call auto-bandwidth\nget call max-time\nget call max-redial-entries\nget call auto-multiway\nget audio active-mic\nget system telepresence\nget camera lock\nget camera far-control\nget camera far-set-preset\nget camera far-use-preset\nget system licensekey -t maint\nget system version\n\n");
@@ -293,7 +260,7 @@ while(time() <= $end){
 			$raw = $ssh->read();
 			//print($raw . "\n");
 			$res = explode("\n",implode(explode("ok,00", $raw)));
-			//print_r($res);
+			print_r($res);
 
 			$model = explode(',',$res[13]);
 
@@ -313,7 +280,7 @@ while(time() <= $end){
 				':name'=>$res[1],
 				':make'=>$model[0],
 				':model'=>$model[1],
-				':call'=>(is_null($res[17]))?0:1,
+				':call'=>(strlen($res[17]) < 10)?0:1,
 				':version'=>$version[1],
 				':license'=>$res[76],
 				':type'=>'camera',
@@ -352,6 +319,46 @@ while(time() <= $end){
 			} else{
 				$res = $update_stmt->execute($options);
 				print("Updating!\n");
+			}
+
+			/*
+			get call history
+			*/
+			$locale = explode(chr(0x0a), $ssh->exec('get locale gmt-offset'));
+			$change = str_split($locale[0]);
+			//print_r($change);
+			$timezone['direction'] = $change[0];
+			$timezone['change'] = $change[2] * 60 * 60;
+			$hist = explode(chr(0x0a), $ssh->exec("status call history -f -X -D |"));
+			//print_r($hist);
+			$print = false;
+			$history_start_stmt->execute(array(':id'=>$options[':id']));
+			$start = $history_start_stmt->fetch(PDO::FETCH_ASSOC);
+			$start = $start['id'];
+			print("Getting history\n");
+			foreach ($hist as $call) {
+				$history = explode("|", $call);
+				if (count($history) > 5) {
+					if ($history[0] > $start) {
+						array_unshift($history, $options[':id']);
+
+						foreach ($history as $key=>$value) {
+							//echo $key . " : " . $value . "\n";
+							$id = ':' . ($key + 1);
+							//echo $id."\n\n";
+							$data[$id] = $value;
+						}
+						$tmp = ($timezone['direction'] == '-') ? strtotime($data[':9']) + $timezone['change'] :strtotime($data[':9']) - $timezone['change'];
+						$data[':9'] = date('Y-m-d H:i:s',$tmp);
+						$tmp = ($timezone['direction'] == '-') ? strtotime($data[':10']) + $timezone['change'] :strtotime($data[':10']) - $timezone['change'];
+						$data[':10'] = date('Y-m-d H:i:s',$tmp);
+						$data[':11'] = to_seconds($data[':11']);
+						$history_stmt->execute($data);
+						//print_r($data);
+					}	
+					//print_r($history_stmt->errorInfo());echo"\n";
+				}
+				$print = false;
 			}
 			$update_time = microtime(true) - $update_start_time;
 			//print_r($update_stmt->errorInfo());
