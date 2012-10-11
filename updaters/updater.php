@@ -42,7 +42,10 @@ try {
     //$app['errors'][]= $e->getMessage();
     throw new Exception('Service is unavailable', 513);
 }
-
+$res = $db->query("SELECT value FROM settings WHERE setting = 'continue")->fetch(PPDO::FETCH_ASSOC);
+$if($res['value'] != 1){
+	exit();
+}
 $res = $db->query("SELECT value FROM settings WHERE setting = 'max_updaters'")->fetch(PDO::FETCH_ASSOC);
 $max_updaters = $res['value'];
 $time = (int)time() - 60;
