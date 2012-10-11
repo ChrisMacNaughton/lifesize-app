@@ -380,7 +380,7 @@ while(time() <= $end){
 				':id'=>$device['id']
 			);
 			$update_stmt2->execute($options);
-			print_r($options);
+			//print_r($options);
 			//print(sprintf("New data for %s is\n\tOnline: %s\n\tName: %s\n\tMake: %s\n\tModel: %s\n\tIn Call:%s\n\tVersion:%s\n", $device['name'], $online, $name, $make, $model, $in_call, $version));
 			$update_time = microtime(true) - $update_start_time;
 			$options = array(
