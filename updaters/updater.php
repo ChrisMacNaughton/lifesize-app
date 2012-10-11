@@ -107,7 +107,7 @@ $update_stmt = $db->prepare("UPDATE devices
 	camera_far_use_preset = :far_use,
 	camera_far_set_preset = :far_set
 	WHERE id = :id");
-
+$update_stmt2 = $db->prepare("UPDATE companies_devices SET hash=:hash WHERE id = :id");
 $log_stmt = $db->prepare("INSERT INTO updater_log (time, worker_id, message, detail, type) VALUES (:time, :id, :message, :detail, 'updater')");
 $history_start_stmt = $db->prepare("SELECT id FROM devices_history WHERE device_id = :id ORDER BY id DESC limit 1");
 $history_stmt = $db->prepare("INSERT INTO devices_history VALUES(:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46,:47,:48,:49, :50)");
@@ -374,6 +374,10 @@ while(time() <= $end){
 				$print = false;
 			}
 			$type = "camera";
+			$update_stmt2->execute(array(
+				':hash'=>$id,
+				':id'=>$device['id']
+			));
 			//print(sprintf("New data for %s is\n\tOnline: %s\n\tName: %s\n\tMake: %s\n\tModel: %s\n\tIn Call:%s\n\tVersion:%s\n", $device['name'], $online, $name, $make, $model, $in_call, $version));
 			$options = array(
 				':id'=>$id,					
@@ -405,6 +409,7 @@ while(time() <= $end){
 			);
 			//print_r($options);
 			$res = $update_stmt->execute($options);
+
 			//print_r($update_stmt->errorInfo());
 			//print("Updated: " . $name . " at " . time() . "(Hash is ".$device['hash'] . " | generated: ".$id.")(quitting at " . $end . ")\n");
 			if($res){
