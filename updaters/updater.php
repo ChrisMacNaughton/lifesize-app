@@ -167,7 +167,7 @@ while(time() <= $end){
 	}
 	if ($res) {
 		//print("Succeeded!\n");
-
+		$update_start_time = microtine(true);
 		$ssh = new mySSH($device['ip']);
 		$pw = ($device['password'] != '')?$device['password'] : 'lifesize';
 		if(!$ssh->login('auto', $pw)){
@@ -379,6 +379,7 @@ while(time() <= $end){
 				':id'=>$device['id']
 			));
 			//print(sprintf("New data for %s is\n\tOnline: %s\n\tName: %s\n\tMake: %s\n\tModel: %s\n\tIn Call:%s\n\tVersion:%s\n", $device['name'], $online, $name, $make, $model, $in_call, $version));
+			$update_time = microtime(true) - $update_start_time;
 			$options = array(
 				':id'=>$id,					
 				':name'=>$name,
@@ -418,7 +419,7 @@ while(time() <= $end){
 					':time'=>$time,
 					':id'=>$worker_id,
 					':message'=>"Updated",
-					':detail'=>$device['id']
+					':detail'=>$device['id'] . " | Took ". $update_time " seconds"
 				));
 			} else{
 				//print(sprintf("Error updating %s:\n", $device['id']));print_r($update_stmt->errorInfo());
