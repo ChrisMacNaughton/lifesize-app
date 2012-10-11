@@ -1,3 +1,100 @@
+# Changelog: 1.5.15 "Quixote"
+"Rocinante" (Don Quixote's horse) was the code name for the PowerMac Upgrade enabler. <http://applemuseum.bott.org/sections/codenames.html>
+
+Launched Wednesday, September 26, 2012.
+
+## Bug fixes and enhancements
+* **Fixed:** SignatureV4 implementation now correctly collapses consecutive whitespace within headers to match the spec.
+* **Fixed:** [Improve error message when backticks fail](https://github.com/amazonwebservices/aws-sdk-for-php/pull/31)
+* **Fixed:** [Fixed invalid detection of MIME type with upper case file extensions](https://github.com/amazonwebservices/aws-sdk-for-php/pull/33)
+* **Fixed:** [prevent notice for unfound keys on s3](https://github.com/amazonwebservices/aws-sdk-for-php/pull/34)
+* **Fixed:** [Optimization of set_time_limit() call](https://github.com/amazonwebservices/aws-sdk-for-php/pull/36)
+* **Fixed:** [Fallback for config will work correctly when having to determine the HOME directory](https://github.com/amazonwebservices/aws-sdk-for-php/pull/38)
+* **Fixed:** [Fixed circular to string method in simplexml](https://github.com/amazonwebservices/aws-sdk-for-php/pull/39)
+* **Fixed:** [Fixed E_NOTICE being raised by AmazonDynamoDB->attributes()](https://github.com/amazonwebservices/aws-sdk-for-php/pull/40)
+* **Fixed:** [Fix bug caused by some SSL implementations with bucket names that have dots in them](https://github.com/amazonwebservices/aws-sdk-for-php/pull/42)
+
+## Services
+### AmazonAS
+* **New:** Support for termination policies for Auto Scaling groups has been added to the SDK.
+
+### AmazonEC2
+* **New:** Support for Reserved Instance Marketplace for Amazon EC2 has been added to the SDK.
+* **New:** Support for static routing configurations (non-BGP) for Amazon VPC has been added to the SDK.
+
+----
+
+# Changelog: 1.5.14 "Panther"
+Code name for Mac OS X 10.3. <http://en.wikipedia.org/wiki/Mac_OS_X_v10.3>
+
+Launched Wednesday, August 29, 2012.
+
+## Services
+### AmazonS3
+* **New:** Support for Cross-Origin Resource Sharing (CORS) configuration on buckets
+
+----
+
+# Changelog: 1.5.13 "Ninja"
+Code name for Claris FileMaker Pro. <http://en.wikipedia.org/wiki/FileMaker_Pro>
+
+Launched Friday, August 24, 2012.
+
+## Services
+### AmazonCloudFormation
+* **New:** Cost Allocation Tagging.
+
+### AmazonRDS
+* **New:** RDS instances running in VPC.
+* **New:** Support for forced failover features for Oracle and MySQL, as well as additional features for Oracle.
+* **New:** Microsoft SQL Server support.
+* **New:** Read Replicas for MySQL instances in Amazon VPC.
+* **New:** Support for option groups. The option to be supported with this release is Oracle Enterprise Management Database Control.
+* **New:** MySQL support for `db.t1.micro` DB instances.
+* **New:** Microsoft SQL Server support for the Database Engine Tuning Advisor.
+* **New:** Cost Allocation Tagging.
+* **New:** SQL Server Agent support.
+* **New:** Request signing with Signature V4.
+
+### AmazonS3
+* **New:** Cost Allocation Tagging
+
+----
+
+# Changelog: 1.5.12 "Marklar"
+Code name for Mac OS X for Intel architecture. <http://en.wikipedia.org/wiki/Mac_OS_X#Apple.E2.80.93Intel_transition>
+
+Launched Tuesday, August 21, 2012.
+
+## Services
+### AmazonDynamoDB
+* Support for binary data types has been added to the SDK.
+
+
+----
+
+# Changelog: 1.5.11 "Leopard"
+Code name for Mac OS X 10.5. <http://en.wikipedia.org/wiki/Mac_OS_X_v10.5>
+
+Launched Wednesday, August 1st, 2012.
+
+## Bug fixes and enhancements
+* **Fixed:** [Inconsistent format between GET and SCAN](https://forums.aws.amazon.com/thread.jspa?threadID=98044).
+* **Fixed:** Improved the documentation around retrieving MD5 sums for objects.
+* **Fixed:** Added multi-region support to the `CFHadoop*` helper classes.
+
+## Services
+### AmazonDynamoDB
+* **Fixed:** Resolved an issue where the results of a `scan()` or `query()` command would incorrectly nest `SS` or `NS` values when unmarshalling.
+
+### AmazonEC2
+* **New:** Support for multiple IP addresses for VPC instances has been added to the SDK.
+* **New:** Support for high I/O instances (hi1.xlarge) has been added to the SDK.
+* **New:** Support for provisioned IOPS EBS volumes and EBS-optimized instances have been added to the SDK.
+
+
+----
+
 # Changelog: 1.5.10 "Killer Rabbit"
 Code name for AppleShare 3.0. <http://en.wikipedia.org/wiki/AppleShare>
 

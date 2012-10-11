@@ -1,20 +1,39 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<title>{{title}} - ControlVC</title>
+<title>
+	{% block title%}{%endblock%} - ControlVC
+</title>
 {% block stylesheets %}
-	<link href="https://dlewcy1lx1kqi.cloudfront.net/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://dlewcy1lx1kqi.cloudfront.net/css/bootstrap-responsive.min.css" rel="stylesheet">
-	<link href="https://dlewcy1lx1kqi.cloudfront.net/css/smoothness/jquery-ui-1.8.22.custom.css" rel="stylesheet">
-	<link href="https://dlewcy1lx1kqi.cloudfront.net/css/main.css" rel="stylesheet">
+	<link href="{{root}}assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<link href="{{root}}assets/css/main.css" rel="stylesheet">
 {% endblock %}
-{% if app.user.level == 4 %}
 <style>
-	.title{
-		font-weight: bold;
-		font-size: 1.1em;	
+
+{% if headercolor == null%}
+	{% set headercolor = "99ccff"%}
+{%endif %}
+html {
+	-webkit-print-color-adjust: exact;
+}
+	.jumbotron{
+
+		background: -moz-linear-gradient(45deg,  #2B1B17 0%, #{{headercolor}} 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left bottom, right top, color-stop(0%,#2B1B17), color-stop(100%,#{{headercolor}})); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(45deg,  #2B1B17 0%,#{{headercolor}} 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(45deg,  #2B1B17 0%,#{{headercolor}} 100%); /* Opera 11.10+ */
+		background: -ms-linear-gradient(45deg,  #2B1B17 0%,#{{headercolor}} 100%); /* IE10+ */
+		background: linear-gradient(45deg,  #2B1B17 0%,#{{headercolor}} 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2B1B17', endColorstr='#{{headercolor}}',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+		-webkit-box-shadow: inset 0 3px 7px rgba(0,0,0,.2), inset 0 -3px 7px rgba(0,0,0,.2);
+		-moz-box-shadow: inset 0 3px 7px rgba(0,0,0,.2), inset 0 -3px 7px rgba(0,0,0,.2);
+		box-shadow: inset 0 3px 7px rgba(0,0,0,.2), inset 0 -3px 7px rgba(0,0,0,.2);
 	}
+	</style>
+	{% if app.user.level == 0 %}
+<style>
 	.adminBar{
-		min-height: 50px;
+		min-height: 30px;
 		background: #ccc;
 		margin-left: 5px;
 		margin-right: 5px;
@@ -26,67 +45,89 @@
 </style>
 {% endif %}
 </head>
-<body>
-	{% if app.user.level == 4 %}
+<body>{% if app.user.level == 0 %}
 	<div id="headerBar"></div>
 	{% endif %}
-<div class="container">
-	<div class="row">
-		<div class="span10">
-			<ul class="nav nav-tabs">
-			{% block nav %}
-				
-				<li{% if app.page == 'default' %} class="active"{% endif %}><a href="/home">Dashboard</a></li>
-				<li{% if app.page == 'devices' %} class="active"{% endif %}><a href="/devices">Devices</a></li>
-				{#
-				<li{% if app.page == 'events' %} class="active"{% endif %}><a href="/events">Events</a></li>
-				#}
-				{% if app.user.level > 2 %}<li{% if app.page == 'company' %} class="active"{% endif %}><a href="/company">Company</a></li>
-{% endif %}
-				<li><a href="/user/view/{{app.user.id}}">Profile</a></li>
-				<li><a href="/user/logout">Logout</a></li>
-{% endblock %}
-			</ul>
+<div class="navbar navbar-inverse navbar-fixed-top">
+	<div class="navbar-inner">
+		<div class="container">
+			{% block afterbrand %}{%endblock %}
+			<a class="brand" href="http://control.vc">ControlVC</a>
+			{% if active != 'login' %}
+			<div class="nav-collapse collapse">
+				<ul class="nav">
+					<li class="{% if active == 'dashboard' %}active{%endif%}">
+						<a href="{{root}}">Dashboard</a>
+					</li>
+					<li class="{% if active == 'devices' %}active{%endif%}">
+						<a href="{{root}}devices">Devices</a>
+					</li>
+					<li class="{% if active == 'alarms' %}active{%endif%}">
+						<a href="{{root}}alarms">Alarms</a>
+					</li>
+					<li class="{% if active == 'me' %}active{%endif%}">
+						<a href="{{root}}me">Profile</a>
+					</li>
+					{% if perms b-and app.permissions['company/index'] %}
+					<li class="{% if active == 'company' %}active{%endif%}">
+						<a href="{{root}}company">Company</a>
+					</li>
+					{% endif %}
+					{% if perms b-and app.permissions['admin/index'] %}
+					<li class="{% if active == 'admin' %}active{%endif%}">
+						<a href="{{root}}admin">Admin</a>
+					</li>
+					{% endif %}
+					<li>
+						<a href="{{root}}logout">Logout</a>
+					</li>
+				</ul>
+			</div>
+			{% endif %}
 		</div>
-		<div class="span2">
-{% block afternav %}
-
-{% endblock %}
-		</div>
-	</div>
-{% block banner %}
-
-{% endblock %}
-{% for error in errors %}
-	<div class="span10 offset1 error">
-		{{error}}
-	</div>
-{% endfor %}
-{% set previous = "" %}
-{% for message in flash %}
-	{% if previous != message %}
-	<div class="span10 offset1 flash">
-		{{message}}
-	</div>
-	{% endif %}
-	{% set previous = message %}
-{% endfor %}
-	<div class="row">
-		{% block body %}
-
-		{% endblock %}
 	</div>
 </div>
 
-{% block javascripts %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
-    <script src="https://dlewcy1lx1kqi.cloudfront.net/js/bootstrap.min.js"></script>
-    <script src="https://dlewcy1lx1kqi.cloudfront.net/js/highstock.js"></script>
-    <script src="https://dlewcy1lx1kqi.cloudfront.net/js/main.js"></script>
-    <script src="https://dlewcy1lx1kqi.cloudfront.net/js/jquery.hotkey.js"></script>
+<div class="jumbotron subhead" id="overview">
+	<div class="container">
+		<h1>
+			{% block name %}Dashboard
 {% endblock %}
-{% if app.user.level == 4 %}
+		</h1>
+		<div class="span2 offset1" style="float: right">
+			{% block offset %}{% endblock %}
+		</div>
+	</div>
+</div>
+<div class="container">
+	{%for err in errors %}
+		<div class="span10 offset1">
+			<div class="error">
+				<p>{{err}}</p>
+			</div>
+		</div>
+	{% endfor %}
+	{%for err in flash %}
+		<div class="span10 offset1">
+			<div class="flash">
+				<p>{{err}}</p>
+			</div>
+		</div>
+	{% endfor %}
+</div>
+<div class="container" id="body">
+{% block body %}
+Hello World!<br/>You haven't overridden the body block!
+{% endblock %}
+
+</div>
+{% block javascripts %}
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+	<script src="{{root}}assets/bootstrap/js/bootstrap.min.js"></script>
+{% endblock %}
+{%  if perms b-and app.permissions['admin/index']%}
+ <script src="https://dlewcy1lx1kqi.cloudfront.net/js/jquery.hotkey.js"></script>
 <script type="text/javascript">
 var adminVisible = 0;
 $(document).bind('keydown', function(e){
@@ -99,42 +140,16 @@ $(document).bind('keydown', function(e){
 			//$(".adminBar").css('display','none');
 			adminVisible = 0;
 		} else {
-			$('#headerBar').html('<div class="adminBar"><span class="title">DB Time:</span> {{app.db_data.meta.time}} | <span class="title">DB Queries:</span> <a id="queries" title="{% for query in app.db_data %}{{query.entry}} ( {{query.time}} ms )\n\n{%endfor%}">{{app.db_data.meta.count}}</a> | <span class="title">Load Time:</span> {{app.system.load_time}} secs | <span class="title">CompanyId</span> <input type="text" id="compId" value="{{app.company.id}}"><a href="javascript:updateCompanyId()">Update</a></div>');
+			$('#headerBar').html('<div class="adminBar navbar-fixed-bottom"><span style="font-weight: bold;font-size: 1.1em;">DB Time:</span> {{db_data.meta.time}} | <span style="font-weight: bold;font-size: 1.1em;">DB Queries:</span> {{db_data.meta.count}} | <span style="font-weight: bold;font-size: 1.1em;">Load Time:</span> {{app.run_time}} secs</div>');
 			//console.log("add");
 			//$(".adminBar").css('display','block');
 			adminVisible=1;
 		}
 	}
 });
-var company_update = "{{app.system.protocol}}://{{app.system.path}}/apiv2/users/{{app.user.id}}/changeCompany?accessId={{app.accessId}}&expires={{app.long_expire}}&signature={{app.long_sig}}";
-function updateCompanyId() {
-	var newId = $("#compId").val();
-	$.ajax({
-		url: company_update,
-		data: {company_id: newId},
-		type: "PUT"
-	}).done(function(data){
-		console.log("Data:");
-		console.log(data);
-		if(data != 'false') {
-			/*
-			data = $.parseJSON(data);
-			$('.users').append('<li id="' + data['id'] + '"><a href="/user/view/'+data['id']+'">'+data['name']+'</a> | <a href="javascript:deleteUser(' + "'" + data['id'] + "'" + ')">Delete</a></li>');*/
-		
-		}
-	});
-}
-$( document ).ready(function() {
-	$("#queries").tooltip();
-	/*{
-		content: 'SSH is the protocol ControlVC uses to connect to devices'
-	});*/
-});
 </script>
 {% endif %}
-{#
-<pre>{{dump(server)}}</pre>
-#}
+
 
 </body>
 </html>

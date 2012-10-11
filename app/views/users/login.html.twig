@@ -1,23 +1,18 @@
 {% extends 'base.html.twig' %}
-{% block nav %}
-{% endblock %}
+{% block title%}Login{{parent()}}{%endblock %}
+{% block name %}Login!{%endblock%}
 {% block body %}
-
-<div class="span4 offset1 well">
-	<form name="login" action="" method="post" >
-		<label>Email</label>
-			<input type="text" name="email" />
-		<label>Password</label>
-			<input type="password" name="password" />
-		<label>Company</label>
-			<input type="text" name="company" />
+<div class="row">
+	<div class="span7 offset2">
+		<form action="" method="post" class="form-inline">
 			<input type="hidden" name="action" value="login" />
-			<Label>Remember Me<input type="checkbox" name="rememberme"></label>
-		<label><input type="submit" value="Submit" /></label><br />
-		<a href="/user/reset">Reset Password</a> | Not yet <a href="/company/register">registered</a>?
-	</form>
+			<input type="text" name="email" class="input-medium" placeholder="email" />
+			<input type="password" name="password" class="input-medium" placeholder="password" />
+			<label class="checkbox">
+		    	<input type="checkbox" name="rememberme">Remember me
+		 	</label>
+		  	<button type="submit" class="btn">Sign in</button>
+		</form>
 	</div>
-	<!--
-	{{dump(app)}}
-	-->
+</div>
 {% endblock %}

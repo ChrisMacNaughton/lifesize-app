@@ -1,49 +1,96 @@
-div .error {
-	border: 1px solid #cc0000;
-	padding: 5px 15px 5px 15px;
-	margin-top: 5px;
-	margin-bottom: 5px;
-	background-color: #ffc;
+.navbar .brand{
+	padding-right: 0;
+	padding-left: 0;
+	margin-left: 20px;
+	float: right;
+	font-weight: bold;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, .1), 0 0 30px rgba(255, 255, 255, .125);
+	-webkit-transition: all .2s linear;
+	-moz-transition: all .2s linear;
+	transition: all .2s linear;
 }
-div .flash {
-	border: 1px solid #009900;
-	padding: 5px 15px 5px 15px;
-	margin-top: 5px;
-	margin-bottom: 5px;
-	background-color: #CCFFFF;
+.right{
+  float: right;
+  margin-left: 10px;
 }
-.online {
-	background-image: url('/assets/img/online.png');
-	background-repeat: no-repeat;
+body {
+	padding-top: 40px;
 }
-.offline {
-	background-image: url('/assets/img/offline.png');
-	background-repeat: no-repeat;
+.title {
+  background: #ffcc99;
 }
-.calling {
-	background-image: url('/assets/img/camera.png');
-	background-repeat: no-repeat;
+.dash-container{
+  margin: 5px;
 }
-#userlist {
-	list-style-type: none;
+.even {
+
 }
-.warning {
-	color: #c00;
+.odd {
+  background: #ccccff;
 }
-input {
-	min-height: 30px;
+.error{
+  padding: 5px;
+  background: #ffffcc;
+  border: 1px solid #cc3333;
 }
-.required {
-	color: #c00;
+.flash {
+  padding: 5px;
+  background: #ccffff;
+  border: 1px solid #6699cc;
 }
-.past {
-	color: #ccc;
+/* Jumbotrons
+-------------------------------------------------- */
+
+/* Base class
+------------------------- */
+.jumbotron {
+  position: relative;
+  padding: 20px 0;
+  margin-bottom: 5px;
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(0,0,0,.4), 0 0 30px rgba(0,0,0,.075);
+  background: #020031; /* Old browsers */
+
 }
-h1 .small{
-	font-size: 14px;
-	color: #ccc;
+.jumbotron h1 {
+  font-size: 80px;
+  font-weight: bold;
+  letter-spacing: -1px;
+  line-height: 1;
 }
-h1 .small a {
-	color: #999;
-	padding-left: 15px;
+.jumbotron p {
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 30px;
+  margin-bottom: 30px;
+}
+
+/* Link styles (used on .masthead-links as well) */
+.jumbotron a {
+  color: #fff;
+  color: rgba(255,255,255,.5);
+  -webkit-transition: all .2s ease-in-out;
+     -moz-transition: all .2s ease-in-out;
+          transition: all .2s ease-in-out;
+}
+.jumbotron a:hover {
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255,255,255,.25);
+}
+
+/* Subhead (other pages)
+------------------------- */
+.subhead {
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+.subhead h1 {
+  font-size: 60px;
+}
+.subhead p {
+  margin-bottom: 20px;
+}
+.subhead .navbar {
+  display: none;
 }

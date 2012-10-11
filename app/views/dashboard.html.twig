@@ -1,0 +1,108 @@
+{% extends 'base.html.twig' %}
+{% block title%}Dashboard{%endblock%}
+{% block body %}
+<div class="row">
+	<div class="span6 dash-container">
+		<div class="row title">
+			Device Inventory
+		</div>
+		<div class="row even">
+			<div class="span5">
+				All Devices
+			</div>
+			<div class="span1">
+				{{devices_count}}
+			</div>
+		</div>
+		<div class="row odd">
+			<div class="span5">
+				Video Devices
+			</div>
+			<div class="span1">
+				{{video_count}}
+			</div>
+		</div>
+		<div class="row even">
+			<div class="span5">
+				Devices Participating in a call
+			</div>
+			<div class="span1">
+				{{in_a_call}}
+			</div>
+		</div>
+		<div class="row odd">
+			<div class="span5">
+				Devices being updated
+			</div>
+			<div class="span1">
+				{{updating}}
+			</div>
+		</div>
+	</div>
+	<div class="span6">
+		<div class="span6 dash-container">
+			<div class="row title">
+				Call History
+			</div>
+			<div class="row even">
+				<div class="span5">
+					Total number of calls
+				</div>
+				<div class="span1">
+					{{call_count}}
+				</div>
+			</div>
+			<div class="row odd">
+				<div class="span5">
+					Devices with no calls
+				</div>
+				<div class="span1">
+					{{unused_devices}}
+				</div>
+			</div>
+			<div class="row even">
+				<div class="span5">
+					Devices used at least once
+				</div>
+				<div class="span1">
+					{{devices_used}}
+				</div>
+			</div>
+			<div class="row odd">
+				<div class="span5">
+					Total duration of calls in {{scale}}
+				</div>
+				<div class="span1">
+					{{call_time}}
+				</div>
+			</div>
+		</div>
+		<div class="span6 dash-container">
+			<div class="row title">
+				Alarms
+			</div>
+			<div class="row even">
+				<div class="span5">
+					My Active Alarms
+				</div>
+				<div class="span1">
+					{{my_alarms}}
+				</div>
+			</div>
+			<div class="row odd">
+				<div class="span5">
+					All Alarms
+				</div>
+				<div class="span1">
+					{{all_alarms}}
+				</div>
+			</div>
+		</div>
+	</div>
+	{% if alarm.ip != null %}
+	<div class="span12">
+		Latest Alarm: {{alarm.ip}} - {{alarm.name}} - {{alarm.description}}
+	</div>
+	{% endif %}
+</div>
+{% endblock %}

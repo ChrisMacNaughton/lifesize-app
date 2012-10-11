@@ -1,245 +1,288 @@
 <?php
 
 class devicesController extends Controller {
-	public function beforeAction() {
-		parent::beforeAction();
-		$stmt = $this->db->prepare("SELECT devices.id, devices.name, devices.ip, devices.password, codes.name AS status, devices.active, devices.online FROM devices LEFT JOIN codes ON devices.status = codes.code WHERE company_id = :id ORDER BY added, name, ip");
-		$this->company = $this->user->getCompanyDetails();
-		$stmt->execute(array(':id'=>$this->company['id']));
-		$this->devices = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		$subscription = explode('_', $this->company['subscription_id']);
-		//echo "<!--";print_r($subscription);echo"-->";
-		$this->max_devices = ($subscription[1] != "-") ? $subscription[1] : 0;
-	}
-	public function indexAction() {
+	public function indexAction(){
 		$data = array(
-			'title'=>'Devices',
-			'devices'=>$this->devices
+			'title'=>"Devices"
 		);
+		$data['headercolor'] = '99ff99';
+		$data['devices'] = $this->user->devices;
 		$this->render('devices/index.html.twig', $data);
 	}
-	public function alarmsAction($dev_id) {
-		if($dev_id != "") {
-			$data = array('title'=>"Alarms");
-			$data['device_id']=$dev_id;
-			$stmt = $this->db->prepare("SELECT devices.name, devices.id, codes.name AS status FROM devices LEFT JOIN codes ON devices.status = codes.code WHERE active = 1 AND id = :id LIMIT 1");
-			$stmt->execute(array(':id'=>$dev_id));
-			$data['device'] = $stmt->fetch(PDO::FETCH_ASSOC);
-			$data['db_errors'][] = $stmt->errorInfo();
-			$list = $this->db->query("SELECT * FROM alarms")->fetchAll(PDO::FETCH_ASSOC);
-
-			$stmt = $this->db->prepare("SELECT D.user_id, D.device_id, D.alarm_id, D.last_notified, D.n, D.active, D.enabled, A.name, A.description FROM devices_alarms AS D RIGHT JOIN alarms AS A ON D.alarm_id = A.id WHERE user_id = :user AND device_id = :device");
-			$stmt->execute(array(':user'=>$this->user->getID(), ':device'=>$dev_id));
-			$alarms = $stmt->fetchAll(PDO::FETCH_ASSOC);
-			//echo "<!--";print_r($alarms);echo"-->";
-			$i=0;
-			foreach ($list as $alarm) {
-				//echo "<!--" . $alarm['id'] . "-->";
-				foreach ($alarms as $device){
-					$id = array_search($alarm['id'], $device);
-					//echo "<!-- ID: $id -->";
-					if ($id){
-						//echo "<!-- Device: ";print_r($device);echo " -->";
-
-						$list[$i]['enabled'] = $device['enabled'];
-						$list[$i]['last_notified'] = $device['last_notified'];
-					} else {
-						if(!isset($list[$i]['enabled']))
-							$list[$i]['enabled'] = 0;
-						if(!isset($list[$i]['last_notified']))
-							$list[$i]['last_notified'] = null;
-					}
-				}
-				$list[$i]['device_id'] = $dev_id;
-				$i++;
-			}
-			$data['alarms'] = $list;
-			//$data['alarms'] = $alarms;
-			$data['db_errors'][] = $stmt->errorInfo();
-			echo $this->render('devices/alarms/device.html.twig', $data);
-		} else {
-			$data = array('title'=>"Alarms");
-			$stmt = $this->db->prepare("SELECT D.user_id, D.device_id, D.alarm_id, D.last_notified, D.n, D.active, D.enabled, A.name, A.description, devices.name FROM devices_alarms AS D LEFT JOIN alarms AS A ON D.alarm_id = A.id LEFT JOIN devices AS devices ON devices.id = D.device_id WHERE user_id = :user AND D.enabled = 1");
-			$stmt->execute(array(':user'=>$this->user->getID()));
-			$data['alarms']= $stmt->fetchAll(PDO::FETCH_ASSOC);			
-			echo $this->render('devices/alarms/index.html.twig', $data);
-		}
-	}
-	public function imgAction($id) {
-		if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE']))
-			$modified = strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']);
-		else
-			$modified = 0;
-
-		if ($modified > time() - 60){
-			header("HTTP/1.0 304 Not Modified");
-			header('Pragma: public');
-			header('Cache-Control: private max-age=' . $modified);
-			header('Expires: ' . gmdate('D, d M Y H:i:s', $modified + 60) . ' GMT');
-			header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $modified) . ' GMT');
-			//echo"<!-- test $modified-->";
-			exit();
-		}
-		$stmt = $this->db->prepare("SELECT screenshot FROM devices WHERE id = :id AND company_id = :company");
-		$stmt->execute(array(
-				':id'=>$id,
-				':company'=>$this->company['id']
-		));
-		$img = $stmt->fetch(PDO::FETCH_ASSOC);
-		//print_r($img);
-		$im = imagecreatefromstring(base64_decode($img['screenshot']));
-		//echo $im;
-		$expire=60;// seconds, minutes, hours, days
-
-		header('Pragma: public');
-		header('Cache-Control: private max-age=' . $expire);
-		header('Expires: ' . gmdate('D, d M Y H:i:s', time()+$expire) . ' GMT');
-		header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-		header('Content-Type: image/png');
-		list($width, $height) = getimagesize($im);
-		$resize = false;
-		if(isset($_GET['width']) && isset($_GET['height'])){
-			$width = (int)$_GET['width']; $height = (int)$_GET['height'];
-			$resize = true;
-		}
-		if($resize) {
-			$image = imagecreatetruecolor($width, $height);
-			imagecopyresampled($image, $im, 0,0,0,0,$width, $height, 416, 234);
-			$im = $image;
-		}
-		imagepng($im);
-		imagedestroy($im);
-		
-		//echo $image;
-	}
-	public function editAction($id) {
-		$stmt = $this->db->prepare("SELECT id, name, ip, company_id, online, status, duration, model_id, software_version_id, updated, screenshot FROM devices WHERE id = :id AND company_id = :company");
-		$stmt->execute(array(
-				':id'=>$id,
-				':company'=>$this->company['id']
-		));
-
-		$device = $stmt->fetch(PDO::FETCH_ASSOC);
-		if(isset($_POST['action']) && $_POST['action'] == 'edit') {
-			unset($_POST['action']);
-			foreach ($_POST as $target=>$detail){
-				switch($target){
-					case "name":
-						$t = "name";
-						break;
-					case "password":
-						$t="password";
-						break;
-					case "ip":
-						$t="ip";
-						break;
-					default:
-						break(2);
-				}
-				if($detail != "" && $device[$t] != $detail){
-
-					$edits[] = array(
-						':id'=>'edit-'. substr(sha1($device['id'] . $device['name'] . 'edit at' . microtime(true)),0,10),
-						':object'=>'system',
-						':target'=>$t,
-						':detail'=>$detail,
-						':added'=>time(),
-						':user'=>$this->user->getID()
-					);
-				}
-			}
-			echo "<!-- Edits: ";print_r($edits);echo "-->";
-		}
-		$data['title'] = "View Device";
-		$data['device'] = $device;
-		$stmt = $this->db->prepare("SELECT sum(duration) AS duration FROM devices WHERE company_id = :id");
-		$stmt->execute(array(':id'=>$this->company['id']));
-		$res = $stmt->fetch(PDO::FETCH_ASSOC);
-		$data['device']['duration_raw'] = $data['device']['duration'];
-		$data['device']['duration'] = formatTime($device['duration']);
-		$data['device']['global_duration_raw'] = $res['duration'];
-		$data['device']['global_duration'] = formatTime($res['duration']);
-		//print_r($device);
-		$this->render('devices/edit.html.twig', $data);
-	}
-	public function viewAction($id) {
-		$stmt = $this->db->prepare("SELECT id, name, ip, company_id, online, status, duration, model_id, software_version_id, updated FROM devices WHERE id = :id AND company_id = :company");
-		$stmt->execute(array(
-				':id'=>$id,
-				':company'=>$this->company['id']
-		));
-
-		$device = $stmt->fetch(PDO::FETCH_ASSOC);
-		$stmt = $this->db->prepare("SELECT Round(Avg(TxV1PktsLost),2), Round(Avg(RxV1PktsLost),2), Round(Avg(TxV1AvgJitter),2), Round(Avg(RxV1AvgJitter),2), AVG(TIME_TO_SEC(Duration)), Round(Avg(TxV1PktsLost) / SEC_TO_TIME(AVG(TIME_TO_SEC(Duration))), 2) FROM devices_history WHERE TIME_TO_SEC(Duration) > 60 AND HOUR(StartTime) = :time AND device_id = :id AND TxV1PktsLost / TIME_TO_SEC(Duration) < :ratio");
-		
-		$stmt = $this->db->prepare("SELECT Id, Duration, StartTime, Round(TxV1PktsLost / TIME_TO_SEC(Duration), 2) AS Ratio FROM devices_history WHERE device_id = :id AND TxV1PktsLost / TIME_TO_SEC(Duration) >= :ratio ORDER BY TxV1PktsLost / TIME_TO_SEC(Duration) DESC");
-		$stmt->execute(array(':ratio'=>5,
-			':id'=>$device['id']));
-		$data['worst_calls'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		$data['stats'] = $statistics;
-		$data['title'] = "View Device";
-		$data['device'] = $device;
-		$stmt = $this->db->prepare("SELECT sum(duration) AS duration FROM devices WHERE company_id = :id");
-		$stmt->execute(array(':id'=>$this->company['id']));
-		$res = $stmt->fetch(PDO::FETCH_ASSOC);
-		$data['device']['duration_raw'] = $data['device']['duration'];
-		$data['device']['duration'] = formatTime($device['duration']);
-		$data['device']['global_duration_raw'] = $data['device']['global_duration'];
-		$data['device']['global_duration'] = formatTime($res['duration']);
-		//print_r($device);
+	public function viewAction($id){
+		$data=array(
+			'headercolor'=>'66cc66',
+		);
+		$data['device'] = $this->user->devices[$id];
 		$this->render('devices/view.html.twig', $data);
 	}
-	public function newAction() {
+	public function verifyAction($id){
 		$data = array(
-			'title'=>'New Device'
+			'headercolor'=>'00ff00'
 		);
-		if (isset($_POST['action']) && $_POST['action'] == 'new') {
-			echo "<!--";print_r($_POST);echo"-->";
-			$id_num = substr(hash('sha512',(rand(1,100000))), 0, 10);
-			$stmt = $this->db->prepare("SELECT * FROM devices WHERE id = :id");
-			$stmt->execute(array(':id'=>'dev-'.$id_num));
-			
-			while ($stmt->rowCount() > 0) {
-				$id_num = substr(hash('sha512',(rand(1,100000))), 0, 10);
-				$stmt->execute(array(':id'=>'dev-'.$id_num));
-			}
-			
-			$stmt = $this->db->prepare("INSERT INTO devices (id, ip, password, name, company_id, status, online, added, active) VALUES (:id, :ip, :password, :name, :company, 10, 0, :added, :active)");
+		$data['device'] = $this->user->devices[$id];
+		if($data['device']['verified'] == 1){
+			header("Location: ".PROTOCOL.ROOT .'/devices/view/' . $id);
+			exit(0);
+		}
+		if(isset($_POST['confirm']) && $_POST['confirm'] == 'true'){
+			$confirm = substr( sha1($id . $this->user->getCompany() . microtime(true)), 0,8);
 			$options = array(
-				':id'=>'dev-' . $id_num,
-				':ip'=>$_POST['ip'],
-				':password'=>(isset($_POST['password'])) ?$_POST['password'] : 'Lifesize',
-				':name'=>$_POST['name'],
-				':company'=>$this->company['id'],
-				':added'=>time(),
-				':active'=>1
+				'code'=>$confirm,
+				'id'=>$id
 			);
-			foreach ($options as $key=>$value) {
-				if ((is_null($value) || $value == '') && $key != ':name') {
-					$errors[]= l($key) . l('not_blank');
-				}
-			}
-			if (count($errors) == 0) {
-				$result = $stmt->execute($options);
-				if ($result) {
-					$_SESSION['flash'][] = l('success_add_device');
-					$stmt = $this->db->prepare("INSERT INTO log (user, action,details,timestamp) VALUES (:user, :action, :details, :now)");
-					$stmt->execute(array(
-						':user'=>$this->user->getID(),
-						':action'=>'add_device',
-						':details'=>"User added device dev-" . $id_num,
-						':now'=>time()
-					));
-				} else {
-					$err = $stmt->errorInfo();
-					$_SESSION['errors'][] = $err[2];
-				}
-			} else {
-				foreach ($errors as $err) {
-					$_SESSION['errors'][] = $err;
+			$this->sqs->send_message(VERIFY_URL, json_encode($options));
+			$stmt = $this->db->prepare("UPDATE companies_devices SET verify_code = :confirm, verify_sent = 1 WHERE device_id = :device AND company_id = :company");
+			$stmt->execute(array(
+				':confirm'=>$confirm,
+				':device'=>$id,
+				':company'=>$this->user->getCompany()
+			));
+			$this->user->updateDevices();
+			$data['device'] = $this->user->devices[$id];
+		}
+		if(isset($_POST['verify']) && $_POST['verify'] == 'true'){
+			if($_POST['code'] == $data['device']['verify_code']){
+				$stmt = $this->writedb->prepare("UPDATE companies_devices SET verified = 1 WHERE company_id = :comp AND device_id = :dev");
+				$res = $stmt->execute(array(
+					':comp'=>$this->user->getCompany(),
+					':dev'=>$id
+				));
+				if($res){
+					$this->user->updateDevices();
+					$data['device'] = $this->user->devices[$id];
 				}
 			}
 		}
-		$this->render('devices/new.html.twig', $data);
+		$this->render("devices/verify.html.twig", $data);
+	}
+	public function editAction($id){
+		$data = array(
+			'headercolor'=>'66ff66'
+		);
+		$data['device'] = $this->user->devices[$id];
+		if(isset($_POST['section'])){
+			$section = $_POST['section'];
+			unset($_POST['section']);
+			$time = time();
+			$edited = false;
+			$edit_stmt = $this->db->prepare("INSERT INTO edits (id, device_id, verb, object, target, details,added, by) VALUES (:id, :device, :verb, :object, :target, :details, :added, :user)");
+			switch($section){
+				case "calls":
+					//echo "<!--";print_r($_POST);echo "-->";
+					$options = array(
+						':device'=>$id,
+						':verb'=>'set',
+						':object'=>'call',
+						':by'=>$this->user->getID()
+					);
+					foreach($_POST as $key=>$var){
+						if($data['device'][$key] != $var){
+							$options[':id']='edit-' . substr(hash('sha512', $id . microtime(true)), 0,10);
+							$options[':details']=$var;
+							$options[':added']=$time;
+							$edited = true;
+							switch($key){
+								case "outgoing_call_bandwidth":
+									$options[':target']='max-speed -o';
+									break;
+								case "incoming_call_bandwidth":
+									$options[':target']='max-speed -i';
+									break;
+								case "outgoing_total_bandwidth":
+									$options[':target']='total-bw -o';
+									break;
+								case "incoming_total_bandwidth":
+									$options[':target']='total-bw -i';
+									break;
+								case "auto_bandwidth":
+									$options[':target'] = 'auto-bandwidth';
+									break;
+								case "max_calltime":
+									$options[':target'] = 'max-time';
+									break;
+								case "max_redials":
+									$options[':target'] = 'max-redial-entries';
+									break;
+								case "auto_answer":
+									$options[':target'] = 'auto-answer';
+									break;
+								case "auto_answer_mute":
+									$options[':target'] = 'auto-mute';
+									break;
+								case "auto_answer_multiway":
+									$options[':target'] = 'auto-multiway';
+									break;
+							}
+							$edit_stmt->execute($options);
+						}
+					}
+					break;
+				case "audio":
+					$options = array(
+						':device'=>$id,
+						':verb'=>'set',
+						':object'=>'audio',
+						':by'=>$this->user->getID()
+					);
+					foreach($_POST as $key=>$var){
+						if($key == 'audio_codecs')
+							$key = 'audio_codecs_short';
+						echo"<!--$key\n";
+						print_r($data['device'][$key]);
+						print_r($var);
+						echo"-->";
+						if($data['device'][$key] != $var AND $data['device'][$key]){
+							$options[':id']='edit-' . substr(hash('sha512', $id . microtime(true)), 0,10);
+							$options[':details']=$var;
+							$options[':added']=$time;
+							$edited = true;
+							switch($key){
+								case "audio_active_microphone":
+									$options[':target']='active-mic';
+									break;
+								case "audio_codecs":
+									$options[':target']='codecs';
+									$options[':details'] = implode(' ',$var);
+									break;
+							}
+							$edit_stmt->execute($options);
+						}
+					}
+					break;
+				case "telepresence":
+					$options = array(
+						':device'=>$id,
+						':verb'=>'set',
+						':object'=>'system',
+						':by'=>$this->user->getID()
+					);
+					foreach($_POST as $key=>$var){
+						if($data['device'][$key] != $var){
+							$options[':id']='edit-' . substr(hash('sha512', $id . microtime(true)), 0,10);
+							$options[':details']=$var;
+							$options[':added']=$time;
+							$edited = true;
+							switch($key){
+								case "camera_lock":
+									$options[':object']="camera";
+									$options[':target']='lock';
+									break;
+								case "telepresence":
+									$options[':target']='telepresence';
+									break;
+							}
+							$edit_stmt->execute($options);
+						}
+					}
+					break;
+				case "video-control":
+					$options = array(
+						':device'=>$id,
+						':verb'=>'set',
+						':object'=>'video',
+						':by'=>$this->user->getID()
+					);
+					foreach($_POST as $key=>$var){
+						if($data['device'][$key] != $var){
+							$options[':id']='edit-' . substr(hash('sha512', $id . microtime(true)), 0,10);
+							$options[':details']=$var;
+							$options[':added']=$time;
+							$edited = true;
+							switch($key){
+								case "camera_far_control":
+									$options[':object']="camera";
+									$options[':target']='far-control';
+									break;
+								case "camera_far_set_preset":
+									$options[':object']="camera";
+									$options[':target']='far-set-preset';
+									break;
+								case "camera_far_use-preset":
+									$options[':object']="camera";
+									$options[':target']='far-use-preset';
+									break;
+							}
+							$edit_stmt->execute($options);
+						}
+					}
+					break;
+			}
+		}			
+		
+		$data['device'] = $this->user->devices[$id];
+		$this->render('devices/edit.html.twig', $data);
+	}
+	public function addAction(){
+		$data = array(
+			'headercolor'=>'339933'
+		);
+		if(isset($_POST['action']) && $_POST['action'] == 'add'){
+
+			$options = array(
+				':ip'=>$_POST['ip'],
+				':password'=>$_POST['device_pass'],
+				':time'=>time()
+			);
+
+			$options[':id'] = 'dev-' . substr(hash('sha512', $options[':ip'] . microtime(true)), 0,10);
+			$stmt = $this->writedb->prepare("INSERT INTO devices (`id`,`ip`,`password`, `added`) VALUES (:id, :ip, :password, :time)");
+			$res = $stmt->execute($options);
+			if(!$res){
+				$_SESSION['errors'][] = "Failed to add the device";
+				$stmt = $this->writedb->prepare("DELETE FROM devices WHERE id = :id");
+				$stmt->execute(array(':id'=>$options[':id']));
+			}
+			$id = $options[':id'];
+			$stmt = $this->writedb->prepare("INSERT INTO companies_devices (`company_id`,`device_id`,`own`) VALUES (:company, :id, 1)");
+			$res = $stmt->execute(array(
+				':company'=>$this->user->getCompany(),
+				':id'=>$id
+			));
+			if(!$res){
+				$_SESSION['errors'][] = "Failed to add the device";
+				$stmt = $this->writedb->prepare("DELETE FROM devices WHERE id = :id");
+				$stmt->execute(array(':id'=>$options[':id']));
+				$stmt = $this->writedb->prepare("DELETE FROM companies_devices WHERE device_id = :id");
+				$stmt->execute(array(':id'=>$options[':id']));
+			}
+			if(!isset($_SESSION['errors'])){
+				$_SESSION['flash'][] = "Successfully added the device!";
+			}
+			//echo"<!--";print_r($options);echo"-->";
+		}
+		$this->render('devices/add.html.twig', $data);
+	}
+	public function deleteAction(){
+		$data = array(
+			'headercolor'=>'cc6666'
+		);
+		if(isset($_POST['id'])){
+			//delete the device if my company owns it
+			$id = $_POST['id'];
+			echo "<!-- Deleting $id -->";
+
+			$stmt = $this->writedb->prepare("DELETE FROM companies_devices WHERE device_id = :id AND company_id = :company AND own = 1");
+			$stmt->execute(array(':id'=>$id, ':company'=>$this->user->getCompany()));
+			$affected = $stmt->rowCount();
+			if($affected > 0){
+				$stmt = $this->writedb->prepare("DELETE FROM companies_devices WHERE device_id = :id");
+				$stmt->execute(array(':id'=>$id));
+				$stmt = $this->writedb->prepare("DELETE FROM devices WHERE id = :id");
+				$stmt->execute(array(':id'=>$id));
+				$stmt = $this->writedb->prepare("DELETE FROM devices_history WHERE device_id = :id");
+				$stmt->execute(array(':id'=>$id));
+			} else {
+				$stmt = $this->writedb->prepare("DELETE FROM companies_devices WHERE device_id = :id AND company_id = :company");
+				$stmt->execute(array(':id'=>$id, ':company'=>$this->user->getCompany()));
+			}
+			header("Location: ".PROTOCOL.ROOT . "/devices/delete");
+				
+			//redirect to clear post
+
+		}
+
+		$data['devices'] = $this->user->devices;
+		$this->render('devices/delete.html.twig', $data);
 	}
 }

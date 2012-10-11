@@ -1,17 +1,104 @@
 {
-    "hash": "1158379c53179ebb62f6c7672b288912",
+    "hash": "abba884c33be8113489238f601eb477f",
     "packages": [
         {
-            "package": "amazonwebservices/aws-sdk-for-php",
-            "version": "1.5.10"
+            "name": "amazonwebservices/aws-sdk-for-php",
+            "version": "1.5.15",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/amazonwebservices/aws-sdk-for-php.git",
+                "reference": "1.5.15"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/amazonwebservices/aws-sdk-for-php/zipball/1.5.15",
+                "reference": "1.5.15",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2.0"
+            },
+            "time": "2012-09-26 23:28:26",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "classmap": [
+                    "authentication/",
+                    "extensions/",
+                    "lib/",
+                    "services/",
+                    "utilities/",
+                    "sdk.class.php"
+                ]
+            },
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Amazon Web Services",
+                    "homepage": "http://aws.amazon.com"
+                }
+            ],
+            "description": "AWS SDK for PHP",
+            "homepage": "http://aws.amazon.com/sdkforphp/",
+            "keywords": [
+                "amazon",
+                "s3",
+                "sdk",
+                "aws",
+                "dynamodb",
+                "ec2"
+            ]
         },
         {
-            "package": "stripe/stripe-php",
-            "version": "v1.7.2"
-        },
-        {
-            "package": "twig/twig",
-            "version": "v1.9.0"
+            "name": "twig/twig",
+            "version": "v1.10.0",
+            "source": {
+                "type": "git",
+                "url": "git://github.com/fabpot/Twig.git",
+                "reference": "v1.10.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/fabpot/Twig/zipball/v1.10.0",
+                "reference": "v1.10.0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2.4"
+            },
+            "time": "2012-09-28 20:11:39",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.10-dev"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-0": {
+                    "Twig_": "lib/"
+                }
+            },
+            "license": [
+                "BSD-3"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Armin Ronacher",
+                    "email": "armin.ronacher@active-4.com"
+                }
+            ],
+            "description": "Twig, the flexible, fast, and secure template language for PHP",
+            "homepage": "http://twig.sensiolabs.org",
+            "keywords": [
+                "templating"
+            ]
         }
     ],
     "packages-dev": null,

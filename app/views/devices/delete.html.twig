@@ -1,0 +1,40 @@
+{% extends 'base.html.twig'%}
+
+{% block title %}Devices {% endblock %}
+{% block name %}Devices{% endblock %}
+{% block body%}
+<div class="row">
+	<div class="row span12">
+		<div class="ip span2">
+			<h4>IP Address</h4>
+		</div>
+		<div class="name span2">
+			<h4>Name</h4>
+		</div>
+	</div>
+	{%for device in devices %}
+	<div class="row span12">
+		<div class="ip span2">
+			{{device.ip}}
+		</div>
+		<div class="name span2">
+			{% if device.serial != null %}
+				<a href="{{root}}devices/view/{{device.id}}">{% if device.name == null %}Unknown{% else %}{{device.name}}{% endif%}</a>
+			{% else %}
+				{% if device.name == null %}Unknown{% else %}{{device.name}}{% endif%}
+			{% endif %}
+		</div>
+		<div class="span2">
+			<form action="" method="post">
+				<input type="hidden" name="id" value="{{device.id}}">
+				<input type="submit" class="btn btn-danger" value="Delete Device">
+			</form>
+		</div>
+	</div>
+	{% else %}
+	<div class="row span12">
+		<p>No devices found</p>
+	</div>
+	{% endfor %}
+</div>
+{% endblock %}

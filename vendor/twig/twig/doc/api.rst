@@ -125,44 +125,76 @@ Built-in Loaders
 
 Here is a list of the built-in loaders Twig provides:
 
-* ``Twig_Loader_Filesystem``: Loads templates from the file system. This
-  loader can find templates in folders on the file system and is the preferred
-  way to load them::
+``Twig_Loader_Filesystem``
+..........................
 
-        $loader = new Twig_Loader_Filesystem($templateDir);
+.. versionadded:: 1.10
+    The ``prependPath()`` and support for namespaces were added in Twig 1.10.
 
-  It can also look for templates in an array of directories::
+``Twig_Loader_Filesystem`` loads templates from the file system. This loader
+can find templates in folders on the file system and is the preferred way to
+load them::
 
-        $loader = new Twig_Loader_Filesystem(array($templateDir1, $templateDir2));
+    $loader = new Twig_Loader_Filesystem($templateDir);
 
-  With such a configuration, Twig will first look for templates in
-  ``$templateDir1`` and if they do not exist, it will fallback to look for
-  them in the ``$templateDir2``.
+It can also look for templates in an array of directories::
 
-* ``Twig_Loader_String``: Loads templates from strings. It's a dummy loader as
-  the template reference is the template source code::
+    $loader = new Twig_Loader_Filesystem(array($templateDir1, $templateDir2));
 
-        $loader = new Twig_Loader_String();
-        $twig = new Twig_Environment($loader);
+With such a configuration, Twig will first look for templates in
+``$templateDir1`` and if they do not exist, it will fallback to look for them
+in the ``$templateDir2``.
 
-        echo $twig->render('Hello {{ name }}!', array('name' => 'Fabien'));
+You can add or prepend paths via the ``addPath()`` and ``prependPath()``
+methods::
 
-  This loader should only be used for unit testing as it has severe
-  limitations: several tags, like ``extends`` or ``include`` do not make sense
-  to use as the reference to the template is the template source code itself.
+    $loader->addPath($templateDir3);
+    $loader->prependPath($templateDir4);
 
-* ``Twig_Loader_Array``: Loads a template from a PHP array. It's passed an
-  array of strings bound to template names::
+The filesystem loader also supports namespaced templates. This allows to group
+your templates under different namespaces which have their own template paths.
 
-        $loader = new Twig_Loader_Array(array(
-            'index.html' => 'Hello {{ name }}!',
-        ));
-        $twig = new Twig_Environment($loader);
+When using the ``setPaths()``, ``addPath()``, and ``prependPath()`` methods,
+specify the namespace as the second argument (when not specified, these
+methods act on the "main" namespace)::
 
-        echo $twig->render('index.html', array('name' => 'Fabien'));
+    $loader->addPath($templateDir, 'admin');
 
-  This loader is very useful for unit testing. It can also be used for small
-  projects where storing all templates in a single PHP file might make sense.
+Namespaced templates can be accessed via the special
+``@namespace_name/template_path`` notation::
+
+    $twig->render('@admin/index.html', array());
+
+``Twig_Loader_String``
+......................
+
+``Twig_Loader_String`` loads templates from strings. It's a dummy loader as
+the template reference is the template source code::
+
+    $loader = new Twig_Loader_String();
+    $twig = new Twig_Environment($loader);
+
+    echo $twig->render('Hello {{ name }}!', array('name' => 'Fabien'));
+
+This loader should only be used for unit testing as it has severe limitations:
+several tags, like ``extends`` or ``include`` do not make sense to use as the
+reference to the template is the template source code itself.
+
+``Twig_Loader_Array``
+.....................
+
+``Twig_Loader_Array`` loads a template from a PHP array. It's passed an array
+of strings bound to template names::
+
+    $loader = new Twig_Loader_Array(array(
+        'index.html' => 'Hello {{ name }}!',
+    ));
+    $twig = new Twig_Environment($loader);
+
+    echo $twig->render('index.html', array('name' => 'Fabien'));
+
+This loader is very useful for unit testing. It can also be used for small
+projects where storing all templates in a single PHP file might make sense.
 
 .. tip::
 

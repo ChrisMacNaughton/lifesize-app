@@ -1,6 +1,0 @@
-{
-	"require": {
-		"amazonwebservices/aws-sdk-for-php": "1.5.*",
-		"stripe/stripe-php": "1.7.*"
-	}
-}

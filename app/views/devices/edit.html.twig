@@ -1,48 +1,531 @@
 {% extends 'base.html.twig' %}
-{% block stylsheets %}
-{{parent()}}
-
-<style>
-.tooltip {
-    display:none;
-    /*background:transparent url(/media/img/tooltip/black_arrow.png);*/
-    font-size:12px;
-    height:70px;
-    width:160px;
-    padding:25px;
-    color:#eee;
-  }
-  
-</style>
-
-{% endblock %}
+{% block title%}{% if device.name == null%}Edit: {{device.id}}{%else%}{{device.name}}{%endif%}{% endblock %}
+{% block name %}Edit <small>{% if device.name == null%}{{device.id}}{% else %}{{device.name}}{%endif%}</small>
+<a class="btn btn-small btn-inverse" href="{{root}}devices/view/{{device.id}}">Return</a>{% endblock %}
 {% block body %}
-<h1>{{device.name}}</h1>
-<div class="span12 row">
-	<form class="well" action="" method="POST">
-		<label>Device name</label><input type="text" name="name" placeholder="{{device.name}}" />
-		<label>IP</label><input type="text" name="ip" placeholder="{{device.ip}}" />
-		<label>Password( <a id="ssh_desc" title="SSH is used by ControLVC to manage devices">SSH</a> )</label><input type="text" name="password">
-		<input type="hidden" name="action" value="edit" />
-		<label /><input type="submit" value="Submit" />
-	</form>
+<div class="tabbable"> <!-- Only required for left/right tabs -->
+	<ul class="nav nav-pills">
+		<li class="active"><a href="#calls" data-toggle="tab">Calls</a></li>
+		<li><a href="#audio" data-toggle="tab">Audio</a></li>
+		<li><a href="#presence" data-toggle="tab">Telepresence</a></li>
+		<li><a href="#video" class="dropdown-toggle" data-toggle="tab">Video<span class="caret"></span></a></li>
+		<li><a href="#security" class="dropdown-toggle" data-toggle="tab">Security<span class="caret"></span></a></li>
+		<li><a href="#network" class="dropdown-toggle" data-toggle="tab">Network<span class="caret"></span></a></li>
+		<li><a href="#communcations" class="dropdown-toggle" data-toggle="tab">Communications<span class="caret"></span></a></li>
+		<li><a href="#system" class="dropdown-toggle" data-toggle="tab">System<span class="caret"></span></a></li>
+		<li><a href="#directory" class="dropdown-toggle" data-toggle="tab">Directory<span class="caret"></span></a></li>
+		<li><a href="#appearance" class="dropdown-toggle" data-toggle="tab">Appearance<span class="caret"></span></a></li>
+	</ul>
+	<div class="tab-content">
+		<div class="tab-pane active" id="calls">
+			<form class="well form-horizontal" method="post">
+				<div class="control-group">
+				    <label class="control-label" for="outgoing_call_bandwidth">Outgoing Call Bandwidth</label>
+				    <div class="controls">
+						<div class="input-append">
+							<select name="outgoing_call_bandwidth">
+								<option {% if device.outgoing_call_bandwidth == 0%}selected="selected" {%endif%}value="0">Auto</option>
+								<option {% if device.outgoing_call_bandwidth == 4000%}selected="selected" {%endif%}value="4000">4000</option>
+								<option {% if device.outgoing_call_bandwidth == 3000%}selected="selected" {%endif%}value="3000">3000</option>
+								<option {% if device.outgoing_call_bandwidth == 2500%}selected="selected" {%endif%}value="2500">2500</option>
+								<option {% if device.outgoing_call_bandwidth == 20000%}selected="selected" {%endif%}value="2000">2000</option>
+								<option {% if device.outgoing_call_bandwidth == 1920%}selected="selected" {%endif%}value="1920">1920</option>
+								<option {% if device.outgoing_call_bandwidth == 1728%}selected="selected" {%endif%}value="1728">1728</option>
+								<option {% if device.outgoing_call_bandwidth == 1471%}selected="selected" {%endif%}value="1472">1471</option>
+								<option {% if device.outgoing_call_bandwidth == 1280%}selected="selected" {%endif%}value="1280">1280</option>
+								<option {% if device.outgoing_call_bandwidth == 1152%}selected="selected" {%endif%}value="1152">1152</option>
+								<option {% if device.outgoing_call_bandwidth == 1024%}selected="selected" {%endif%}value="1024">1024</option>
+								<option {% if device.outgoing_call_bandwidth == 896%}selected="selected" {%endif%}value="896">896</option>
+								<option {% if device.outgoing_call_bandwidth == 768%}selected="selected" {%endif%}value="768">768</option>
+								<option {% if device.outgoing_call_bandwidth == 640%}selected="selected" {%endif%}value="640">640</option>
+								<option {% if device.outgoing_call_bandwidth == 512%}selected="selected" {%endif%}value="512">512</option>
+								<option {% if device.outgoing_call_bandwidth == 384%}selected="selected" {%endif%}value="384">384</option>
+								<option {% if device.outgoing_call_bandwidth == 320%}selected="selected" {%endif%}value="320">320</option>
+								<option {% if device.outgoing_call_bandwidth == 256%}selected="selected" {%endif%}value="256">256</option>
+								<option {% if device.outgoing_call_bandwidth == 192%}selected="selected" {%endif%}value="192">192</option>
+								<option {% if device.outgoing_call_bandwidth == 128%}selected="selected" {%endif%}value="128">128</option>
+							</select><span class="add-on">kb/s</span>
+						</div>
+					</div>
+				</div>
+				<div class="control-group">
+				    <label class="control-label" for="incoming_call_bandwidth">Incoming Call Bandwidth</label>
+				    <div class="controls">
+						<div class="input-append">
+							<select name="incoming_call_bandwidth">
+								<option {% if device.incoming_call_bandwidth == 0%}selected="selected" {%endif%}value="0">Auto</option>
+								<option {% if device.incoming_call_bandwidth == 4000%}selected="selected" {%endif%}value="4000">4000</option>
+								<option {% if device.incoming_call_bandwidth == 3000%}selected="selected" {%endif%}value="3000">3000</option>
+								<option {% if device.incoming_call_bandwidth == 2500%}selected="selected" {%endif%}value="2500">2500</option>
+								<option {% if device.incoming_call_bandwidth == 20000%}selected="selected" {%endif%}value="2000">2000</option>
+								<option {% if device.incoming_call_bandwidth == 1920%}selected="selected" {%endif%}value="1920">1920</option>
+								<option {% if device.incoming_call_bandwidth == 1728%}selected="selected" {%endif%}value="1728">1728</option>
+								<option {% if device.incoming_call_bandwidth == 1471%}selected="selected" {%endif%}value="1472">1471</option>
+								<option {% if device.incoming_call_bandwidth == 1280%}selected="selected" {%endif%}value="1280">1280</option>
+								<option {% if device.incoming_call_bandwidth == 1152%}selected="selected" {%endif%}value="1152">1152</option>
+								<option {% if device.incoming_call_bandwidth == 1024%}selected="selected" {%endif%}value="1024">1024</option>
+								<option {% if device.incoming_call_bandwidth == 896%}selected="selected" {%endif%}value="896">896</option>
+								<option {% if device.incoming_call_bandwidth == 768%}selected="selected" {%endif%}value="768">768</option>
+								<option {% if device.incoming_call_bandwidth == 640%}selected="selected" {%endif%}value="640">640</option>
+								<option {% if device.incoming_call_bandwidth == 512%}selected="selected" {%endif%}value="512">512</option>
+								<option {% if device.incoming_call_bandwidth == 384%}selected="selected" {%endif%}value="384">384</option>
+								<option {% if device.incoming_call_bandwidth == 320%}selected="selected" {%endif%}value="320">320</option>
+								<option {% if device.incoming_call_bandwidth == 256%}selected="selected" {%endif%}value="256">256</option>
+								<option {% if device.incoming_call_bandwidth == 192%}selected="selected" {%endif%}value="192">192</option>
+								<option {% if device.incoming_call_bandwidth == 128%}selected="selected" {%endif%}value="128">128</option>
+							</select><span class="add-on">kb/s</span>
+						</div>
+					</div>
+				</div>
+				<div class="control-group">
+				    <label class="control-label" for="outgoing_total_bandwidth">Outgoing Total Bandwidth</label>
+				    <div class="controls">
+						<div class="input-append">
+							<select name="outgoing_total_bandwidth">
+								<option {% if device.outgoing_total_bandwidth == 0%}selected="selected" {%endif%}value="0">Auto</option>
+								<option {% if device.outgoing_total_bandwidth == 10000%}selected="selected" {%endif%}value="1000">10000</option>
+								<option {% if device.outgoing_total_bandwidth == 9000%}selected="selected" {%endif%}value="9000">9000</option>
+								<option {% if device.outgoing_total_bandwidth == 8000%}selected="selected" {%endif%}value="8000">8000</option>
+								<option {% if device.outgoing_total_bandwidth == 7000%}selected="selected" {%endif%}value="7000">7000</option>
+								<option {% if device.outgoing_total_bandwidth == 6000%}selected="selected" {%endif%}value="6000">6000</option>
+								<option {% if device.outgoing_total_bandwidth == 5000%}selected="selected" {%endif%}value="5000">5000</option>
+								<option {% if device.outgoing_total_bandwidth == 4000%}selected="selected" {%endif%}value="4000">4000</option>
+								<option {% if device.outgoing_total_bandwidth == 3000%}selected="selected" {%endif%}value="3000">3000</option>
+								<option {% if device.outgoing_total_bandwidth == 2500%}selected="selected" {%endif%}value="2500">2500</option>
+								<option {% if device.outgoing_total_bandwidth == 2048%}selected="selected" {%endif%}value="2048">2048(E1)</option>
+								<option {% if device.outgoing_total_bandwidth == 2000%}selected="selected" {%endif%}value="2000">2000</option>
+								<option {% if device.outgoing_total_bandwidth == 1920%}selected="selected" {%endif%}value="1920">1920</option>
+								<option {% if device.outgoing_total_bandwidth == 1782%}selected="selected" {%endif%}value="1728">1728</option>
+								<option {% if device.outgoing_total_bandwidth == 1544%}selected="selected" {%endif%}value="1544">1544(T1)</option>
+								<option {% if device.outgoing_total_bandwidth == 1472%}selected="selected" {%endif%}value="1472">1472</option>
+								<option {% if device.outgoing_total_bandwidth == 1280%}selected="selected" {%endif%}value="1280">1280</option>
+								<option {% if device.outgoing_total_bandwidth == 1152%}selected="selected" {%endif%}value="1152">1152</option>
+								<option {% if device.outgoing_total_bandwidth == 1024%}selected="selected" {%endif%}value="1024">1024</option>
+								<option {% if device.outgoing_total_bandwidth == 896%}selected="selected" {%endif%}value="896">896</option>
+								<option {% if device.outgoing_total_bandwidth == 768%}selected="selected" {%endif%}value="768">768</option>
+								<option {% if device.outgoing_total_bandwidth == 640%}selected="selected" {%endif%}value="640">640</option>
+								<option {% if device.outgoing_total_bandwidth == 512%}selected="selected" {%endif%}value="512">512</option>
+								<option {% if device.outgoing_total_bandwidth == 384%}selected="selected" {%endif%}value="384">384</option>
+								<option {% if device.outgoing_total_bandwidth == 320%}selected="selected" {%endif%}value="320">320</option>
+								<option {% if device.outgoing_total_bandwidth == 256%}selected="selected" {%endif%}value="256">256</option>
+								<option {% if device.outgoing_total_bandwidth == 192%}selected="selected" {%endif%}value="192">192</option>
+								<option {% if device.outgoing_total_bandwidth == 128%}selected="selected" {%endif%}value="128">128</option>
+							</select><span class="add-on">kb/s</span>
+						</div>
+					</div>
+				</div>
+				<div class="control-group">
+				    <label class="control-label" for="incoming_total_bandwidth">Incoming Total Bandwidth</label>
+				    <div class="controls">
+						<div class="input-append">
+							<select name="incoming_total_bandwidth">
+								<option {% if device.incoming_total_bandwidth == 0%}selected="selected" {%endif%}value="0">Auto</option>
+								<option {% if device.incoming_total_bandwidth == 10000%}selected="selected" {%endif%}value="1000">10000</option>
+								<option {% if device.incoming_total_bandwidth == 9000%}selected="selected" {%endif%}value="9000">9000</option>
+								<option {% if device.incoming_total_bandwidth == 8000%}selected="selected" {%endif%}value="8000">8000</option>
+								<option {% if device.incoming_total_bandwidth == 7000%}selected="selected" {%endif%}value="7000">7000</option>
+								<option {% if device.incoming_total_bandwidth == 6000%}selected="selected" {%endif%}value="6000">6000</option>
+								<option {% if device.incoming_total_bandwidth == 5000%}selected="selected" {%endif%}value="5000">5000</option>
+								<option {% if device.incoming_total_bandwidth == 4000%}selected="selected" {%endif%}value="4000">4000</option>
+								<option {% if device.incoming_total_bandwidth == 3000%}selected="selected" {%endif%}value="3000">3000</option>
+								<option {% if device.incoming_total_bandwidth == 2500%}selected="selected" {%endif%}value="2500">2500</option>
+								<option {% if device.incoming_total_bandwidth == 2048%}selected="selected" {%endif%}value="2048">2048(E1)</option>
+								<option {% if device.incoming_total_bandwidth == 2000%}selected="selected" {%endif%}value="2000">2000</option>
+								<option {% if device.incoming_total_bandwidth == 1920%}selected="selected" {%endif%}value="1920">1920</option>
+								<option {% if device.incoming_total_bandwidth == 1782%}selected="selected" {%endif%}value="1728">1728</option>
+								<option {% if device.incoming_total_bandwidth == 1544%}selected="selected" {%endif%}value="1544">1544(T1)</option>
+								<option {% if device.incoming_total_bandwidth == 1472%}selected="selected" {%endif%}value="1472">1472</option>
+								<option {% if device.incoming_total_bandwidth == 1280%}selected="selected" {%endif%}value="1280">1280</option>
+								<option {% if device.incoming_total_bandwidth == 1152%}selected="selected" {%endif%}value="1152">1152</option>
+								<option {% if device.incoming_total_bandwidth == 1024%}selected="selected" {%endif%}value="1024">1024</option>
+								<option {% if device.incoming_total_bandwidth == 896%}selected="selected" {%endif%}value="896">896</option>
+								<option {% if device.incoming_total_bandwidth == 768%}selected="selected" {%endif%}value="768">768</option>
+								<option {% if device.incoming_total_bandwidth == 640%}selected="selected" {%endif%}value="640">640</option>
+								<option {% if device.incoming_total_bandwidth == 512%}selected="selected" {%endif%}value="512">512</option>
+								<option {% if device.incoming_total_bandwidth == 384%}selected="selected" {%endif%}value="384">384</option>
+								<option {% if device.incoming_total_bandwidth == 320%}selected="selected" {%endif%}value="320">320</option>
+								<option {% if device.incoming_total_bandwidth == 256%}selected="selected" {%endif%}value="256">256</option>
+								<option {% if device.incoming_total_bandwidth == 192%}selected="selected" {%endif%}value="192">192</option>
+								<option {% if device.incoming_total_bandwidth == 128%}selected="selected" {%endif%}value="128">128</option>
+							</select><span class="add-on">kb/s</span>
+						</div>
+					</div>
+				</div>
+				<div class="control-group">
+				    <label class="control-label" for="auto_bandwidth">Auto Bandwidth</label>
+				    <div class="controls">
+				    	<select name="auto_bandwidth">
+				    		<option {% if device.auto_bandwidth == 'on'%}selected="selected" {%endif%}value="on">Enabled</option>
+				    		<option {% if device.auto_bandwidth == 'off'%}selected="selected" {%endif%}value="off">Disabled</option>
+			    		</select>
+			    	</div>
+			    </div>
+			    <div class="control-group">
+				    <label class="control-label" for="max_calltime">Maximum Call Time</label>
+				    <div class="controls">
+				    	<select name="max_calltime">
+				    		<option {% if device.max_calltime == 0.5 %}selected="selected" {%endif%}value=".5">30 Minutes</option>
+				    		<option {% if device.max_calltime == 'on'%}selected="selected" {%endif%}value="1">1 Hour</option>
+				    		<option {% if device.max_calltime == 2 %}selected="selected" {%endif%}value="2">2 Hours</option>
+				    		<option {% if device.max_calltime == 4 %}selected="selected" {%endif%}value="4">4 Hours</option>
+				    		<option {% if device.max_calltime == 6 %}selected="selected" {%endif%}value="6">6 Hours</option>
+				    		<option {% if device.max_calltime == 8 %}selected="selected" {%endif%}value="8">8 Hours</option>
+				    		<option {% if device.max_calltime == 10 %}selected="selected" {%endif%}value="10">10 Hours</option>
+				    		<option {% if device.max_calltime == 12 %}selected="selected" {%endif%}value="12">12 Hours</option>
+				    		<option {% if device.max_calltime == 14 %}selected="selected" {%endif%}value="14">14 Hours</option>
+				    		<option {% if device.max_calltime == 16 %}selected="selected" {%endif%}value="16">16 Hours</option>
+				    		<option {% if device.max_calltime == 18 %}selected="selected" {%endif%}value="18">18 Hours</option>
+				    		<option {% if device.max_calltime == 20 %}selected="selected" {%endif%}value="20">20 Hours</option>
+				    		<option {% if device.max_calltime == 22 %}selected="selected" {%endif%}value="22">22 Hours</option>
+				    		<option {% if device.max_calltime == 24 %}selected="selected" {%endif%}value="24">24 Hours</option>
+				    		<option {% if device.max_calltime == 'off'%}selected="selected" {%endif%}value="0">None</option>
+			    		</select>
+			    	</div>
+			    </div>
+			    <div class="control-group">
+				    <label class="control-label" for="max_redials">Maximum Redial Entries</label>
+				    <div class="controls">
+				    	<select name="max_redials">
+				    		<option {% if device.max_redials == 'off'%}selected="selected" {%endif%}value="0">None</option>
+				    		<option {% if device.max_redials == 'on'%}selected="selected" {%endif%}value="1">1</option>
+				    		<option {% if device.max_redials == 2 %}selected="selected" {%endif%}value="2">2</option>
+				    		<option {% if device.max_redials == 3 %}selected="selected" {%endif%}value="3">3</option>
+				    		<option {% if device.max_redials == 4 %}selected="selected" {%endif%}value="4">4</option>
+				    		<option {% if device.max_redials == 5 %}selected="selected" {%endif%}value="5">5</option>
+				    		<option {% if device.max_redials == 6 %}selected="selected" {%endif%}value="6">6</option>
+				    		<option {% if device.max_redials == 7 %}selected="selected" {%endif%}value="7">7</option>
+				    		<option {% if device.max_redials == 8 %}selected="selected" {%endif%}value="8">8</option>
+				    		<option {% if device.max_redials == 9 %}selected="selected" {%endif%}value="9">9</option>
+				    		<option {% if device.max_redials == 10 %}selected="selected" {%endif%}value="10">10</option>
+				    		<option {% if device.max_redials == 11 %}selected="selected" {%endif%}value="11">11</option>
+				    		<option {% if device.max_redials == 12 %}selected="selected" {%endif%}value="12">12</option>
+				    		<option {% if device.max_redials == 13 %}selected="selected" {%endif%}value="13">13</option>
+				    		<option {% if device.max_redials == 14 %}selected="selected" {%endif%}value="14">14</option>
+				    		<option {% if device.max_redials == 15 %}selected="selected" {%endif%}value="15">15</option>
+			    		</select>
+			    	</div>
+			    </div>
+			    <div class="control-group">
+				    <label class="control-label" for="auto_answer">Auto Answer</label>
+				    <div class="controls">
+				    	<select name="auto_answer">
+				    		<option {% if device.auto_answer == 'on'%}selected="selected" {%endif%}value="on">Enabled</option>
+				    		<option {% if device.auto_answer == 'off'%}selected="selected" {%endif%}value="off">Disabled</option>
+			    		</select>
+			    	</div>
+			    </div>
+			    <div class="control-group">
+				    <label class="control-label" for="auto_answer_mute">Auto Answer Mute</label>
+				    <div class="controls">
+				    	<select name="auto_answer_mute">
+				    		<option {% if device.auto_answer_mute == 'on'%}selected="selected" {%endif%}value="on">Enabled</option>
+				    		<option {% if device.auto_answer_mute == 'off'%}selected="selected" {%endif%}value="off">Disabled</option>
+			    		</select>
+			    	</div>
+			    </div>
+			    <div class="control-group">
+				    <label class="control-label" for="auto_answer_multiway">Auto Answer Multiway Call</label>
+				    <div class="controls">
+				    	<select name="auto_answer_multiway">
+				    		<option {% if device.auto_answer_multiway == 'on'%}selected="selected" {%endif%}value="on">Enabled</option>
+				    		<option {% if device.auto_answer_multiway == 'off'%}selected="selected" {%endif%}value="off">Disabled</option>
+			    		</select>
+			    	</div>
+			    </div>
+				<input type="hidden" name="section" value="calls">
+				<input type="submit" value="Save">
+			</form>
+		</div>
+		<!--
+
+		AUDIO
+
+		-->
+		<div class="tab-pane" id="audio">
+			<form class="well form-inline" method="post"  onsubmit="selectAllOptions('audio_codecs');">
+				<div class="control-group">
+				    <label class="control-label" for="audio_codecs">Audio Codec Order</label>
+				    <div class="controls">
+				    	<select name="audio_codecs[]" multiple="multiple" id="audio_codecs" class="input-xxlarge">
+				    		{% for codec in device.audio_codecs %}
+				    		<option value="{{codec.id}}">{{codec.name}}</option>
+				    		{% endfor %}
+			    		</select>
+			    		<a href="JavaScript:void(0);" id="btn-up"><i class="icon-chevron-up"></i></a>
+    					<a href="JavaScript:void(0);" id="btn-down"><i class="icon-chevron-down"></i></a>
+			    	</div>
+			    </div>
+			    <div class="control-group">
+				    <label class="control-label" for="audio_active_microphone">Active Microphone</label>
+				    <div class="controls">
+				    	<select name="audio_active_microphone">
+				    		<option {% if device.audio_active_microphone == "auto"%}selected="selected" {%endif%}value="auto">Auto</option>
+				    		<option {% if device.audio_active_microphone == "phone"%}selected="selected" {%endif%}value="phone">Phone</option>
+				    		<option {% if device.audio_active_microphone == "micin"%}selected="selected" {%endif%}value="micin">Microphone In</option>
+				    		<option {% if device.audio_active_microphone == "micin_no_aec"%}selected="selected" {%endif%}value="micin_noaec">Microphone In (no AEC)</option>
+				    		<option {% if device.audio_active_microphone == "linein"%}selected="selected" {%endif%}value="linein">Line In</option>
+				    		<option {% if device.audio_active_microphone == "linein_noaec"%}selected="selected" {%endif%}value="linein_noaec">Line In (no AEC)</option>
+			    		</select>
+			    	</div>
+			    </div>
+				<input type="hidden" name="section" value="audio">
+				<input type="submit" value="Save">
+			</form>
+		</div>
+		<div class="tab-pane" id="presence">
+			<form class="well form-inline" method="post">
+				<div class="control-group">
+				    <label class="control-label" for="telepresence">Telepresence</label>
+				    <div class="controls">
+				    	<select name="telepresence">
+				    		<option {% if device.telepresence == 'on'%}selected="selected" {%endif%}value="on">Enabled</option>
+				    		<option {% if device.telepresence == 'off'%}selected="selected" {%endif%}value="off">Disabled</option>
+			    		</select>
+			    	</div>
+			    </div>
+			    <div class="control-group">
+				    <label class="control-label" for="camera_lock">HD Camera 1 Movement</label>
+				    <div class="controls">
+				    	<select name="camera_lock">
+				    		<option {% if device.camera_lock == 'on'%}selected="selected" {%endif%}value="on">Locked</option>
+				    		<option {% if device.camera_lock == 'off'%}selected="selected" {%endif%}value="off">Unlocked</option>
+			    		</select>
+			    	</div>
+			    </div>
+				<input type="hidden" name="section" value="telepresence">
+				<input type="submit" value="Save">
+			</form>
+		</div>
+		<div class="tab-pane" id="video">
+			<div class="tabbable"> <!-- Only required for left/right tabs -->
+				<ul class="nav nav-tabs">
+					<li class="active"><a href="#video-control" data-toggle="tab">Video Control</a></li>
+					<li><a href="#video-quality" data-toggle="tab">Video Quality</a></li>
+					<li><a href="#video-record" data-toggle="tab">Record and Stream</a></li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="video-control">
+						<form class="well form-inline" method="post">
+							<div class="control-group">
+							    <label class="control-label" for="camera_far_control">Far Control of Near Camera</label>
+							    <div class="controls">
+							    	<select name="camera_far_control">
+							    		<option {% if device.camera_far_control == 'enabled'%}selected="selected" {%endif%}value="on">Enabled</option>
+							    		<option {% if device.camera_far_control == 'disabled'%}selected="selected" {%endif%}value="off">Disabled</option>
+						    		</select>
+						    	</div>
+						    </div>
+						    <div class="control-group">
+							    <label class="control-label" for="camera_far_set_preset">Far Set of Camera Presets</label>
+							    <div class="controls">
+							    	<select name="camera_far_set_preset">
+							    		<option {% if device.camera_far_set_preset == 'enabled'%}selected="selected" {%endif%}value="on">Enabled</option>
+							    		<option {% if device.camera_far_set_preset == 'disabled'%}selected="selected" {%endif%}value="off">Disabled</option>
+						    		</select>
+						    	</div>
+						    </div>
+						    <div class="control-group">
+							    <label class="control-label" for="camera_far_use_preset">Far Move to Camera Presets</label>
+							    <div class="controls">
+							    	<select name="camera_far_use_preset">
+							    		<option {% if device.camera_far_use_preset == 'enabled'%}selected="selected" {%endif%}value="on">Enabled</option>
+							    		<option {% if device.camera_far_use_preset == 'disabled'%}selected="selected" {%endif%}value="off">Disabled</option>
+						    		</select>
+						    	</div>
+						    </div>
+							<input type="hidden" name="section" value="video-control">
+							<input type="submit" value="Save">
+						</form>
+					</div>
+					<div class="tab-pane" id="video-quality">
+						<form class="well form-inline" method="post">
+
+							<input type="hidden" name="section" value="video-quality">
+							<input type="submit" value="Save">
+						</form>
+					</div>
+					<div class="tab-pane" id="video-record">
+						<form class="well form-inline" method="post">
+
+							<input type="hidden" name="section" value="video-record">
+							<input type="submit" value="Save">
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="tab-pane" id="security">
+			<div class="tabbable"> <!-- Only required for left/right tabs -->
+				<ul class="nav nav-tabs">
+					<li class="active"><a href="#security-general" data-toggle="tab">General</a></li>
+					<li><a href="#security-passwords" data-toggle="tab">Passwords</a></li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="security-general">
+						<p>General</p>
+					</div>
+					<div class="tab-pane" id="security-passwords">
+						<p>Passwords</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="tab-pane" id="network">
+			<div class="tabbable"> <!-- Only required for left/right tabs -->
+				<ul class="nav nav-tabs">
+					<li class="active"><a href="#network-general" data-toggle="tab">General</a></li>
+					<li><a href="#nat" data-toggle="tab">NAT</a></li>
+					<li><a href="#reserved-ports" data-toggle="tab">Reserved Ports</a></li>
+					<li><a href="#network-qos" data-toggle="tab">Network QoS</a></li>
+					<li><a href="#transit" data-toggle="tab">Lifesize Transit</a></li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="network-general">
+						<p>General</p>
+					</div>
+					<div class="tab-pane" id="nat">
+						<p>NAT</p>
+					</div>
+					<div class="tab-pane" id="reserved-ports">
+						<p>Reserved Ports</p>
+					</div>
+					<div class="tab-pane" id="network-qos">
+						<p>Network QoS</p>
+					</div>
+					<div class="tab-pane" id="transit">
+						<p>Lifesize Transit</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="tab-pane" id="communcations">
+			<div class="tabbable"> <!-- Only required for left/right tabs -->
+				<ul class="nav nav-tabs">
+					<li class="active"><a href="#comm-general" data-toggle="tab">General</a></li>
+					<li><a href="#comm-h323" data-toggle="tab">H.323</a></li>
+					<li><a href="#comm-sip" data-toggle="tab">SIP</a></li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="comm-general">
+						<p>General</p>
+					</div>
+					<div class="tab-pane" id="comm-h323">
+						<p>H.323</p>
+					</div>
+					<div class="tab-pane" id="comm-sip">
+						<p>SIP</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="tab-pane" id="system">
+			<div class="tabbable"> <!-- Only required for left/right tabs -->
+				<ul class="nav nav-tabs">
+					<li class="active"><a href="#system-general" data-toggle="tab">General</a></li>
+					<li><a href="#system-id" data-toggle="tab">Identification</a></li>
+					<li><a href="#system-datetime" data-toggle="tab">Date and Time</a></li>
+					<li><a href="#system-keys" data-toggle="tab">License Keys</a></li>
+					<li><a href="#system-reset" data-toggle="tab">System Reset</a></li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="system-general">
+						<p>General</p>
+					</div>
+					<div class="tab-pane" id="system-id">
+						<p>Identification</p>
+					</div>
+					<div class="tab-pane" id="system-datetime">
+						<p>System Date & Time</p>
+					</div>
+					<div class="tab-pane" id="system-keys">
+						<p>License Keys</p>
+					</div>
+					<div class="tab-pane" id="system-reset">
+						<p>System Reset</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="tab-pane" id="directory">
+			<div class="tabbable"> <!-- Only required for left/right tabs -->
+				<ul class="nav nav-tabs">
+					<li class="active"><a href="#dir-general" data-toggle="tab">General</a></li>
+					<li><a href="#dir-disc" data-toggle="tab">Auto Discovery</a></li>
+					<li><a href="#dir-ldap" data-toggle="tab">LDAP</a></li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="dir-general">
+						<p>General</p>
+					</div>
+					<div class="tab-pane" id="dir-disc">
+						<p>Auto Discovery</p>
+					</div>
+					<div class="tab-pane" id="dir-ldap">
+						<p>LDAP</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="tab-pane" id="appearance">
+			<div class="tabbable"> <!-- Only required for left/right tabs -->
+				<ul class="nav nav-tabs">
+					<li class="active"><a href="#appear-general" data-toggle="tab">General</a></li>
+					<li><a href="#appear-backgrounds" data-toggle="tab">Backgrounds</a></li>
+					<li><a href="#appear-layout" data-toggle="tab">Layout</a></li>
+					<li><a href="#appear-displays" data-toggle="tab">Displays</a></li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="appear-general">
+						<p>General</p>
+					</div>
+					<div class="tab-pane" id="appear-backgrounds">
+						<p>Backgrounds</p>
+					</div>
+					<div class="tab-pane" id="appear-layout">
+						<p>Layout</p>
+					</div>
+					<div class="tab-pane" id="appear-displays">
+						<p>Displays</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		</div>
+	</div>
 </div>
-{#
-<div class="span12 row">
-<pre>
-{{dump(device)}}
-</pre>
-</div>
-#}
+
 {% endblock %}
 {% block javascripts %}
 {{parent()}}
 <script type="text/javascript">
-$( document ).ready(function() {
-	$("#ssh_desc").tooltip();
-	/*{
-		content: 'SSH is the protocol ControlVC uses to connect to devices'
-	});*/
+$(document).ready(function(){
+	 $('#btn-up').bind('click', function() {
+        $('#audio_codecs option:selected').each( function() {
+            var newPos = $('#audio_codecs option').index(this) - 1;
+            if (newPos > -1) {
+                $('#audio_codecs option').eq(newPos).before("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
+                $(this).remove();
+            }
+        });
+    });
+    $('#btn-down').bind('click', function() {
+        var countOptions = $('#audio_codecs option').size();
+        $('#audio_codecs option:selected').each( function() {
+            var newPos = $('#audio_codecs option').index(this) + 1;
+            if (newPos < countOptions) {
+                $('#audio_codecs option').eq(newPos).after("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
+                $(this).remove();
+            }
+        });
+    });
 });
+function selectAllOptions(selStr)
+{
+  var selObj = document.getElementById(selStr);
+  for (var i=0; i<selObj.options.length; i++) {
+    selObj.options[i].selected = true;
+  }
+  console.log(selObj);
+}
 </script>
-{% endblock %}
+{%endblock %}
