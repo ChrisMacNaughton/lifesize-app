@@ -168,11 +168,15 @@ while(time() <= $end){
 				));
 			}
 		} else {
+			$offline_alarm->execute(array(
+					':id'=>$device['id'],
+					':active'=>0
+				));
 			$res = explode(chr(0x0a), $ssh->exec("get system serial"));
 			$serial = $res[0];
 
 			if($serial != $device['serial']){
-				if(is_null($device['serial'])){
+				if(is_null($device['serial']) OR $device['serial'] == ''){
 					//add serial to device
 					$serial_stmt->execute(array(':serial'=>$serial));
 					print_r($serial_stmt->errorInfo());
@@ -409,9 +413,9 @@ while(time() <= $end){
 					':far_use'=>$far_use_preset,
 					':far_set'=>$far_set_preset
 				);
-				print_r($options);
+				//print_r($options);
 				$res = $update_stmt->execute($options);
-				print_r($update_stmt->errorInfo());
+				//print_r($update_stmt->errorInfo());
 				//print("Updated: " . $name . " at " . time() . "(quitting at " . $end . ")\n");
 				if($res){
 					//print(sprintf("%s:%s| Updated %s (%s)\n", $time, $worker_id,$device['id'], $name));

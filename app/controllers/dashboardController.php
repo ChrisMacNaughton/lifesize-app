@@ -51,8 +51,8 @@ INNER JOIN companies_devices ON devices_history.device_id = companies_devices.de
 INNER JOIN companies ON companies_devices.company_id = companies.id
 INNER JOIN users_companies ON companies.id = users_companies.company_id
 INNER JOIN users ON users.id = users_companies.user_id
-WHERE users.id = :id AND companies.id = users.as");
-		$stmt->execute(array(':id'=>$this->user->getID()));
+WHERE companies.id = :as");
+		$stmt->execute(array(':as'=>$this->user->getCompany()));
 		$res = $stmt->fetch(PDO::FETCH_ASSOC);
 		$data['devices_used'] = $res['sum'];
 		
