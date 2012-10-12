@@ -250,59 +250,212 @@ while(time() <= $end){
 
 			
 			
+			$update_start_time = microtime(true);
+		$ssh = new mySSH($device['ip']);
+		$pw = ($device['password'] != '')?$device['password'] : 'lifesize';
+		if(!$ssh->login('auto', $pw)){
+			$offline_stmt->execute(array(':id'=>$device['hash']));
+			//print_r($offline_stmt->errorInfo());
+			$log_stmt->execute(array(
+						':time'=>$time,
+						':id'=>$worker_id,
+						':message'=>"Tried",
+						':detail'=>$device['id']
+					));
+			if($device['online'] == 0){
+				$offline_alarm->execute(array(
+					':id'=>$device['id'],
+					':active'=>1
+				));
+			}
+		} else {
+			$offline_alarm->execute(array(
+					':id'=>$device['id'],
+					':active'=>0
+				));
+			$res = explode(chr(0x0a), $ssh->exec("get system serial"));
+			$serial = $res[0];
+
+			$device_id = sha1($serial);
+
+			//echo $serial . " => " . $id;exit("\n\n");
+
+			$get_edits_stmt->execute(array(':id'=>$device['id']));
+			$edits = $get_edits_stmt->fetchAll(PDO::FETCH_ASSOC);
+			foreach($edits as $edit){
+				$command = $edit['verb'] . ' ' . $edit['object'] . ' ' . $edit['target'] . ' ' . $edit['details'];
+				$res = explode(chr(0x0a), $ssh->exec($command));
+				//print("Edit: ".$command . "\n");
+				if(array_search('ok,00', $res)){
+					$edit_completed_stmt->execute(array(':id'=>$edit['id']));
+				}
+			}
+			//print_r($edits);
+			$online = 1;	
+			//get licensekey from device
+			$res = ($ssh->exec('get system licensekey -t maint'));
+			if($res){
+				$licensekey = explode(chr(0x0a), $res);
+				$licensekey = $licensekey[0];
+				$new_license->execute(array(':license'=>$licensekey,':id'=>$device['id']));
+			}
+			//get name from device
+			$name = assign('get system name', 'name', $device);
+
+			$res = clean($ssh->exec('get system model'));
+			if($res){
+				$dev = explode(',', $res);
+				$make = $dev[0]; $model = $dev[1];
+			} else {
+				$make = $device['make'];
+				$model = $device['model'];
+			}
+			$res = explode(chr(0x0a), $ssh->exec('get system version'));
+			if(array_search('ok,00', $res)){
+				$res = explode(',', $res[0]);
+				$version = $res[1];
+			} else {
+				$version = $device['version'];
+			}
+			$res = explode(chr(0x0a), $ssh->exec('status call active'));
+			if(array_search('ok,00', $res)){
+				$in_call = ($res[0] == '')?0 : 1;
+				$high_loss_stmt->execute(array(
+					':id'=>$device['id'],
+					':active'=>0
+				));
+			} else {
+				$in_call = $device['in_call'];
+				$active_call = explode(chr(0x0a), $ssh->exec('status call active'));
+				$active_call = explode(',',$active_call[0]);
+				$call_time = to_seconds($active_call[10]);
+
+				$call_stats = explode(chr(0x0a), $ssh->exec('status call statistics'));
+				$call_stats = explode(',',$call_stats[0]);
+
+				$cumu_pkt_loss = $call_stats[12] + $call_stats[17] + $call_stats[21] + $call_stats[27];
+
+				$pkt_loss = $call_stats[11] + $call_stats[16] + $call_stats[20] + $call_stats[26];
+
+				$loss_per_sec = $cumu_pkt_loss / $call_time;
+
+				if($loss_per_sec > 5){
+					$high_loss_stmt->execute(array(
+						':id'=>$device['id'],
+						':active'=>1
+					));
+				} else {
+					$high_loss_stmt->execute(array(
+						':id'=>$device['id'],
+						':active'=>0
+					));
+				}
+			}
+			//get auto-answer from device
+			$auto_answer = assign('get call auto-answer', 'auto_answer', $device);
+
+			$auto_answer_mute = assign('get call auto-mute', 'auto_answer_mute', $device);
+			//get max-call-speed-mute from device
+			$res = clean($ssh->exec('get call max-speed'));
+			if($res){
+				$res = explode(',', $res);
+				$incoming_call_bandwidth = ($res[0] != "auto")?$res[0]:0;
+				$outgoing_call_bandwidth = ($res[1] != "auto")?$res[1]:0;
+			} else {
+				$incoming_call_bandwidth = $device['incoming_call_bandwidth'];
+				$outgoing_call_bandwidth = $device['outgoing_call_bandwidth'];
+			}
+			//get max-bw from device
+			$res = clean($ssh->exec('get call total-bw'));
+			if($res){
+				$res = explode(',', $res);
+				$incoming_total_bandwidth = ($res[0] != "")?$res[0]:0;
+				$outgoing_total_bandwidth = ($res[1] != "")?$res[1]:0;
+			} else {
+				$incoming_total_bandwidth = $device['incoming_total_bandwidth'];
+				$outgoing_total_bandwidth = $device['outgoing_total_bandwidth'];
+			}
+			//auto-bandwitdh
+			$res = clean($ssh->exec('get call auto-bandwidth'));
+			if($res){
+				$auto_bandwidth = ($res == 'on')?'on':'off';
+			} else {
+				$auto_bandwidth = $device['auto_bandwidth'];
+			}
+			//max_calltime
+			$max_calltime = assign('get call max-time', 'max_calltime', $device);
+
+			//max_redials
+			$max_redials = assign('get call max-redial-entries','max_redials', $device);
+
+			//auto_multiway
+			$auto_multiway = assign('get call auto-multiway', 'auto_multiway', $device);
+
+			//audio_codecs
+			$res = clean($ssh->exec('get audio codecs'));
+			if($res){
+				$res = explode(' ', rtrim($res));
+				//$res = 
+				$codecs = json_encode($res);
+			} else {
+				$codecs = $device['audio_codecs'];
+			}
+
+			//audio active mic
+			$active_mic = assign('get audio active-mic', 'audio_active_microphone', $device);
+
+			$telepresence = assign('get system telepresence', 'telepresence', $device);
+
+			$lock = assign("get camera lock", 'camera_lock', $device);
+
+			$far_control = assign("get camera far-control", 'camera_far_control', $device);
+
+			$far_set_preset = assign("get camera far-set-preset", 'camera_far_set_preset', $device);
+
+			$far_use_preset = assign("get camera far-use-preset", 'camera_far_use_preset', $device);
+
+			if(strpos($lock, ',')){
+				$lock = explode(',',$lock);
+				$lock = $lock[1];
+			}
+			
+			$type = "camera";
+			$options = array(
+				':hash'=>$deviceid,
+				':id'=>$device['id']
+			);
+			$update_stmt2->execute($options);
 			//print_r($options);
 			//print(sprintf("New data for %s is\n\tOnline: %s\n\tName: %s\n\tMake: %s\n\tModel: %s\n\tIn Call:%s\n\tVersion:%s\n", $device['name'], $online, $name, $make, $model, $in_call, $version));
-			$ssh->setTimeout(2);
-			$ssh->write("get system name\nget audio codecs\nget system serial\nget system model\nstatus call active\nget call auto-answer\nget call auto-mute\nget call max-speed\nget call total-bw\nget call auto-bandwidth\nget call max-time\nget call max-redial-entries\nget call auto-multiway\nget audio active-mic\nget system telepresence\nget camera lock\nget camera far-control\nget camera far-set-preset\nget camera far-use-preset\nget system licensekey -t maint\nget system version\n\n");
-			$ssh->read('$');
-
-			$gathered = microtime(true) - $start;
-			$raw = $ssh->read();
-			//print($raw . "\n");
-			$res = explode("\n",implode(explode("ok,00", $raw)));
-			print_r($res);
-
-			$model = explode(',',$res[13]);
-
-			$version = explode(',',$res[80]);
-			$bw = explode(',',$res[28]);
-				$incoming_call_bandwidth = ($bw[0] != "auto")?$bw[0]:0;
-				$outgoing_call_bandwidth = ($bw[1] != "auto")?$bw[1]:0;
-
-			$bw = explode(',', $res[32]);
-				$incoming_total_bandwidth = ($bw[0] != "auto")?$bw[0]:0;
-				$outgoing_total_bandwidth = ($bw[1] != "auto")?$bw[1]:0;
-			$lock = explode(',', $res[60]);
-			$lock = $lock[1];
-			//print_r($res);
+			$update_time = microtime(true) - $update_start_time;
 			$options = array(
-				':id'=>sha1($res[9]),					
-				':name'=>$res[1],
-				':make'=>$model[0],
-				':model'=>$model[1],
-				':call'=>(strlen($res[17]) < 5)?0:1,
-				':version'=>$version[1],
-				':license'=>$res[76],
-				':type'=>'camera',
-				':online'=>1,
-				':auto_answer'=>$res[20],
-				':auto_answer_mute'=>$res[24],
+				':id'=>sha1($serial),					
+				':name'=>$name,
+				':make'=>$make,
+				':model'=>$model,
+				':call'=>$in_call,
+				':version'=>$version,
+				':license'=>$licensekey,
+				':type'=>$type,
+				':serial'=>$serial,
+				':online'=>$online,
+				':auto_answer'=>$auto_answer,
+				':auto_answer_mute'=>$auto_answer_mute,
 				':incoming_call'=>$incoming_call_bandwidth,
 				':outgoing_call'=>$outgoing_call_bandwidth,
 				':incoming_total'=>$incoming_total_bandwidth,
 				':outgoing_total'=>$outgoing_total_bandwidth,
-				':auto_bw'=>$res[36],
-				':max_calltime'=>$res[40],
-				':max_redials'=>$res[44],
-				':auto_multiway'=>$res[48],
-				':codecs'=>$res[5],
-				':active_mic'=>$res[52],
+				':auto_bw'=>$auto_bandwidth,
+				':max_calltime'=>$max_calltime,
+				':max_redials'=>$max_redials,
+				':auto_multiway'=>$auto_multiway,
+				':codecs'=>$codecs,
+				':active_mic'=>$active_mic,
 				':lock'=>$lock,
-				':telepresence'=>$res[56],
-				':far_control'=>$res[64],
-				':far_use'=>$res[68],
-				':far_set'=>$res[72],
-				':serial'=>$res[9]
+				':telepresence'=>$telepresence,
+				':far_control'=>$far_control,
+				':far_use'=>$far_use_preset,
+				':far_set'=>$far_set_preset
 			);
 
 			$update_options = array(
@@ -379,6 +532,7 @@ while(time() <= $end){
 		$cleanup->execute();
 		$ssh = null;
 	}
+}
 }
 
 $log_stmt->execute(array(
