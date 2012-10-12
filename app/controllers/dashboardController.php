@@ -39,6 +39,10 @@ WHERE cd.company_id = :id");
 			$time = ($time/24);
 			$scale = "days";
 		}
+		if($time > 365){
+			$time = ($time / 365);
+			$scale = "years";
+		}
 		$data['call_time'] = round($time, 2); $data['scale'] = $scale;
 
 	$stmt = $this->db->prepare("SELECT count(DISTINCT devices_history.device_id) AS sum

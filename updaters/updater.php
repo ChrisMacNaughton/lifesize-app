@@ -192,7 +192,7 @@ while(time() <= $end){
 	print("$time: Checking for available device\n");
 	$stmt->execute();
 	$device = $stmt->fetch(PDO::FETCH_ASSOC);
-	print_r($device);
+	//print_r($device);
 	//print_r($stmt->errorInfo());
 	if(empty($device)){
 		sleep(5);
@@ -210,7 +210,7 @@ while(time() <= $end){
 		$res = 1;
 	}
 	if ($res) {
-		print("Locked!\n");
+		//print("Locked!\n");
 
 		print($device['id'] . "\n");
 		$update_start_time = microtime(true);
@@ -232,7 +232,7 @@ while(time() <= $end){
 				));
 			}
 		} else {
-			print("Logged in!\n");
+			//print("Logged in!\n");
 
 			//echo $serial . " => " . $id;exit("\n\n");
 			
@@ -468,10 +468,10 @@ while(time() <= $end){
 			print_r($options);
 			if($count['count'] == 0){
 				$res = $new_device_stmt->execute($options);
-				print("New!\n");
+				//print("New!\n");
 			} else{
 				$res = $update_stmt->execute($options);
-				print("Updating!\n");
+				//print("Updating!\n");
 			}
 
 			/*
@@ -488,7 +488,7 @@ while(time() <= $end){
 			$history_start_stmt->execute(array(':id'=>$options[':id']));
 			$start = $history_start_stmt->fetch(PDO::FETCH_ASSOC);
 			$start = $start['id'];
-			print("Getting history\n");
+			//print("Getting history\n");
 			foreach ($hist as $call) {
 				$history = explode("|", $call);
 				if (count($history) > 5) {

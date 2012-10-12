@@ -25,7 +25,8 @@ class User {
 		'a9b450163938b4d4bc8f5db078cd480f9f353f3b'=>'G.728',
 		'954cc4d5b2e8716250bc400eb831827054079a64'=>'G.729',
 		'f905115bad1dd5db8e66768e2a2f680c1e924b2e'=>'G.711 mu-law',
-		'e616f41e091bdbdcaf48b72aa70e2b7d860b30cd'=>'G.711 a-law'
+		'e616f41e091bdbdcaf48b72aa70e2b7d860b30cd'=>'G.711 a-law',
+		'da39a3ee5e6b4b0d3255bfef95601890afd80709'=>''
 	);
 	public function __construct($db, $writedb){
 		$this->db = $db;
