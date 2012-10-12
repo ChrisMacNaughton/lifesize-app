@@ -36,7 +36,7 @@
 	{%for device in devices %}
 	<div class="row span12">
 		<div class="status span1">
-			<img src="assets/img/devices/{% if device.online == 1%}{% if device.in_call == 1%}calling{% else %}Online{% endif %}{% else %}Offline{% endif %}.png" />
+			<img class="noprint" src="assets/img/devices/{% if device.online == 1%}{% if device.in_call == 1%}calling{% else %}Online{% endif %}{% else %}Offline{% endif %}.png" />
 		</div>
 		<div class="make span1">
 			{% if device.make != null%}
@@ -71,7 +71,7 @@
 		</div>
 		<div class="type span1">
 			{% if device.type != null%}
-			<img src="assets/img/devices/{{device.type}}.png" />
+			<img class="noprint" src="assets/img/devices/{{device.type}}.png" />
 			{% else %}
 			?
 			{% endif %}

@@ -465,7 +465,7 @@ while(time() <= $end){
 			$update_stmt2->execute($update_options);
 			$check_for_hash->execute(array(':id'=>$options[':id']));
 			$count = $check_for_hash->fetch(PDO::FETCH_ASSOC);
-			print_r($options);
+			//print_r($options);
 			if($count['count'] == 0){
 				$res = $new_device_stmt->execute($options);
 				//print("New!\n");

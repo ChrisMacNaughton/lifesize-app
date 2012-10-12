@@ -94,3 +94,9 @@ body {
 .subhead .navbar {
   display: none;
 }
+
+@media print {
+  .noprint {
+      display:none;
+  }
+}
