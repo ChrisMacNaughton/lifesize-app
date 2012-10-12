@@ -222,23 +222,26 @@ class devicesController extends Controller {
 			$options = array(
 				':ip'=>$_POST['ip'],
 				':password'=>$_POST['device_pass'],
-				':time'=>time()
+				':company'=>$this->user->getCompany()
 			);
 
 			$options[':id'] = 'dev-' . substr(hash('sha512', $options[':ip'] . microtime(true)), 0,10);
-			$stmt = $this->writedb->prepare("INSERT INTO devices (`id`,`ip`,`password`, `added`) VALUES (:id, :ip, :password, :time)");
+			$stmt = $this->writedb->prepare("INSERT INTO companies_devices (`id`,`company_id`,`ip`,`password`, `own`) VALUES (:id, :company,:ip, :password, 1)");
 			$res = $stmt->execute($options);
 			if(!$res){
 				$_SESSION['errors'][] = "Failed to add the device";
-				$stmt = $this->writedb->prepare("DELETE FROM devices WHERE id = :id");
+				$stmt = $this->writedb->prepare("DELETE FROM companies_devices WHERE id = :id");
 				$stmt->execute(array(':id'=>$options[':id']));
 			}
-			$id = $options[':id'];
-			$stmt = $this->writedb->prepare("INSERT INTO companies_devices (`company_id`,`device_id`,`own`) VALUES (:company, :id, 1)");
+			//$id = $options[':id'];
+			//$stmt = $this->writedb->prepare("INSERT INTO companies_devices (`company_id`,`device_id`,`own`) VALUES (:company, :id, 1)");
+			/*
 			$res = $stmt->execute(array(
 				':company'=>$this->user->getCompany(),
 				':id'=>$id
 			));
+			*/
+/*
 			if(!$res){
 				$_SESSION['errors'][] = "Failed to add the device";
 				$stmt = $this->writedb->prepare("DELETE FROM devices WHERE id = :id");
@@ -246,6 +249,7 @@ class devicesController extends Controller {
 				$stmt = $this->writedb->prepare("DELETE FROM companies_devices WHERE device_id = :id");
 				$stmt->execute(array(':id'=>$options[':id']));
 			}
+			*/
 			if(!isset($_SESSION['errors'])){
 				$_SESSION['flash'][] = "Successfully added the device!";
 			}

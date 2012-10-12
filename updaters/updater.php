@@ -421,7 +421,7 @@ while(time() <= $end){
 			
 			$type = "camera";
 			$options = array(
-				':hash'=>$deviceid,
+				':hash'=>sha1($serial),
 				':id'=>$device['id']
 			);
 			$update_stmt2->execute($options);
