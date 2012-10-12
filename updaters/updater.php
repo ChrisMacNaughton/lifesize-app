@@ -8,14 +8,14 @@ error_reporting(E_ALL^E_USER_NOTICE);
 
 require 'predis/autoload.php';
 Predis\Autoloader::register();
-
+require dirname(__FILE__).'/../system/config.php';
 $single_server = array(
-    'host'     => '127.0.0.1',
+    'host'     => $redis_server,
     'port'     => 6379,
 );
 
 $redis = new Predis\Client($single_server);
-
+$redis->auth($redis_pass);
 /* used functions*/
 function clean($command){
 	$res = explode(chr(0x0a), $command);
@@ -45,7 +45,7 @@ $start = time();
 $max_runtime = (60 * 60) + rand(60,600);
 $end = $start + $max_runtime;
 
-require dirname(__FILE__).'/../system/config.php';
+
 require dirname(__FILE__).'/../system/classes/loggedPDO.php';
 try {
 	$db = new loggedPDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass);
@@ -67,10 +67,11 @@ $query = "SELECT count(distinct worker_id) AS count FROM updater_log WHERE `type
 $res = $db->query($query)->fetch(PDO::FETCH_ASSOC);
 $current_devices = $res["count"];
 
+$current_devices = $redis->get('workers.count');
 if (($current_devices == $max_updaters OR $current_devices > $max_updaters) AND !DEV_ENV){
 	die('Already at max updaters of ' . $max_updaters . " ( $current_devices )\n");
 }
-
+$redis->incr('workers.count');
 $res = $db->query("SELECT value AS version FROM `settings` WHERE `setting` = 'worker_version'")->fetch(PDO::FETCH_ASSOC);
 $worker_version = $res['version'];
 
@@ -157,7 +158,7 @@ $new_device_stmt = $db->prepare("INSERT INTO devices
 	camera_far_set_preset = :far_set");
 $check_for_hash = $db->prepare("SELECT count(*) AS count FROM devices WHERE id = :id");
 $update_stmt2 = $db->prepare("UPDATE companies_devices SET hash = :hash WHERE id = :id");
-$cleanup = $db->prepare("UPDATE devices SET updated = 0, updating=0 WHERE id = 'da39a3ee5e6b4b0d3255bfef95601890afd80709'");
+$cleanup = $db->prepare("UPDATE devices SET updated = 0, updating=0, `serial` = 'New Device' WHERE id = 'da39a3ee5e6b4b0d3255bfef95601890afd80709'");
 $log_stmt = $db->prepare("INSERT INTO updater_log (time, worker_id, message, detail, type) VALUES (:time, :id, :message, :detail, 'updater')");
 $history_start_stmt = $db->prepare("SELECT id FROM devices_history WHERE device_id = :id ORDER BY id DESC limit 1");
 $history_stmt = $db->prepare("INSERT INTO devices_history VALUES(:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46,:47,:48,:49, :50)");
@@ -368,9 +369,14 @@ while(time() <= $end){
 					}
 				}
 				//get auto-answer from device
+				$s = microtime(true);
 				$auto_answer = assign('get call auto-answer', 'auto_answer', $device);
 
+				$times['auto-answer'] = microtime(true) - $s;
+				$s = microtime(true);
 				$auto_answer_mute = assign('get call auto-mute', 'auto_answer_mute', $device);
+				$times['auto-mute'] = microtime(true) - $s;
+				$s = microtime(true);
 				//get max-call-speed-mute from device
 				$res = clean($ssh->exec('get call max-speed'));
 				if($res){
@@ -381,6 +387,8 @@ while(time() <= $end){
 					$incoming_call_bandwidth = $device['incoming_call_bandwidth'];
 					$outgoing_call_bandwidth = $device['outgoing_call_bandwidth'];
 				}
+				$times['call-bw'] = microtime(true) - $s;
+				$s = microtime(true);
 				//get max-bw from device
 				$res = clean($ssh->exec('get call total-bw'));
 				if($res){
@@ -392,6 +400,8 @@ while(time() <= $end){
 					$incoming_total_bandwidth = $device['incoming_total_bandwidth'];
 					$outgoing_total_bandwidth = $device['outgoing_total_bandwidth'];
 				}
+				$times['total-bw'] = microtime(true) - $s;
+				$s = microtime(true);
 				//auto-bandwitdh
 				$res = clean($ssh->exec('get call auto-bandwidth'));
 				if($res){
@@ -399,15 +409,20 @@ while(time() <= $end){
 				} else {
 					$auto_bandwidth = $device['auto_bandwidth'];
 				}
+				$times['auto-bw'] = microtime(true) - $s;
+				$s = microtime(true);
 				//max_calltime
 				$max_calltime = assign('get call max-time', 'max_calltime', $device);
-
+				$times['max_calltime'] = microtime(true) - $s;
+				$s = microtime(true);
 				//max_redials
 				$max_redials = assign('get call max-redial-entries','max_redials', $device);
-
+				$times['max-redials'] = microtime(true) - $s;
+				$s = microtime(true);
 				//auto_multiway
 				$auto_multiway = assign('get call auto-multiway', 'auto_multiway', $device);
-
+				$times['auto-multiway'] = microtime(true) - $s;
+				$s = microtime(true);
 				//audio_codecs
 				$res = clean($ssh->exec('get audio codecs'));
 				if($res){
@@ -417,20 +432,27 @@ while(time() <= $end){
 				} else {
 					$codecs = $device['audio_codecs'];
 				}
-
+				$times['codecs'] = microtime(true) - $s;
+				$s = microtime(true);
 				//audio active mic
 				$active_mic = assign('get audio active-mic', 'audio_active_microphone', $device);
-
+				$times['active-mic'] = microtime(true) - $s;
+				$s = microtime(true);
 				$telepresence = assign('get system telepresence', 'telepresence', $device);
-
+				$times['telepresence'] = microtime(true) - $s;
+				$s = microtime(true);
 				$lock = assign("get camera lock", 'camera_lock', $device);
-
+				$times['camera-lock'] = microtime(true) - $s;
+				$s = microtime(true);
 				$far_control = assign("get camera far-control", 'camera_far_control', $device);
-
+				$times['far-control'] = microtime(true) - $s;
+				$s = microtime(true);
 				$far_set_preset = assign("get camera far-set-preset", 'camera_far_set_preset', $device);
-
+				$times['far-set'] = microtime(true) - $s;
+				$s = microtime(true);
 				$far_use_preset = assign("get camera far-use-preset", 'camera_far_use_preset', $device);
-
+				$times['far-set'] = microtime(true) - $s;
+				$s =null;
 				if(strpos($lock, ',')){
 					$lock = explode(',',$lock);
 					$lock = $lock[1];
@@ -496,6 +518,7 @@ while(time() <= $end){
 				*/
 				
 				$locale = explode(chr(0x0a), $ssh->exec('get locale gmt-offset'));
+
 				$change = str_split($locale[0]);
 				//print_r($change);
 				$timezone['direction'] = $change[0];
@@ -536,6 +559,7 @@ while(time() <= $end){
 				$duration_stmt->execute(array(':duration'=>$duration, ':id'=>$options[':id']));
 				//print_r($duration_stmt->errorInfo());
 				$update_time = microtime(true) - $update_start_time;
+				$times['update-time'] = $update_time;
 				//print_r($update_stmt->errorInfo());
 				//print("Updated: " . $name . " at " . time() . "(Hash is ".$device['hash'] . " | generated: ".$id.")(quitting at " . $end . ")\n");
 				if($res){
@@ -554,10 +578,13 @@ while(time() <= $end){
 		}
 		$cleanup->execute();
 		$ssh = null;
+		if(isset($argv[1]) AND $argv[1] == 'debug'){
+			print_r($times);
+		}
 	}
 }
 }
-
+$redis->decr('workers.count');
 $log_stmt->execute(array(
 						':time'=>$time,
 						':id'=>$worker_id,
