@@ -23,8 +23,7 @@ WHERE cd.company_id = :id");
 		$res = $stmt->fetch(PDO::FETCH_ASSOC);
 		$data['call_count'] = $res['count'];
 		$stmt = $this->db->prepare("SELECT SUM(duration) AS sum
-FROM devices_history
-INNER JOIN devices ON devices_history.device_id = devices.id
+FROM devices
 INNER JOIN companies_devices AS cd ON cd.hash = devices.id
 WHERE cd.company_id = :id");
 		$stmt->execute(array(':id'=>$this->user->getCompany()));
