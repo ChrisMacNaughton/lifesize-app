@@ -30,27 +30,39 @@ WHERE cd.company_id = :id");
 		}
 		
 		$data['call_count'] = $count;
-		$stmt = $this->db->prepare("SELECT SUM(duration) AS sum
-FROM devices
-INNER JOIN companies_devices AS cd ON cd.hash = devices.id
-WHERE cd.company_id = :id");
-		$stmt->execute(array(':id'=>$this->user->getCompany()));
-		$res = $stmt->fetch(PDO::FETCH_ASSOC);
-		$time = ($res['sum'] / 60);
-		$scale = "minutes";
-		if($time > 360){
-			$time = ($time/60);
-			$scale = "hours";
+
+		$call_time = $this->redis->get("call_time.".$this->user->getCompany());
+		$call_scale = $this->redis->get("call_scale.".$this->user->getCompany());
+		if($call_time == 0){
+			$stmt = $this->db->prepare("SELECT SUM(duration) AS sum
+	FROM devices
+	INNER JOIN companies_devices AS cd ON cd.hash = devices.id
+	WHERE cd.company_id = :id");
+			$stmt->execute(array(':id'=>$this->user->getCompany()));
+			$res = $stmt->fetch(PDO::FETCH_ASSOC);
+			$time = ($res['sum'] / 60);
+			$scale = "minutes";
+			if($time > 360){
+				$time = ($time/60);
+				$scale = "hours";
+			}
+			if($time > 360){
+				$time = ($time/24);
+				$scale = "days";
+			}
+			if($time > 365){
+				$time = ($time / 365);
+				$scale = "years";
+			}
+			$call_scale = $scale; $call_time = $time;
+			$r = rand(10,600);
+			$this->redis->set('call_time.'.$this->user->getCompany(), $time);
+			$this->redis->expire('call_time.'.$this->user->getCompany(), 600+ ($r));
+			$this->redis->set('call_scale.'.$this->user->getCompany(), $scale);
+			$this->redis->expire('call_scale.'.$this->user->getCompany(), 600+ ($r));
+			$r = null;
 		}
-		if($time > 360){
-			$time = ($time/24);
-			$scale = "days";
-		}
-		if($time > 365){
-			$time = ($time / 365);
-			$scale = "years";
-		}
-		$data['call_time'] = round($time, 2); $data['scale'] = $scale;
+		$data['call_time'] = $call_time; $data['scale'] = $call_scale;
 
 	$stmt = $this->db->prepare("SELECT count(DISTINCT devices_history.device_id) AS sum
 FROM devices_history

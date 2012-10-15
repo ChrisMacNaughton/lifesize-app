@@ -31,7 +31,7 @@ $redis = new Predis\Client($single_server);
 $redis->auth($redis_pass);
 
 require 'system/classes/user.php';
-$user = new User($db, $writedb);
+$user = new User($db, $writedb, $redis);
 define('TIMEZONE',$user->getTimezone());
 date_default_timezone_set(TIMEZONE);
 $redirect = ($user->is_logged_in())?false:true;

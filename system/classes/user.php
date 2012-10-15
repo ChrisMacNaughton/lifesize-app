@@ -28,8 +28,8 @@ class User {
 		'e616f41e091bdbdcaf48b72aa70e2b7d860b30cd'=>'G.711 a-law',
 		'da39a3ee5e6b4b0d3255bfef95601890afd80709'=>''
 	);
-	public function __construct($db, $writedb){
-		$this->db = $db;
+	public function __construct($db, $writedb, $redis){
+		$this->db = $db;$this->redis = $redis;
 		$this->writedb = $writedb;
 		if(!isset($_COOKIE['controlVC_uid'])) $_COOKIE['controlVC_uid'] = "";
 		if(!isset($_COOKIE['controlVC_hash'])) $_COOKIE['controlVC_hash'] = "";
@@ -59,26 +59,31 @@ class User {
 		return (isset($this->info['timezone']))?$this->info['timezone'] : "GMT";
 	}
 	public function updateDevices(){
-		$stmt = $this->db->prepare("SELECT CD.id, CD.ip, CD.password, CD.own, CD.verified, D.serial, D.online, D.in_call, D.update, D.updated, D.added, D.name, D.make, D.model, D.version, D.type, D.updating, CD.location, D.licensekey, D.outgoing_call_bandwidth, D.incoming_call_bandwidth, D.outgoing_total_bandwidth, D.incoming_total_bandwidth, D.auto_bandwidth, D.max_calltime, D.max_redials, D.auto_answer, D.auto_answer_mute, D.auto_answer_multiway, D.audio_codecs, D.audio_active_microphone, D.telepresence, D.camera_lock, D.camera_far_control, D.camera_far_set_preset, D.camera_far_use_preset
-			FROM `companies_devices` AS CD
-			INNER JOIN devices AS D ON CD.hash = D.id
-			WHERE CD.company_id = :company");
-			$stmt->execute(array(':company'=>$this->getCompany()));
-			$devs=$stmt->fetchAll(PDO::FETCH_ASSOC);
-			$devices = array();
-			foreach($devs as $dev){
-				$devices[$dev['id']] = $dev;
-				$codecs = json_decode($devices[$dev['id']]['audio_codecs'], true);
-				$ret_short = array(); $ret = array();
-				if($codecs != ''){
-					foreach($codecs as $codec){
-						if(!array_search($codec, $ret_short))
-						$ret_short[] = $codec;
-						$ret[sha1($codec)] = array('id'=>$codec, 'name'=>$this->codecs[sha1($codec)]);
+		$devices = unserialize($this->redis->get("devices_list.".$this->getCompany()));
+		if($devices == 0){
+			$stmt = $this->db->prepare("SELECT CD.id, CD.ip, CD.password, CD.own, CD.verified, D.serial, D.online, D.in_call, D.update, D.updated, D.added, D.name, D.make, D.model, D.version, D.type, D.updating, CD.location, D.licensekey, D.outgoing_call_bandwidth, D.incoming_call_bandwidth, D.outgoing_total_bandwidth, D.incoming_total_bandwidth, D.auto_bandwidth, D.max_calltime, D.max_redials, D.auto_answer, D.auto_answer_mute, D.auto_answer_multiway, D.audio_codecs, D.audio_active_microphone, D.telepresence, D.camera_lock, D.camera_far_control, D.camera_far_set_preset, D.camera_far_use_preset
+				FROM `companies_devices` AS CD
+				INNER JOIN devices AS D ON CD.hash = D.id
+				WHERE CD.company_id = :company");
+				$stmt->execute(array(':company'=>$this->getCompany()));
+				$devs=$stmt->fetchAll(PDO::FETCH_ASSOC);
+				$devices = array();
+				foreach($devs as $dev){
+					$devices[$dev['id']] = $dev;
+					$codecs = json_decode($devices[$dev['id']]['audio_codecs'], true);
+					$ret_short = array(); $ret = array();
+					if($codecs != ''){
+						foreach($codecs as $codec){
+							if(!array_search($codec, $ret_short))
+							$ret_short[] = $codec;
+							$ret[sha1($codec)] = array('id'=>$codec, 'name'=>$this->codecs[sha1($codec)]);
+						}
 					}
+					$devices[$dev['id']]['audio_codecs'] = $ret;
+					$devices[$dev['id']]['audio_codecs_short'] = $ret_short;
 				}
-				$devices[$dev['id']]['audio_codecs'] = $ret;
-				$devices[$dev['id']]['audio_codecs_short'] = $ret_short;
+				$this->redis->set("devices_list.".$this->getCompany(), serialize($devices));
+				$this->redis->expire("devices_list.".$this->getCompany(), 600 + rand(60,600));
 			}
 			$this->devices = $devices;
 	}
