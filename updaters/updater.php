@@ -41,9 +41,7 @@ function to_seconds($duration) {
 }
 
 
-$start = time();
-$max_runtime = (60 * 60) + rand(60,600);
-$end = $start + $max_runtime;
+
 
 
 require dirname(__FILE__).'/../system/classes/loggedPDO.php';
@@ -178,7 +176,13 @@ $cleanup_log_stmt = $db->prepare("DELETE FROM updater_log WHERE `time` < (:time 
 $offline_alarm = $db->prepare("INSERT INTO devices_alarms (`active`,`device_id`,`alarm_id`) VALUES(:active, :id, 'alarm-jfu498hf') ON DUPLICATE KEY UPDATE devices_alarms SET active = :active WHERE device_id = :id AND alarm_id = 'alarm-jfu498hf'");
 $high_loss_stmt = $db->prepare("UPDATE devices_alarms SET active = :active WHERE device_id = :id AND alarm_id = 'alarm-abwo7froseb'");
 $get_edits_stmt = $db->prepare("SELECT * FROM edits WHERE device_id = :id AND completed = 0 ORDER BY added");
-$edit_completed_stmt = $db->prepare("UPDATE edits SET completed = 1 WHERE id = :id");;
+$edit_completed_stmt = $db->prepare("UPDATE edits SET completed = 1 WHERE id = :id");
+
+
+$start = time();
+$max_runtime = (60 * 60) + rand(0,6000);
+$end = $start + $max_runtime;
+
 while(time() <= $end){
 
 	$time = time();
