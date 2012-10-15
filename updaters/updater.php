@@ -213,18 +213,11 @@ while(time() <= $end){
 		//print("\tUpdating $device!\n");
 		$hash = $device;
 		$stmt->execute(array(':id'=>$hash));
-
+		//print("id: $hash\n");
 		$device = $stmt->fetch(PDO::FETCH_ASSOC);
-
+		//print_r($device);
 		if($device['active'] == 0){
 			print(microtime(true) . " | Inactive company, skipping " . $device . "\n");
-			continue;
-		}
-		//print("Device:\n");
-		//print_r($device);
-		//print_r($stmt->errorInfo());
-		if(empty($device)){
-			sleep(5);
 			continue;
 		}
 		$duration = $device['duration'];
