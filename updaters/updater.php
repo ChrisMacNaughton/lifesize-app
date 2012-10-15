@@ -47,6 +47,7 @@ $end = $start + $max_runtime;
 
 
 require dirname(__FILE__).'/../system/classes/loggedPDO.php';
+print($dbhost);
 try {
 	$db = new loggedPDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass);
 } catch (PDOException $e) {
@@ -587,6 +588,7 @@ while(time() <= $end){
 	}
 }
 }
+
 $redis->decr('workers.count');
 $redis->decr("workers.$server_id.count");
 $log_stmt->execute(array(
