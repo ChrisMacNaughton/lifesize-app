@@ -15,7 +15,7 @@ class dashboardController extends Controller {
 		$data['in_a_call'] = $calling;
 		$data['video_count'] = $count;
 		
-		$count = $this->redis->get('call_count.'.$this->user->getCompany());
+		$count = (int)$this->redis->get('call_count.'.$this->user->getCompany());
 		if($count == 0){
 			$stmt = $this->db->prepare("SELECT count(*) AS count 
 FROM devices_history
@@ -31,7 +31,7 @@ WHERE cd.company_id = :id");
 		
 		$data['call_count'] = $count;
 
-		$call_time = $this->redis->get("call_time.".$this->user->getCompany());
+		$call_time = (float)$this->redis->get("call_time.".$this->user->getCompany());
 		$call_scale = $this->redis->get("call_scale.".$this->user->getCompany());
 		if($call_time == 0){
 			$stmt = $this->db->prepare("SELECT SUM(duration) AS sum
