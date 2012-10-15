@@ -78,7 +78,7 @@ WHERE cd.company_id = :id");
 			$this->redis->expire('cache.devices_used.'.$this->user->getCompany(), 600+ (rand(10,600)));
 
 		}
-		$data['devices_used'] = $res['sum'];
+		$data['devices_used'] = $devices_used;
 		
 		$data['unused_devices'] = $data['devices_count'] - $data['devices_used'];
 
