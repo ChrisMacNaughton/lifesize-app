@@ -49,9 +49,7 @@ $end = $start + $max_runtime;
 require dirname(__FILE__).'/../system/classes/loggedPDO.php';
 //print($dbhost);
 try {
-	$db = new loggedPDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass,array(
-    	PDO::ATTR_PERSISTENT => true
-	));
+	$db = new loggedPDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass);
 } catch (PDOException $e) {
     //$app['errors'][]= $e->getMessage();
     throw new Exception('Service is unavailable', 513);
