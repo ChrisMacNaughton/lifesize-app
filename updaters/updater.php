@@ -210,7 +210,7 @@ while(time() <= $end){
 	//print_r($device);
 	if(!is_null($device)){
 		if($device['active'] == 0){
-			print(microtime(true) . " | Inactive company, skipping "$device['id'] . "\n");
+			print(microtime(true) . " | Inactive company, skipping " . $device['id'] . "\n");
 			continue;
 		}
 		//print("\tUpdating $device!\n");
