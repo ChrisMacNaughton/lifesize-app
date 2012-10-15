@@ -209,15 +209,17 @@ while(time() <= $end){
 	$device = $redis->brpoplpush('updates','updates', 5);
 	//print_r($device);
 	if(!is_null($device)){
-		if($device['active'] == 0){
-			print(microtime(true) . " | Inactive company, skipping " . $device . "\n");
-			continue;
-		}
+		
 		//print("\tUpdating $device!\n");
 		$hash = $device;
 		$stmt->execute(array(':id'=>$hash));
 
 		$device = $stmt->fetch(PDO::FETCH_ASSOC);
+
+		if($device['active'] == 0){
+			print(microtime(true) . " | Inactive company, skipping " . $device . "\n");
+			continue;
+		}
 		//print("Device:\n");
 		//print_r($device);
 		//print_r($stmt->errorInfo());
