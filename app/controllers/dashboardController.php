@@ -14,14 +14,22 @@ class dashboardController extends Controller {
 		$data['updating'] = $updating;
 		$data['in_a_call'] = $calling;
 		$data['video_count'] = $count;
-		$stmt = $this->db->prepare("SELECT count(*) AS count 
+		
+		$count = $this->redis->get('call_count.'.$this->user->getCompany());
+		if($count == 0){
+			$stmt = $this->db->prepare("SELECT count(*) AS count 
 FROM devices_history
 INNER JOIN devices ON devices_history.device_id = devices.id
 INNER JOIN companies_devices AS cd ON cd.hash = devices.id
 WHERE cd.company_id = :id");
-		$stmt->execute(array(':id'=>$this->user->getCompany()));
-		$res = $stmt->fetch(PDO::FETCH_ASSOC);
-		$data['call_count'] = $res['count'];
+			$stmt->execute(array(':id'=>$this->user->getCompany()));
+			$res = $stmt->fetch(PDO::FETCH_ASSOC);
+			$count = $res['count'];
+			$this->redis->set('call_count.'.$this->user->getCompany(), $count);
+			$this->redis->expire('call_count.'.$this->user->getCompany(), 600+ (rand(10,600)));
+		}
+		
+		$data['call_count'] = $count;
 		$stmt = $this->db->prepare("SELECT SUM(duration) AS sum
 FROM devices
 INNER JOIN companies_devices AS cd ON cd.hash = devices.id
