@@ -59,7 +59,7 @@ class User {
 		return (isset($this->info['timezone']))?$this->info['timezone'] : "GMT";
 	}
 	public function updateDevices(){
-		$devices = unserialize($this->redis->get("devices_list.".$this->getCompany()));
+		$devices = unserialize($this->redis->get("cache.devices_list.".$this->getCompany()));
 		if($devices == 0){
 			$stmt = $this->db->prepare("SELECT CD.id, CD.ip, CD.password, CD.own, CD.verified, D.serial, D.online, D.in_call, D.update, D.updated, D.added, D.name, D.make, D.model, D.version, D.type, D.updating, CD.location, D.licensekey, D.outgoing_call_bandwidth, D.incoming_call_bandwidth, D.outgoing_total_bandwidth, D.incoming_total_bandwidth, D.auto_bandwidth, D.max_calltime, D.max_redials, D.auto_answer, D.auto_answer_mute, D.auto_answer_multiway, D.audio_codecs, D.audio_active_microphone, D.telepresence, D.camera_lock, D.camera_far_control, D.camera_far_set_preset, D.camera_far_use_preset
 				FROM `companies_devices` AS CD
@@ -82,8 +82,8 @@ class User {
 					$devices[$dev['id']]['audio_codecs'] = $ret;
 					$devices[$dev['id']]['audio_codecs_short'] = $ret_short;
 				}
-				$this->redis->set("devices_list.".$this->getCompany(), serialize($devices));
-				$this->redis->expire("devices_list.".$this->getCompany(), 600 + rand(60,600));
+				$this->redis->set("cache.devices_list.".$this->getCompany(), serialize($devices));
+				$this->redis->expire("cache.devices_list.".$this->getCompany(), 600 + rand(60,600));
 			}
 			$this->devices = $devices;
 	}

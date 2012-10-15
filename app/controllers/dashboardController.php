@@ -15,7 +15,7 @@ class dashboardController extends Controller {
 		$data['in_a_call'] = $calling;
 		$data['video_count'] = $count;
 		
-		$count = (int)$this->redis->get('call_count.'.$this->user->getCompany());
+		$count = (int)$this->redis->get('cache.call_count.'.$this->user->getCompany());
 		if($count == 0){
 			$stmt = $this->db->prepare("SELECT count(*) AS count 
 FROM devices_history
@@ -25,14 +25,14 @@ WHERE cd.company_id = :id");
 			$stmt->execute(array(':id'=>$this->user->getCompany()));
 			$res = $stmt->fetch(PDO::FETCH_ASSOC);
 			$count = $res['count'];
-			$this->redis->set('call_count.'.$this->user->getCompany(), $count);
-			$this->redis->expire('call_count.'.$this->user->getCompany(), 600+ (rand(10,600)));
+			$this->redis->set('cache.call_count.'.$this->user->getCompany(), $count);
+			$this->redis->expire('cache.call_count.'.$this->user->getCompany(), 600+ (rand(10,600)));
 		}
 		
 		$data['call_count'] = $count;
 
-		$call_time = (float)$this->redis->get("call_time.".$this->user->getCompany());
-		$call_scale = $this->redis->get("call_scale.".$this->user->getCompany());
+		$call_time = (float)$this->redis->get("cache.call_time.".$this->user->getCompany());
+		$call_scale = $this->redis->get("cache.call_scale.".$this->user->getCompany());
 		if($call_time == 0){
 			$stmt = $this->db->prepare("SELECT SUM(duration) AS sum
 	FROM devices
@@ -56,10 +56,10 @@ WHERE cd.company_id = :id");
 			}
 			$call_scale = $scale; $call_time = $time;
 			$r = rand(10,600);
-			$this->redis->set('call_time.'.$this->user->getCompany(), $time);
-			$this->redis->expire('call_time.'.$this->user->getCompany(), 600+ ($r));
-			$this->redis->set('call_scale.'.$this->user->getCompany(), $scale);
-			$this->redis->expire('call_scale.'.$this->user->getCompany(), 600+ ($r));
+			$this->redis->set('cache.call_time.'.$this->user->getCompany(), $time);
+			$this->redis->expire('cache.call_time.'.$this->user->getCompany(), 600+ ($r));
+			$this->redis->set('cache.call_scale.'.$this->user->getCompany(), $scale);
+			$this->redis->expire('cache.call_scale.'.$this->user->getCompany(), 600+ ($r));
 			$r = null;
 		}
 		$data['call_time'] = $call_time; $data['scale'] = $call_scale;
