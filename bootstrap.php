@@ -26,7 +26,7 @@ $single_server = array(
     'host'     => $redis_server,
     'port'     => 6379,
 );
-
+require 'vendor/predis/predis/autoload.php';
 $redis = new Predis\Client($single_server);
 $redis->auth($redis_pass);
 
