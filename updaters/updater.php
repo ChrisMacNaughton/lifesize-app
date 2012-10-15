@@ -77,8 +77,9 @@ $redis->incr('workers.count');
 $res = $db->query("SELECT value AS version FROM `settings` WHERE `setting` = 'worker_version'")->fetch(PDO::FETCH_ASSOC);
 $worker_version = $res['version'];
 
-$stmt = $db->prepare("SELECT CD.id, CD.ip, CD.password, CD.own, CD.verified, CD.hash, D.online, D.serial, D.updating, D.incoming_total_bandwidth, D.outgoing_total_bandwidth, D.duration
+$stmt = $db->prepare("SELECT CD.id, CD.ip, companies.active, CD.password, CD.own, CD.verified, CD.hash, D.online, D.serial, D.updating, D.incoming_total_bandwidth, D.outgoing_total_bandwidth, D.duration
 FROM companies_devices AS CD
+INNER JOIN companies ON companies.id = CD.company_id
 INNER JOIN devices AS D ON CD.hash = D.id
 WHERE CD.id = :id");
 /*
@@ -207,7 +208,7 @@ while(time() <= $end){
 
 	$device = $redis->brpoplpush('updates','updates', 5);
 	//print_r($device);
-	if(!is_null($device)){
+	if(!is_null($device) AND $device['active'] == 1){
 		print("\tUpdating $device!\n");
 		$hash = $device;
 		$stmt->execute(array(':id'=>$hash));
