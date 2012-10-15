@@ -156,13 +156,10 @@ class Twig_Tests_Extension_SandboxTest extends PHPUnit_Framework_TestCase
     public function testMacrosInASandbox()
     {
         $twig = $this->getEnvironment(true, array('autoescape' => true), array('index' => <<<EOF
-{%- import _self as macros %}
-
-{%- macro test(text) %}<p>{{ text }}</p>{% endmacro %}
-
-{{- macros.test('username') }}
+{% macro test(text) %}<p>{{ text }}</p>{% endmacro %}
+{{ _self.test('username') }}
 EOF
-        ), array('macro', 'import'), array('escape'));
+        ), array('macro'), array('escape'));
 
         $this->assertEquals('<p>username</p>', $twig->loadTemplate('index')->render(array()));
     }

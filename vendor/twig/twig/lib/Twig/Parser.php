@@ -29,7 +29,7 @@ class Twig_Parser implements Twig_ParserInterface
     protected $macros;
     protected $env;
     protected $reservedMacroNames;
-    protected $importedSymbols;
+    protected $importedFunctions;
     protected $traits;
     protected $embeddedTemplates = array();
 
@@ -88,7 +88,7 @@ class Twig_Parser implements Twig_ParserInterface
         $this->macros = array();
         $this->traits = array();
         $this->blockStack = array();
-        $this->importedSymbols = array(array());
+        $this->importedFunctions = array(array());
         $this->embeddedTemplates = array();
 
         try {
@@ -282,33 +282,33 @@ class Twig_Parser implements Twig_ParserInterface
         $this->embeddedTemplates[] = $template;
     }
 
-    public function addImportedSymbol($type, $alias, $name = null, Twig_Node_Expression $node = null)
+    public function addImportedFunction($alias, $name, Twig_Node_Expression $node)
     {
-        $this->importedSymbols[0][$type][$alias] = array('name' => $name, 'node' => $node);
+        $this->importedFunctions[0][$alias] = array('name' => $name, 'node' => $node);
     }
 
-    public function getImportedSymbol($type, $alias)
+    public function getImportedFunction($alias)
     {
-        foreach ($this->importedSymbols as $functions) {
-            if (isset($functions[$type][$alias])) {
-                return $functions[$type][$alias];
+        foreach ($this->importedFunctions as $functions) {
+            if (isset($functions[$alias])) {
+                return $functions[$alias];
             }
         }
     }
 
     public function isMainScope()
     {
-        return 1 === count($this->importedSymbols);
+        return 1 === count($this->importedFunctions);
     }
 
     public function pushLocalScope()
     {
-        array_unshift($this->importedSymbols, array());
+        array_unshift($this->importedFunctions, array());
     }
 
     public function popLocalScope()
     {
-        array_shift($this->importedSymbols);
+        array_shift($this->importedFunctions);
     }
 
     /**

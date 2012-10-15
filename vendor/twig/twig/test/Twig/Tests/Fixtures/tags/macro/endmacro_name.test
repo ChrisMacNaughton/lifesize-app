@@ -1,10 +1,8 @@
 --TEST--
 "macro" tag supports name for endmacro
 --TEMPLATE--
-{% import _self as macros %}
-
-{{ macros.foo() }}
-{{ macros.bar() }}
+{{ _self.foo() }}
+{{ _self.bar() }}
 
 {% macro foo() %}foo{% endmacro %}
 {% macro bar() %}bar{% endmacro bar %}

@@ -1,9 +1,7 @@
 --TEST--
 "☃" as a macro name
 --TEMPLATE--
-{% import _self as macros %}
-
-{{ macros.☃('foo') }}
+{{ _self.☃('foo') }}
 
 {% macro ☃(foo) %}
   ☃{{ foo }}☃

@@ -22,16 +22,8 @@ try {
     //$app['errors'][]= $e->getMessage();
     die("Database connection failed");
 }
-$single_server = array(
-    'host'     => $redis_server,
-    'port'     => 6379,
-);
-require 'vendor/predis/predis/autoload.php';
-$redis = new Predis\Client($single_server);
-$redis->auth($redis_pass);
-
 require 'system/classes/user.php';
-$user = new User($db, $writedb, $redis);
+$user = new User($db, $writedb);
 define('TIMEZONE',$user->getTimezone());
 date_default_timezone_set(TIMEZONE);
 $redirect = ($user->is_logged_in())?false:true;

@@ -14,71 +14,44 @@ class dashboardController extends Controller {
 		$data['updating'] = $updating;
 		$data['in_a_call'] = $calling;
 		$data['video_count'] = $count;
-		
-		$count = (int)$this->redis->get('cache.call_count.'.$this->user->getCompany());
-		if($count == 0){
-			$stmt = $this->db->prepare("SELECT count(*) AS count 
+		$stmt = $this->db->prepare("SELECT count(*) AS count 
 FROM devices_history
 INNER JOIN devices ON devices_history.device_id = devices.id
 INNER JOIN companies_devices AS cd ON cd.hash = devices.id
 WHERE cd.company_id = :id");
-			$stmt->execute(array(':id'=>$this->user->getCompany()));
-			$res = $stmt->fetch(PDO::FETCH_ASSOC);
-			$count = $res['count'];
-			$this->redis->set('cache.call_count.'.$this->user->getCompany(), $count);
-			$this->redis->expire('cache.call_count.'.$this->user->getCompany(), 600+ (rand(10,600)));
+		$stmt->execute(array(':id'=>$this->user->getCompany()));
+		$res = $stmt->fetch(PDO::FETCH_ASSOC);
+		$data['call_count'] = $res['count'];
+		$stmt = $this->db->prepare("SELECT SUM(duration) AS sum
+FROM devices
+INNER JOIN companies_devices AS cd ON cd.hash = devices.id
+WHERE cd.company_id = :id");
+		$stmt->execute(array(':id'=>$this->user->getCompany()));
+		$res = $stmt->fetch(PDO::FETCH_ASSOC);
+		$time = ($res['sum'] / 60);
+		$scale = "minutes";
+		if($time > 360){
+			$time = ($time/60);
+			$scale = "hours";
 		}
-		
-		$data['call_count'] = $count;
-
-		$call_time = (float)$this->redis->get("cache.call_time.".$this->user->getCompany());
-		$call_scale = $this->redis->get("cache.call_scale.".$this->user->getCompany());
-		if($call_time == 0){
-			$stmt = $this->db->prepare("SELECT SUM(duration) AS sum
-	FROM devices
-	INNER JOIN companies_devices AS cd ON cd.hash = devices.id
-	WHERE cd.company_id = :id");
-			$stmt->execute(array(':id'=>$this->user->getCompany()));
-			$res = $stmt->fetch(PDO::FETCH_ASSOC);
-			$time = ($res['sum'] / 60);
-			$scale = "minutes";
-			if($time > 360){
-				$time = ($time/60);
-				$scale = "hours";
-			}
-			if($time > 360){
-				$time = ($time/24);
-				$scale = "days";
-			}
-			if($time > 365){
-				$time = ($time / 365);
-				$scale = "years";
-			}
-			$call_scale = $scale; $call_time = $time;
-			$r = rand(10,600);
-			$this->redis->set('cache.call_time.'.$this->user->getCompany(), $time);
-			$this->redis->expire('cache.call_time.'.$this->user->getCompany(), 600+ ($r));
-			$this->redis->set('cache.call_scale.'.$this->user->getCompany(), $scale);
-			$this->redis->expire('cache.call_scale.'.$this->user->getCompany(), 600+ ($r));
-			$r = null;
+		if($time > 360){
+			$time = ($time/24);
+			$scale = "days";
 		}
-		$data['call_time'] = round($call_time, 2); $data['scale'] = $call_scale;
-		$devices_used = $this->redis->get('cache.devices_used.'.$this->user->getCompany());
-		if($devices_used == 0){
-			$stmt = $this->db->prepare("SELECT count(DISTINCT devices_history.device_id) AS sum
-		FROM devices_history
-		INNER JOIN devices ON devices_history.device_id = devices.id
-		INNER JOIN companies_devices AS cd ON cd.hash = devices.id
-		WHERE cd.company_id = :id");
-			$stmt->execute(array(':id'=>$this->user->getCompany()));
-			$res = $stmt->fetch(PDO::FETCH_ASSOC);
-			$devices_used = $res['sum'];
-
-			$this->redis->set('cache.devices_used.'.$this->user->getCompany(), $devices_used);
-			$this->redis->expire('cache.devices_used.'.$this->user->getCompany(), 600+ (rand(10,600)));
-
+		if($time > 365){
+			$time = ($time / 365);
+			$scale = "years";
 		}
-		$data['devices_used'] = $devices_used;
+		$data['call_time'] = round($time, 2); $data['scale'] = $scale;
+
+	$stmt = $this->db->prepare("SELECT count(DISTINCT devices_history.device_id) AS sum
+FROM devices_history
+INNER JOIN devices ON devices_history.device_id = devices.id
+INNER JOIN companies_devices AS cd ON cd.hash = devices.id
+WHERE cd.company_id = :id");
+		$stmt->execute(array(':id'=>$this->user->getCompany()));
+		$res = $stmt->fetch(PDO::FETCH_ASSOC);
+		$data['devices_used'] = $res['sum'];
 		
 		$data['unused_devices'] = $data['devices_count'] - $data['devices_used'];
 
