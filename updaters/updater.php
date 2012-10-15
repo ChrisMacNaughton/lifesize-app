@@ -98,8 +98,6 @@ $serial_stmt = $db->prepare("SELECT * FROM devices WHERE `serial` = :serial");
 $new_serial = $db->prepare("UPDATE devices SET `serial` = :serial WHERE id = :id");
 $new_license = $db->prepare("UPDATE devices SET `licensekey` = :license WHERE id = :id");
 $change_stmt = $db->prepare("UPDATE companies_devices SET device_id = :id WHERE device_id = :old_id AND company_id = :company");
-$remove_stmt = $db->prepare("DELETE FROM devices WHERE id = :id");
-$remove_stmt2 = $db->prepare("DELETE FROM companies_devices WHERE device_id = :id");
 $update_stmt = $db->prepare("UPDATE devices 
 	SET name = :name,
 	make=:make,
