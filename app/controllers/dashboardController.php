@@ -62,7 +62,7 @@ WHERE cd.company_id = :id");
 			$this->redis->expire('cache.call_scale.'.$this->user->getCompany(), 600+ ($r));
 			$r = null;
 		}
-		$data['call_time'] = $call_time; $data['scale'] = $call_scale;
+		$data['call_time'] = round($call_time, 2); $data['scale'] = $call_scale;
 
 	$stmt = $this->db->prepare("SELECT count(DISTINCT devices_history.device_id) AS sum
 FROM devices_history
