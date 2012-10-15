@@ -63,7 +63,7 @@ WHERE cd.company_id = :id");
 			$r = null;
 		}
 		$data['call_time'] = round($call_time, 2); $data['scale'] = $call_scale;
-		$devices_used = $this->redis->get('cache.devices_used.'.$user->getCompany());
+		$devices_used = $this->redis->get('cache.devices_used.'.$this->user->getCompany());
 		if($devices_used == 0){
 			$stmt = $this->db->prepare("SELECT count(DISTINCT devices_history.device_id) AS sum
 		FROM devices_history
@@ -74,7 +74,7 @@ WHERE cd.company_id = :id");
 			$res = $stmt->fetch(PDO::FETCH_ASSOC);
 			$devices_used = $res['sum'];
 
-			$this->redis->set('cache.devices_used.'.$user->getCompany(), $devices_used);
+			$this->redis->set('cache.devices_used.'.$this->user->getCompany(), $devices_used);
 			$this->redis->expire('cache.devices_used.'.$this->user->getCompany(), 600+ (rand(10,600)));
 
 		}
