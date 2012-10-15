@@ -204,12 +204,16 @@ while(time() <= $end){
 		':message'=>"Checking for available device",
 		':detail'=>''
 	));
-	print("$time: Checking for available device\n");
+	//print("$time: Checking for available device\n");
 
 	$device = $redis->brpoplpush('updates','updates', 5);
 	//print_r($device);
-	if(!is_null($device) AND $device['active'] == 1){
-		print("\tUpdating $device!\n");
+	if(!is_null($device)){
+		if($device['active'] == 0){
+			//print("Inactive company\n");
+			continue;
+		}
+		//print("\tUpdating $device!\n");
 		$hash = $device;
 		$stmt->execute(array(':id'=>$hash));
 
