@@ -14,7 +14,7 @@ try {
 	$db = new loggedPDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass);
 } catch (PDOException $e) {
     //$app['errors'][]= $e->getMessage();
-    throw new Exception('Service is unavailable', 513);
+    die("Database connection failed");
 }
 try {
 	$writedb = new loggedPDO('mysql:dbname=' . $write_dbname . ';host=' . $write_dbhost, $write_dbuser, $write_dbpass);

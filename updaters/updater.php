@@ -49,7 +49,9 @@ $end = $start + $max_runtime;
 require dirname(__FILE__).'/../system/classes/loggedPDO.php';
 //print($dbhost);
 try {
-	$db = new loggedPDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass);
+	$db = new loggedPDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass,array(
+    	PDO::ATTR_PERSISTENT => true
+	));
 } catch (PDOException $e) {
     //$app['errors'][]= $e->getMessage();
     throw new Exception('Service is unavailable', 513);
@@ -175,7 +177,7 @@ $log_stmt->execute(array(
 	));
 
 $cleanup_log_stmt = $db->prepare("DELETE FROM updater_log WHERE `time` < (:time - 86400)");
-$offline_alarm = $db->prepare("UPDATE devices_alarms SET active = :active WHERE device_id = :id AND alarm_id = 'alarm-jfu498hf'");
+$offline_alarm = $db->prepare("INSERT INTO devices_alarms (`active`,`device_id`,`alarm_id`) VALUES(:active, :id, 'alarm-jfu498hf') ON DUPLICATE KEY UPDATE devices_alarms SET active = :active WHERE device_id = :id AND alarm_id = 'alarm-jfu498hf'");
 $high_loss_stmt = $db->prepare("UPDATE devices_alarms SET active = :active WHERE device_id = :id AND alarm_id = 'alarm-abwo7froseb'");
 $get_edits_stmt = $db->prepare("SELECT * FROM edits WHERE device_id = :id AND completed = 0 ORDER BY added");
 $edit_completed_stmt = $db->prepare("UPDATE edits SET completed = 1 WHERE id = :id");;
