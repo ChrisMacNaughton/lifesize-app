@@ -195,7 +195,7 @@ while(time() <= $end){
 						':message'=>"Closing",
 						':detail'=>"New worker version"
 					));
-		exit(0);
+		break;
 	}
 	$log_stmt->execute(array(
 		':time'=>$time,
