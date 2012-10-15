@@ -47,7 +47,7 @@ $end = $start + $max_runtime;
 
 
 require dirname(__FILE__).'/../system/classes/loggedPDO.php';
-print($dbhost);
+//print($dbhost);
 try {
 	$db = new loggedPDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass);
 } catch (PDOException $e) {
