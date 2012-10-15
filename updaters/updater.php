@@ -604,3 +604,5 @@ $log_stmt->execute(array(
 						':message'=>"Closing",
 						':detail'=>"Max Execution time reached"
 					));
+
+print("Closing!");
