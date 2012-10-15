@@ -63,14 +63,21 @@ WHERE cd.company_id = :id");
 			$r = null;
 		}
 		$data['call_time'] = round($call_time, 2); $data['scale'] = $call_scale;
+		$devices_used = $this->redis->get('cache.devices_used.'.$user->getCompany());
+		if($devices_used == 0){
+			$stmt = $this->db->prepare("SELECT count(DISTINCT devices_history.device_id) AS sum
+		FROM devices_history
+		INNER JOIN devices ON devices_history.device_id = devices.id
+		INNER JOIN companies_devices AS cd ON cd.hash = devices.id
+		WHERE cd.company_id = :id");
+			$stmt->execute(array(':id'=>$this->user->getCompany()));
+			$res = $stmt->fetch(PDO::FETCH_ASSOC);
+			$devices_used = $res['sum'];
 
-	$stmt = $this->db->prepare("SELECT count(DISTINCT devices_history.device_id) AS sum
-FROM devices_history
-INNER JOIN devices ON devices_history.device_id = devices.id
-INNER JOIN companies_devices AS cd ON cd.hash = devices.id
-WHERE cd.company_id = :id");
-		$stmt->execute(array(':id'=>$this->user->getCompany()));
-		$res = $stmt->fetch(PDO::FETCH_ASSOC);
+			$this->redis->set('cache.devices_used.'.$user->getCompany(), $devices_used);
+			$this->redis->expire('cache.devices_used.'.$this->user->getCompany(), 600+ (rand(10,600)));
+
+		}
 		$data['devices_used'] = $res['sum'];
 		
 		$data['unused_devices'] = $data['devices_count'] - $data['devices_used'];
