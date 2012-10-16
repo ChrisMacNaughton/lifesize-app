@@ -14,22 +14,106 @@ class devicesController extends Controller {
 			'headercolor'=>'66cc66',
 		);
 		$data['average_loss'] = json_decode($this->redis->get('cache.averages'), true);
-		$stmt = $this->db->prepare('SELECT SUM(  `RxV1PktsLost` ) AS RxV1, SUM(  `RxA1PktsLost` ) AS RxA1, SUM(  `RxV2PktsLost` ) AS RxV2, SUM(  `TxV1PktsLost` ) AS TxV1, SUM( `TxA1PktsLost` ) AS TxA1, SUM(  `TxV2PktsLost` ) AS TxV2, SUM(  `Duration` ) AS Duration
+
+		$time_limit = 60;
+		$loss7 = array();
+		$loss30 = array();
+		$loss60 = array();
+		$loss90 = array();
+		$loss = array();
+		$stmt = $this->db->prepare("SELECT SUM(  `RxV1PktsLost` ) AS RxV1, SUM(  `RxA1PktsLost` ) AS RxA1, SUM(  `RxV2PktsLost` ) AS RxV2, SUM(  `TxV1PktsLost` ) AS TxV1, SUM( `TxA1PktsLost` ) AS TxA1, SUM(  `TxV2PktsLost` ) AS TxV2, SUM(  `Duration` ) AS Duration
 FROM devices_history
 INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id
-WHERE companies_devices.id =:id');
+WHERE companies_devices.id =:id
+AND devices_history.Duration > $time_limit");
 		$stmt->execute(array(':id'=>$id));
 		$losses = $stmt->fetch(PDO::FETCH_ASSOC);
 		$duration = $losses['Duration'] / 60;
 		unset($losses['Duration']);
 		foreach($losses as $name=>$loss){
-			if($loss / $duration > 0.01){
+			if($duration > 0 AND $loss / $duration > 0.01){
 				$l[$name] = array("name"=>$name, "loss"=>$loss / $duration);
 			} else {
 				unset($data['average_loss'][$name]);
 			}
 		}
-		
+		/*
+		*	Last 7 days
+		*/
+		$stmt = $this->db->prepare("SELECT SUM(  `RxV1PktsLost` ) AS RxV1, SUM(  `RxA1PktsLost` ) AS RxA1, SUM(  `RxV2PktsLost` ) AS RxV2, SUM(  `TxV1PktsLost` ) AS TxV1, SUM( `TxA1PktsLost` ) AS TxA1, SUM(  `TxV2PktsLost` ) AS TxV2, SUM(  `Duration` ) AS Duration
+FROM devices_history
+INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id
+WHERE companies_devices.id =:id AND devices_history.StartTime > from_unixtime(unix_timestamp()-(7*24*60*60))
+AND devices_history.duration > $time_limit");
+		$stmt->execute(array(':id'=>$id));
+
+		$res = $stmt->fetch(PDO::FETCH_ASSOC);
+
+		//print_r($stmt->errorInfo());
+		$duration = $res['Duration'] / 60;
+		unset($res['Duration']);
+		foreach($res as $name=>$loss){
+			if($duration > 0 AND $loss / $duration > 0.01){
+				$loss7[$name] = array("name"=>$name, "loss"=>$loss / $duration);	
+			}
+		}
+		/*
+		*	Last 30 days
+		*/
+		$stmt = $this->db->prepare("SELECT SUM(  `RxV1PktsLost` ) AS RxV1, SUM(  `RxA1PktsLost` ) AS RxA1, SUM(  `RxV2PktsLost` ) AS RxV2, SUM(  `TxV1PktsLost` ) AS TxV1, SUM( `TxA1PktsLost` ) AS TxA1, SUM(  `TxV2PktsLost` ) AS TxV2, SUM(  `Duration` ) AS Duration
+FROM devices_history
+INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id
+WHERE companies_devices.id =:id AND devices_history.StartTime > from_unixtime(unix_timestamp()-(30*24*60*60))
+AND devices_history.duration > $time_limit");
+		$stmt->execute(array(':id'=>$id));
+
+		$res = $stmt->fetch(PDO::FETCH_ASSOC);
+		//print_r($stmt->errorInfo());
+		$duration = $res['Duration'] / 60;
+		unset($res['Duration']);
+		foreach($res as $name=>$loss){
+			if($duration > 0 AND $loss / $duration > 0.01){
+				$loss30[$name] = array("name"=>$name, "loss"=>$loss / $duration);
+			}
+		}
+		/*
+		*	Last 60 days
+		*/
+		$stmt = $this->db->prepare("SELECT SUM(  `RxV1PktsLost` ) AS RxV1, SUM(  `RxA1PktsLost` ) AS RxA1, SUM(  `RxV2PktsLost` ) AS RxV2, SUM(  `TxV1PktsLost` ) AS TxV1, SUM( `TxA1PktsLost` ) AS TxA1, SUM(  `TxV2PktsLost` ) AS TxV2, SUM(  `Duration` ) AS Duration
+FROM devices_history
+INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id
+WHERE companies_devices.id =:id AND devices_history.StartTime > from_unixtime(unix_timestamp()-(60*24*60*60))
+AND devices_history.duration > $time_limit");
+		$stmt->execute(array(':id'=>$id));
+
+		$res = $stmt->fetch(PDO::FETCH_ASSOC);
+		//print_r($stmt->errorInfo());
+		$duration = $res['Duration'] / 60;
+		unset($res['Duration']);
+		foreach($res as $name=>$loss){
+			if($duration > 0 AND $loss / $duration > 0.01){
+				$loss60[$name] = array("name"=>$name, "loss"=>$loss / $duration);
+			}
+		}
+		/*
+		*	Last 90 days
+		*/
+		$stmt = $this->db->prepare("SELECT SUM(  `RxV1PktsLost` ) AS RxV1, SUM(  `RxA1PktsLost` ) AS RxA1, SUM(  `RxV2PktsLost` ) AS RxV2, SUM(  `TxV1PktsLost` ) AS TxV1, SUM( `TxA1PktsLost` ) AS TxA1, SUM(  `TxV2PktsLost` ) AS TxV2, SUM(  `Duration` ) AS Duration
+FROM devices_history
+INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id
+WHERE companies_devices.id =:id AND devices_history.StartTime > from_unixtime(unix_timestamp()-(90*24*60*60))
+AND devices_history.duration > $time_limit");
+		$stmt->execute(array(':id'=>$id));
+
+		$res = $stmt->fetch(PDO::FETCH_ASSOC);
+		//print_r($stmt->errorInfo());
+		$duration = $res['Duration'] / 60;
+		unset($res['Duration']);
+		foreach($res as $name=>$loss){
+			if($duration > 0 AND $loss / $duration > 0.01){
+				$loss90[$name] = array("name"=>$name, "loss"=>$loss / $duration);
+			}
+		}
 		$data['packetnames'] = array(
 			'TxV1'=>'Video1 Transmit',
 			'TxA1'=>'Audio Transmit',
@@ -38,7 +122,15 @@ WHERE companies_devices.id =:id');
 			'RxA1'=>'Audio Receive',
 			'RxV2'=>'Video2 Receive'
 		);
+		$data['loss7'] = $loss7;
+		$data['loss30'] = $loss30;
+		$data['loss60'] = $loss60;
+		$data['loss90'] = $loss90;
 		$data['losses'] = $l;
+		ksort($data['loss7']);
+		ksort($data['loss30']);
+		ksort($data['loss60']);
+		ksort($data['loss90']);
 		ksort($data['average_loss']);
 		ksort($data['losses']);
 
