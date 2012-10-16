@@ -271,8 +271,8 @@
 			    <div class="control-group">
 				    <label class="control-label" for="active_microphone_volume">Active Microphone Volume</label>
 				    <div class="controls">
-				    	<input type="text" id="active_microphone_volume" disabled="disabled" name="active_microphone_volume" cols="2">
-				    	<div id="slider"></div>
+				    	<input type="text" id="active_microphone_volume" disabled="disabled" name="active_microphone_volume" value="{{device.active_microphone_volume}}">
+				    	<div id="slider" style="width: 220px;"></div>
 			    	</div>
 			    </div>
 				<input type="hidden" name="section" value="audio">
@@ -539,12 +539,12 @@ function selectAllOptions(selStr)
 <script>
     $(function() {
         $( "#slider" ).slider({
-            value:{{device.active_microphone_value}},
+            value:{{device.active_microphone_volume}},
             min: 0,
             max: 20,
             step: 1,
             slide: function( event, ui ) {
-                $( "#active_microphone_volume" ).val( "$" + ui.value );
+                $( "#active_microphone_volume" ).val( ui.value );
             }
         });
     });

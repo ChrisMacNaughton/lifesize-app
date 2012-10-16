@@ -59,7 +59,7 @@ class User {
 		return (isset($this->info['timezone']))?$this->info['timezone'] : "GMT";
 	}
 	public function updateDevices(){
-		$stmt = $this->db->prepare("SELECT CD.id, CD.ip, CD.password, CD.own, CD.verified, D.serial, D.online, D.in_call, D.update, D.updated, D.added, D.name, D.make, D.model, D.version, D.type, D.updating, CD.location, D.licensekey, D.outgoing_call_bandwidth, D.incoming_call_bandwidth, D.outgoing_total_bandwidth, D.incoming_total_bandwidth, D.auto_bandwidth, D.max_calltime, D.max_redials, D.auto_answer, D.auto_answer_mute, D.auto_answer_multiway, D.audio_codecs, D.audio_active_microphone, D.telepresence, D.camera_lock, D.camera_far_control, D.camera_far_set_preset, D.camera_far_use_preset
+		$stmt = $this->db->prepare("SELECT CD.id, CD.ip, CD.password, CD.own, CD.verified, D.serial, D.online, D.in_call, D.update, D.updated, D.added, D.name, D.make, D.model, D.version, D.type, D.updating, CD.location, D.licensekey, D.outgoing_call_bandwidth, D.incoming_call_bandwidth, D.outgoing_total_bandwidth, D.incoming_total_bandwidth, D.auto_bandwidth, D.max_calltime, D.max_redials, D.auto_answer, D.auto_answer_mute, D.auto_answer_multiway, D.audio_codecs, D.audio_active_microphone, D.telepresence, D.camera_lock, D.camera_far_control, D.camera_far_set_preset, D.camera_far_use_preset, D.line_out_bass, D.line_out_treble, D.line_in_volume, D.active_microphone_volume
 			FROM `companies_devices` AS CD
 			INNER JOIN devices AS D ON CD.hash = D.id
 			WHERE CD.company_id = :company");

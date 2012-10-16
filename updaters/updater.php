@@ -77,7 +77,7 @@ $redis->incr('workers.count');
 $res = $db->query("SELECT value AS version FROM `settings` WHERE `setting` = 'worker_version'")->fetch(PDO::FETCH_ASSOC);
 $worker_version = $res['version'];
 
-$stmt = $db->prepare("SELECT CD.id, CD.ip, companies.active, CD.password, CD.own, CD.verified, CD.hash, D.online, D.serial, D.updating, D.updated, D.incoming_total_bandwidth, D.outgoing_total_bandwidth, D.duration, D.line_out_bass, D.line_out_treble
+$stmt = $db->prepare("SELECT CD.id, CD.ip, companies.active, CD.password, CD.own, CD.verified, CD.hash, D.online, D.serial, D.updating, D.updated, D.incoming_total_bandwidth, D.outgoing_total_bandwidth, D.duration, D.line_out_bass, D.line_out_treble, D.line_in_volume, D.active_microphone_volume
 FROM companies_devices AS CD
 INNER JOIN companies ON companies.id = CD.company_id
 INNER JOIN devices AS D ON CD.hash = D.id
@@ -129,7 +129,9 @@ $update_stmt = $db->prepare("UPDATE devices
 	camera_far_use_preset = :far_use,
 	camera_far_set_preset = :far_set,
 	line_out_treble=:line_out_treble,
-	line_out_bass=:line_out_bass
+	line_out_bass=:line_out_bass,
+	active_microphone_volume=:active_microphone_volume,
+	line_in_volume=:line_in_volume
 	WHERE id = :id");
 $new_device_stmt = $db->prepare("INSERT INTO devices
 	SET id=:id,
@@ -161,7 +163,9 @@ $new_device_stmt = $db->prepare("INSERT INTO devices
 	camera_far_use_preset = :far_use,
 	camera_far_set_preset = :far_set,
 	line_out_treble=:line_out_treble,
-	line_out_bass=:line_out_bass");
+	line_out_bass=:line_out_bass,
+	active_microphone_volume=:active_microphone_volume,
+	line_in_volume=:line_in_volume");
 $check_for_hash = $db->prepare("SELECT count(*) AS count FROM devices WHERE id = :id");
 $update_stmt2 = $db->prepare("UPDATE companies_devices SET hash = :hash WHERE id = :id");
 $cleanup = $db->prepare("UPDATE devices SET online=0, licensekey='', updated = 0, updating=0, `serial` = 'New Device' WHERE id = 'da39a3ee5e6b4b0d3255bfef95601890afd80709'");
@@ -496,7 +500,8 @@ while(time() <= $end){
 				} else {
 					$lineout_treble = $device['line_out_treble'];
 					$lineout_bass = $device['line_out_bass'];
-				}
+				}$line_in_volume = assign('get volume line-in', 'line_in_volume',$device);
+				$active_microphone_volume = assign("get audio gain", "active_microphone_volume", $device);
 				$type = "camera";
 				$options = array(
 					':hash'=>sha1($serial),
@@ -535,7 +540,9 @@ while(time() <= $end){
 					':far_use'=>$far_use_preset,
 					':far_set'=>$far_set_preset,
 					':line_out_treble'=>$lineout_treble,
-					':line_out_bass'=>$lineout_bass
+					':line_out_bass'=>$lineout_bass,
+					':active_microphone_volume'=>$active_microphone_volume,
+					':line_in_volume'=>$line_in_volume
 				);
 
 				$update_options = array(
