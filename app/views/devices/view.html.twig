@@ -6,12 +6,12 @@
 {% block name %}Device <small>{% if device.name == null%}{{device.id}}{% else %}{{device.name}}{%endif%}</small>
 {% if device.own == 1 and device.verified == 0 %}
 	{% if perms b-and app.permissions['devices/edit']%}
-		<a class="btn btn-small btn-inverse" href="{{root}}devices/verify/{{device.id}}">Verify Device</a>
+		<a class="btn btn-small btn-inverse noprint" href="{{root}}devices/verify/{{device.id}}">Verify Device</a>
 	{% endif %}
 {% endif %}
 {% if device.own == 1 and device.verified == 1 %}
 	{% if perms b-and app.permissions['devices/edit'] %}
-		<a class="btn btn-small btn-inverse" href="{{root}}devices/edit/{{device.id}}">Edit Device</a>
+		<a class="btn btn-small btn-inverse noprint" href="{{root}}devices/edit/{{device.id}}">Edit Device</a>
 	{% endif %}
 {% endif %}
 {% endblock %}
