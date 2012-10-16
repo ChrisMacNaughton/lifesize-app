@@ -13,6 +13,11 @@ class devicesController extends Controller {
 		$data=array(
 			'headercolor'=>'66cc66',
 		);
+		$data['average_loss'] = json_decode($this->redis->get('cache.averages'), true);
+		$data['losses'] = $this->db->prepare('SELECT AVG(  `TxV1PctLoss` ) AS TxV1, AVG(  `RxV1PctLoss` ) AS RxV1, AVG(  `TxA1PctLoss` ) AS TxA1, AVG(  `RxA1PctLoss` ) AS RxA1, AVG(  `TxV2PctLoss` ) AS TxV2, AVG(  `RxV2PctLoss` ) AS RxV2
+FROM devices_history
+INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id
+WHERE companies_devices.id =:id')->execute(array(':id'=>$id));
 		$data['device'] = $this->user->devices[$id];
 		$this->render('devices/view.html.twig', $data);
 	}
