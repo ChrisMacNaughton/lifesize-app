@@ -1,5 +1,5 @@
 {
-    "hash": "abba884c33be8113489238f601eb477f",
+    "hash": "cf7c0f6560edf5f07cd7ef76c5dda0a5",
     "packages": [
         {
             "name": "amazonwebservices/aws-sdk-for-php",
@@ -52,23 +52,66 @@
             ]
         },
         {
-            "name": "twig/twig",
-            "version": "v1.10.0",
+            "name": "predis/predis",
+            "version": "v0.7.3",
             "source": {
                 "type": "git",
-                "url": "git://github.com/fabpot/Twig.git",
-                "reference": "v1.10.0"
+                "url": "git://github.com/nrk/predis.git",
+                "reference": "v0.7.3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/fabpot/Twig/zipball/v1.10.0",
-                "reference": "v1.10.0",
+                "url": "https://github.com/nrk/predis/zipball/v0.7.3",
+                "reference": "v0.7.3",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "time": "2012-06-01 02:17:31",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-0": {
+                    "Predis": "lib/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Daniele Alessandri",
+                    "email": "suppakilla@gmail.com",
+                    "homepage": "http://clorophilla.net"
+                }
+            ],
+            "description": "Flexible and feature-complete PHP client library for Redis",
+            "homepage": "http://github.com/nrk/predis",
+            "keywords": [
+                "nosql",
+                "redis",
+                "predis"
+            ]
+        },
+        {
+            "name": "twig/twig",
+            "version": "v1.10.2",
+            "source": {
+                "type": "git",
+                "url": "git://github.com/fabpot/Twig.git",
+                "reference": "v1.10.2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/fabpot/Twig/zipball/v1.10.2",
+                "reference": "v1.10.2",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.2.4"
             },
-            "time": "2012-09-28 20:11:39",
+            "time": "2012-10-15 01:23:34",
             "type": "library",
             "extra": {
                 "branch-alias": {

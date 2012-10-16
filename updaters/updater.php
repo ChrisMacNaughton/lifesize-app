@@ -307,7 +307,7 @@ while(time() <= $end){
 				}
 				if($device['updated'] > time() - 60){
 					sleep(5);
-					continue();
+					continue;
 				}
 				//echo $serial . " => " . $id;exit("\n\n");
 

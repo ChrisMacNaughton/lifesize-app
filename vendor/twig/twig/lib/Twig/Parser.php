@@ -29,7 +29,7 @@ class Twig_Parser implements Twig_ParserInterface
     protected $macros;
     protected $env;
     protected $reservedMacroNames;
-    protected $importedFunctions;
+    protected $importedSymbols;
     protected $traits;
     protected $embeddedTemplates = array();
 
@@ -88,7 +88,7 @@ class Twig_Parser implements Twig_ParserInterface
         $this->macros = array();
         $this->traits = array();
         $this->blockStack = array();
-        $this->importedFunctions = array(array());
+        $this->importedSymbols = array(array());
         $this->embeddedTemplates = array();
 
         try {
@@ -282,33 +282,33 @@ class Twig_Parser implements Twig_ParserInterface
         $this->embeddedTemplates[] = $template;
     }
 
-    public function addImportedFunction($alias, $name, Twig_Node_Expression $node)
+    public function addImportedSymbol($type, $alias, $name = null, Twig_Node_Expression $node = null)
     {
-        $this->importedFunctions[0][$alias] = array('name' => $name, 'node' => $node);
+        $this->importedSymbols[0][$type][$alias] = array('name' => $name, 'node' => $node);
     }
 
-    public function getImportedFunction($alias)
+    public function getImportedSymbol($type, $alias)
     {
-        foreach ($this->importedFunctions as $functions) {
-            if (isset($functions[$alias])) {
-                return $functions[$alias];
+        foreach ($this->importedSymbols as $functions) {
+            if (isset($functions[$type][$alias])) {
+                return $functions[$type][$alias];
             }
         }
     }
 
     public function isMainScope()
     {
-        return 1 === count($this->importedFunctions);
+        return 1 === count($this->importedSymbols);
     }
 
     public function pushLocalScope()
     {
-        array_unshift($this->importedFunctions, array());
+        array_unshift($this->importedSymbols, array());
     }
 
     public function popLocalScope()
     {
-        array_shift($this->importedFunctions);
+        array_shift($this->importedSymbols);
     }
 
     /**

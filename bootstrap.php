@@ -10,6 +10,15 @@ $app = array(
 
 require 'system/config.php';
 require 'system/classes/loggedPDO.php';
+require 'vendor/autoload.php';
+$single_server = array(
+    'host'     => $redis_server,
+    'port'     => 6379,
+);
+
+$redis = new Predis\Client($single_server);
+$redis->auth($redis_pass);
+
 try {
 	$db = new loggedPDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass);
 } catch (PDOException $e) {
@@ -28,7 +37,7 @@ define('TIMEZONE',$user->getTimezone());
 date_default_timezone_set(TIMEZONE);
 $redirect = ($user->is_logged_in())?false:true;
 
-require 'vendor/autoload.php';
+
 /*
 *	building URI array
 */

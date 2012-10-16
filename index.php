@@ -21,5 +21,5 @@ if(file_exists('app/controllers/' . strtolower($app['controller']) . 'Controller
 	$actionName = "NotFoundAction";
 }
 
-$controller = new $controllerName($app, $db, $writedb);
+$controller = new $controllerName($app, $db, $writedb, $redis);
 $controller->$actionName($app['detail']);

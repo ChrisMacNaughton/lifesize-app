@@ -14,10 +14,34 @@ class devicesController extends Controller {
 			'headercolor'=>'66cc66',
 		);
 		$data['average_loss'] = json_decode($this->redis->get('cache.averages'), true);
-		$data['losses'] = $this->db->prepare('SELECT AVG(  `TxV1PctLoss` ) AS TxV1, AVG(  `RxV1PctLoss` ) AS RxV1, AVG(  `TxA1PctLoss` ) AS TxA1, AVG(  `RxA1PctLoss` ) AS RxA1, AVG(  `TxV2PctLoss` ) AS TxV2, AVG(  `RxV2PctLoss` ) AS RxV2
+		$stmt = $this->db->prepare('SELECT SUM(  `RxV1PktsLost` ) AS RxV1, SUM(  `RxA1PktsLost` ) AS RxA1, SUM(  `RxV2PktsLost` ) AS RxV2, SUM(  `TxV1PktsLost` ) AS TxV1, SUM( `TxA1PktsLost` ) AS TxA1, SUM(  `TxV2PktsLost` ) AS TxV2, SUM(  `Duration` ) AS Duration
 FROM devices_history
 INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id
-WHERE companies_devices.id =:id')->execute(array(':id'=>$id));
+WHERE companies_devices.id =:id');
+		$stmt->execute(array(':id'=>$id));
+		$losses = $stmt->fetch(PDO::FETCH_ASSOC);
+		$duration = $losses['Duration'] / 60;
+		unset($losses['Duration']);
+		foreach($losses as $name=>$loss){
+			if($loss / $duration > 0.1){
+				$l[$name] = array("name"=>$name, "loss"=>$loss / $duration);
+			} else {
+				unset($data['average_loss'][$name]);
+			}
+		}
+		
+		$data['packetnames'] = array(
+			'TxV1'=>'Video1 Transmit',
+			'TxA1'=>'Audio Transmit',
+			'TxV2'=>'Video2 Transmit',
+			'RxV1'=>'Video1 Receive',
+			'RxA1'=>'Audio Receive',
+			'RxV2'=>'Video2 Receive'
+		);
+		$data['losses'] = $l;
+		ksort($data['average_loss']);
+		ksort($data['losses']);
+
 		$data['device'] = $this->user->devices[$id];
 		$this->render('devices/view.html.twig', $data);
 	}

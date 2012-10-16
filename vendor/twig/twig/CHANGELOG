@@ -1,3 +1,13 @@
+* 1.10.2 (2012-10-15)
+
+ * fixed macro calls on PHP 5.4
+
+* 1.10.1 (2012-10-15)
+
+ * made a speed optimization to macro calls when imported via the "import" tag
+ * fixed C extension compilation on Windows
+ * fixed a segfault in the C extension when using DateTime objects
+
 * 1.10.0 (2012-09-28)
 
  * extracted functional tests framework to make it reusable for third-party extensions

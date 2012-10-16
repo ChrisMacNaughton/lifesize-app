@@ -62,12 +62,12 @@ FROM devices_history
 INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id")->fetch(PDO::FETCH_ASSOC);
 
 	$d = ($totals['Duration'] / 60);
-	$averages['rx']['v1'] = $totals['RxV1'] / $d;
-	$averages['rx']['a1'] = $totals['RxA1'] / $d;
-	$averages['rx']['v2'] = $totals['RxV2'] / $d;
-	$averages['tx']['v1'] = $totals['TxV1'] / $d;
-	$averages['tx']['a1'] = $totals['TxA1'] / $d;
-	$averages['tx']['v2'] = $totals['TxV2'] / $d;
+	$averages['RxV1'] = $totals['RxV1'] / $d;
+	$averages['RxA1'] = $totals['RxA1'] / $d;
+	$averages['RxV2'] = $totals['RxV2'] / $d;
+	$averages['TxV1'] = $totals['TxV1'] / $d;
+	$averages['TxA1'] = $totals['TxA1'] / $d;
+	$averages['TxV2'] = $totals['TxV2'] / $d;
 	//print("Global Averages:\n");
 	//print_r($averages);
 	//$final = microtime(true);

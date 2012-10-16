@@ -1,8 +1,9 @@
 <?php
 
 class Controller{
-	public function __construct($app, $db, $writedb){
+	public function __construct($app, $db, $writedb, $redis){
 		global $user, $options;
+		$this->redis = $redis;
 		$this->user = $user;
 		$this->writedb = $writedb;
 		$this->app = $app;

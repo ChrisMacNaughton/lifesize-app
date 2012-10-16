@@ -9,6 +9,12 @@
 	-moz-transition: all .2s linear;
 	transition: all .2s linear;
 }
+.good {
+  color: #009933;
+}
+.bad {
+  color: #cc0000;
+}
 .right{
   float: right;
   margin-left: 10px;
