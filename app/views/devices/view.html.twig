@@ -3,7 +3,7 @@
 {% block afterbrand %}
 
 {% endblock %}
-{% block name %}Device <small>{% if device.name == null%}{{device.id}}{% else %}{{device.name}}{%endif%}</small>
+{% block name %}Device <div style="display: inline-block; line-height: 0;"><small>{% if device.name == null%}{{device.id}}{% else %}{{device.name}}{%endif%}<br />{{device.ip}}</small></div>
 {% if device.own == 1 and device.verified == 0 %}
 	{% if perms b-and app.permissions['devices/edit']%}
 		<a class="btn btn-small btn-inverse noprint" href="{{root}}devices/verify/{{device.id}}">Verify Device</a>

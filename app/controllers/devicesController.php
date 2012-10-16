@@ -21,6 +21,8 @@ class devicesController extends Controller {
 		$loss60 = array();
 		$loss90 = array();
 		$loss = array();
+
+		$min_loss = 0.005;
 		$stmt = $this->db->prepare("SELECT SUM(  `RxV1PktsLost` ) AS RxV1, SUM(  `RxA1PktsLost` ) AS RxA1, SUM(  `RxV2PktsLost` ) AS RxV2, SUM(  `TxV1PktsLost` ) AS TxV1, SUM( `TxA1PktsLost` ) AS TxA1, SUM(  `TxV2PktsLost` ) AS TxV2, SUM(  `Duration` ) AS Duration
 FROM devices_history
 INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id
@@ -31,7 +33,7 @@ AND devices_history.Duration > $time_limit");
 		$duration = $losses['Duration'] / 60;
 		unset($losses['Duration']);
 		foreach($losses as $name=>$loss){
-			if($duration > 0 AND $loss / $duration > 0.01){
+			if($duration > 0 AND $loss / $duration > $min_loss){
 				$l[$name] = array("name"=>$name, "loss"=>$loss / $duration);
 			} else {
 				unset($data['average_loss'][$name]);
@@ -53,7 +55,7 @@ AND devices_history.duration > $time_limit");
 		$duration = $res['Duration'] / 60;
 		unset($res['Duration']);
 		foreach($res as $name=>$loss){
-			if($duration > 0 AND $loss / $duration > 0.01){
+			if($duration > 0 AND $loss / $duration > $min_loss){
 				$loss7[$name] = array("name"=>$name, "loss"=>$loss / $duration);	
 			}
 		}
@@ -72,7 +74,7 @@ AND devices_history.duration > $time_limit");
 		$duration = $res['Duration'] / 60;
 		unset($res['Duration']);
 		foreach($res as $name=>$loss){
-			if($duration > 0 AND $loss / $duration > 0.01){
+			if($duration > 0 AND $loss / $duration > $min_loss){
 				$loss30[$name] = array("name"=>$name, "loss"=>$loss / $duration);
 			}
 		}
@@ -91,7 +93,7 @@ AND devices_history.duration > $time_limit");
 		$duration = $res['Duration'] / 60;
 		unset($res['Duration']);
 		foreach($res as $name=>$loss){
-			if($duration > 0 AND $loss / $duration > 0.01){
+			if($duration > 0 AND $loss / $duration > $min_loss){
 				$loss60[$name] = array("name"=>$name, "loss"=>$loss / $duration);
 			}
 		}
@@ -110,7 +112,7 @@ AND devices_history.duration > $time_limit");
 		$duration = $res['Duration'] / 60;
 		unset($res['Duration']);
 		foreach($res as $name=>$loss){
-			if($duration > 0 AND $loss / $duration > 0.01){
+			if($duration > 0 AND $loss / $duration > $min_loss){
 				$loss90[$name] = array("name"=>$name, "loss"=>$loss / $duration);
 			}
 		}
