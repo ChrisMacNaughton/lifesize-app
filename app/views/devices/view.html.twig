@@ -19,7 +19,7 @@
 <p class="muted"><small>Updated: {{device.updated|date("M/d/y h:i:s a")}}</small></p>
 <div class="row">
 	<div class="span6">
-		<h4>All Time</h4>
+		<h4>All Time<small>:{{call_counts[0]}} Calls</small></h4>
 		{% for l in losses %}
 			<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span>(Average:{{'%.2f'| format(average_loss[l.name])}})  packets lost / minute<br />
 			{%else %}
@@ -27,25 +27,7 @@
 		{% endfor %}
 	</div>
 	<div class="span6">
-		<h4>Last 30 Days</h4>
-		{% for l in loss30 %}
-			<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span>(Average:{{'%.2f'| format(average_loss[l.name])}})  packets lost / minute<br />
-			{%else %}
-			<p>No calls within this period</p>
-		{% endfor %}
-	</div>
-</div>
-<div class="row">
-	<div class="span6">
-		<h4>Last 60 Days</h4>
-		{% for l in loss60 %}
-			<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span>(Average:{{'%.2f'| format(average_loss[l.name])}})  packets lost / minute<br />
-			{%else %}
-			<p>No calls within this period</p>
-		{% endfor %}
-	</div>
-	<div class="span6">
-		<h4>Last 90 Days</h4>
+		<h4>Last 90 Days<small>:{{call_counts[90]}} Calls</small></h4>
 		{% for l in loss90 %}
 			<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span>(Average:{{'%.2f'| format(average_loss[l.name])}})  packets lost / minute<br />
 			{%else %}
@@ -55,7 +37,25 @@
 </div>
 <div class="row">
 	<div class="span6">
-		<h4>Last 7 Days</h4>
+		<h4>Last 60 Days<small>:{{call_counts[60]}} Calls</small></h4>
+		{% for l in loss60 %}
+			<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span>(Average:{{'%.2f'| format(average_loss[l.name])}})  packets lost / minute<br />
+			{%else %}
+			<p>No calls within this period</p>
+		{% endfor %}
+	</div>
+	<div class="span6">
+		<h4>Last 30 Days<small>:{{call_counts[30]}} Calls</small></h4>
+		{% for l in loss30 %}
+			<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span>(Average:{{'%.2f'| format(average_loss[l.name])}})  packets lost / minute<br />
+			{%else %}
+			<p>No calls within this period</p>
+		{% endfor %}
+	</div>
+</div>
+<div class="row">
+	<div class="span6">
+		<h4>Last 7 Days<small>:{{call_counts[7]}} Calls</small></h4>
 		{% for l in loss7 %}
 			<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span>(Average:{{'%.2f'| format(average_loss[l.name])}})  packets lost / minute<br />
 			{%else %}

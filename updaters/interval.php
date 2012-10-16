@@ -42,8 +42,6 @@ ORDER BY devices.updated")->fetchAll(PDO::FETCH_ASSOC);
 	
 }
 
-
-
 if($redis->get('stats_generated') < time() - 15 * 60){
 	$redis->set('stats_generated', time());
 	
