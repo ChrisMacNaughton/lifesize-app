@@ -234,6 +234,7 @@ LIMIT 1
 			'RxA1'=>'Audio Receive',
 			'RxV2'=>'Video2 Receive'
 		);
+		$duration_scale = "seconds";
 		if($duration > 60){
 			$duration = $duration / 60;
 			$duration_scale = "minutes";
