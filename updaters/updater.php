@@ -163,7 +163,7 @@ $cleanup = $db->prepare("UPDATE devices SET updated = 0, updating=0, `serial` = 
 $log_stmt = $db->prepare("INSERT INTO updater_log (time, worker_id, message, detail, type) VALUES (:time, :id, :message, :detail, 'updater')");
 $history_start_stmt = $db->prepare("SELECT id FROM devices_history WHERE device_id = :id ORDER BY id DESC limit 1");
 $history_stmt = $db->prepare("INSERT INTO devices_history VALUES(:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46,:47,:48,:49, :50)");
-
+$update_device_hash = $db->prepare("UPDATE companies_devices SET hash = :hash WHERE id = :id");
 $log_stmt->execute(array(
 		':time'=>time(),
 		':id'=>$worker_id,
@@ -301,6 +301,14 @@ while(time() <= $end){
 
 				$device_id = sha1($serial);
 
+				if($device['hash'] != $device_id){
+					$update_device_hash->execute(array(':hash'=>$device_id, ':id'=>$device['id']));
+					continue;
+				}
+				if($device['updated'] > time() - 60){
+					sleep(5);
+					continue();
+				}
 				//echo $serial . " => " . $id;exit("\n\n");
 
 				$get_edits_stmt->execute(array(':id'=>$device['id']));
