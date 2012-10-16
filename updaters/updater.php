@@ -160,7 +160,7 @@ $new_device_stmt = $db->prepare("INSERT INTO devices
 	camera_far_set_preset = :far_set");
 $check_for_hash = $db->prepare("SELECT count(*) AS count FROM devices WHERE id = :id");
 $update_stmt2 = $db->prepare("UPDATE companies_devices SET hash = :hash WHERE id = :id");
-$cleanup = $db->prepare("UPDATE devices SET updated = 0, updating=0, `serial` = 'New Device' WHERE id = 'da39a3ee5e6b4b0d3255bfef95601890afd80709'");
+$cleanup = $db->prepare("UPDATE devices SET online=0, licensekey='', updated = 0, updating=0, `serial` = 'New Device' WHERE id = 'da39a3ee5e6b4b0d3255bfef95601890afd80709'");
 $log_stmt = $db->prepare("INSERT INTO updater_log (time, worker_id, message, detail, type) VALUES (:time, :id, :message, :detail, 'updater')");
 $history_start_stmt = $db->prepare("SELECT id FROM devices_history WHERE device_id = :id ORDER BY id DESC limit 1");
 $history_stmt = $db->prepare("INSERT INTO devices_history VALUES(:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46,:47,:48,:49, :50)");
