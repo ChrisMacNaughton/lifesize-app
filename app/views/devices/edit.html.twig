@@ -275,6 +275,13 @@
 				    	<div id="slider" style="width: 220px;"></div>
 			    	</div>
 			    </div>
+			    <div class="control-group">
+				    <label class="control-label" for="line_in_volume">Line-In Volume</label>
+				    <div class="controls">
+				    	<input type="text" id="line_in_volume" disabled="disabled" name="line_in_volume" value="{{device.line_in_volume}}">
+				    	<div id="slider_line_in_volume" style="width: 220px;"></div>
+			    	</div>
+			    </div>
 				<input type="hidden" name="section" value="audio">
 				<input type="submit" value="Save">
 			</form>
@@ -547,6 +554,17 @@ function selectAllOptions(selStr)
                 $( "#active_microphone_volume" ).val( ui.value );
             }
         });
+        $( "#slider_line_in_volume" ).slider({
+            value:{{device.line_in_volume}},
+            min: 0,
+            max: 10,
+            step: 1,
+            slide: function( event, ui ) {
+                $( "#line_in_volume" ).val( ui.value );
+            }
+        });
     });
     </script>
+
+    
 {%endblock %}
