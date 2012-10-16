@@ -268,6 +268,13 @@
 			    		</select>
 			    	</div>
 			    </div>
+			    <div class="control-group">
+				    <label class="control-label" for="active_microphone_volume">Active Microphone Volume</label>
+				    <div class="controls">
+				    	<input type="text" id="active_microphone_volume" disabled="disabled" name="active_microphone_volume" cols="2">
+				    	<div id="slider"></div>
+			    	</div>
+			    </div>
 				<input type="hidden" name="section" value="audio">
 				<input type="submit" value="Save">
 			</form>
@@ -528,4 +535,18 @@ function selectAllOptions(selStr)
   console.log(selObj);
 }
 </script>
+
+<script>
+    $(function() {
+        $( "#slider" ).slider({
+            value:{{device.active_microphone_value}},
+            min: 0,
+            max: 20,
+            step: 1,
+            slide: function( event, ui ) {
+                $( "#active_microphone_volume" ).val( "$" + ui.value );
+            }
+        });
+    });
+    </script>
 {%endblock %}
