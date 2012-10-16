@@ -23,7 +23,7 @@ WHERE companies_devices.id =:id');
 		$duration = $losses['Duration'] / 60;
 		unset($losses['Duration']);
 		foreach($losses as $name=>$loss){
-			if($loss / $duration > 0.1){
+			if($loss / $duration > 0.01){
 				$l[$name] = array("name"=>$name, "loss"=>$loss / $duration);
 			} else {
 				unset($data['average_loss'][$name]);
@@ -255,7 +255,7 @@ WHERE companies_devices.id =:id');
 			);
 
 			$options[':id'] = 'dev-' . substr(hash('sha512', $options[':ip'] . microtime(true)), 0,10);
-			$stmt = $this->writedb->prepare("INSERT INTO companies_devices (`id`,`company_id`,`ip`,`password`, `own`) VALUES (:id, :company,:ip, :password, 1)");
+			$stmt = $this->writedb->prepare("INSERT INTO companies_devices (`id`,`company_id`,`ip`,`password`, `own`, `verified`) VALUES (:id, :company,:ip, :password, 1, 1)");
 			$res = $stmt->execute($options);
 			if(!$res){
 				$_SESSION['errors'][] = "Failed to add the device";

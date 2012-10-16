@@ -20,4 +20,5 @@
 {% for l in losses %}
 	<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span>(Average:{{'%.2f'| format(average_loss[l.name])}})  packets lost / minute<br />
 {% endfor %}
+
 {% endblock %}

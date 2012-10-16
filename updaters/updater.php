@@ -94,6 +94,7 @@ ORDER BY D.updated
 $duration_stmt = $db->prepare("UPDATE devices SET duration = :duration WHERE id = :id");
 $rsrv = $db->prepare("UPDATE devices SET updating = unix_timestamp() WHERE id = :id AND updating = :updating");
 $offline_stmt = $db->prepare("UPDATE devices SET online = 0, updated = unix_timestamp() WHERE id = :id");
+$online_stmt = $db->prepare("UPDATE devices SET online = 1, updated = unix_timestamp() WHERE id = :id");
 $checked_stmt = $db->prepare("UPDATE companies_devices SET checked = unix_timestamp() WHERE id = :id");
 $serial_stmt = $db->prepare("SELECT * FROM devices WHERE `serial` = :serial");
 $new_serial = $db->prepare("UPDATE devices SET `serial` = :serial WHERE id = :id");
@@ -238,12 +239,12 @@ while(time() <= $end){
 		if ($res) {
 			//print("Locked!\n");
 
+			$offline_stmt->execute(array(':id'=>$device['hash']));
 			//print($device['id'] . "\n");
 			$update_start_time = microtime(true);
 			$ssh = new mySSH($device['ip']);
 			$pw = ($device['password'] != '')?$device['password'] : 'lifesize';
 			if(!$ssh->login('auto', $pw)){
-				$offline_stmt->execute(array(':id'=>$device['hash']));
 				//print_r($offline_stmt->errorInfo());
 				$log_stmt->execute(array(
 							':time'=>$time,
@@ -258,6 +259,8 @@ while(time() <= $end){
 					));
 				}
 			} else {
+
+				$online_stmt->execute(array(':id'=>$device['hash']));
 				//print("Logged in!\n");
 
 				//echo $serial . " => " . $id;exit("\n\n");
