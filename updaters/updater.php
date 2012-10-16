@@ -239,12 +239,13 @@ while(time() <= $end){
 		if ($res) {
 			//print("Locked!\n");
 
-			$offline_stmt->execute(array(':id'=>$device['hash']));
+			
 			//print($device['id'] . "\n");
 			$update_start_time = microtime(true);
 			$ssh = new mySSH($device['ip']);
 			$pw = ($device['password'] != '')?$device['password'] : 'lifesize';
 			if(!$ssh->login('auto', $pw)){
+				$offline_stmt->execute(array(':id'=>$device['hash']));
 				//print_r($offline_stmt->errorInfo());
 				$log_stmt->execute(array(
 							':time'=>$time,
