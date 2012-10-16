@@ -234,12 +234,26 @@ LIMIT 1
 			'RxA1'=>'Audio Receive',
 			'RxV2'=>'Video2 Receive'
 		);
+		if($duration > 60){
+			$duration = $duration / 60;
+			$duration_scale = "minutes";
+		}
+		if($duration > 60){
+			$duration = $duration / 60;
+			$duration_scale = "hours";
+		}
+		if($duration > 24){
+			$duration = $duration / 24;
+			$duration_scale = "days";
+		}
 		$data['loss0'] = $loss0;
 		$data['loss7'] = $loss7;
 		$data['loss30'] = $loss30;
 		$data['loss60'] = $loss60;
 		$data['loss90'] = $loss90;
 		$data['loss120'] = $loss120;
+		$data['duration']['count'] = $duration;
+		$data['duration']['scale'] = $duration_scale;
 		ksort($data['loss0']);
 		ksort($data['loss7']);
 		ksort($data['loss30']);
