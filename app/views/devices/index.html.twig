@@ -56,7 +56,7 @@
 			{{device.ip}}
 		</div>
 		<div class="name span2">
-			{% if device.serial != null %}
+			{% if device.serial != 'New Device' %}
 				<a href="{{root}}devices/view/{{device.id}}">{% if device.name == null %}Unknown{% else %}{{device.name}}{% endif%}</a>
 			{% else %}
 				{% if device.name == null %}Unknown{% else %}{{device.name}}{% endif%}
