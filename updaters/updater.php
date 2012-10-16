@@ -243,8 +243,14 @@ while(time() <= $end){
 			//print($device['id'] . "\n");
 			$update_start_time = microtime(true);
 			$ssh = new mySSH($device['ip']);
+			if($ssh===false){
+				$offline_stmt->execute(array(':id'=>$device['hash']));
+			}
 			$pw = ($device['password'] != '')?$device['password'] : 'lifesize';
 			if(!$ssh->login('auto', $pw)){
+				/* TODO: 
+				*	implement a password incorrect error
+				*/
 				$offline_stmt->execute(array(':id'=>$device['hash']));
 				//print_r($offline_stmt->errorInfo());
 				$log_stmt->execute(array(

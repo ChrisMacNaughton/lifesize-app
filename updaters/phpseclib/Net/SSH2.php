@@ -774,13 +774,13 @@ class Net_SSH2 {
         $this->fsock = @fsockopen($host, $port, $errno, $errstr, $timeout);
         if (!$this->fsock) {
             user_error(rtrim("Cannot connect to $host. Error $errno. $errstr"), E_USER_NOTICE);
-            return;
+            return false;
         }
         $elapsed = strtok(microtime(), ' ') + strtok('') - $start;
 
         if ($timeout - $elapsed <= 0) {
             user_error(rtrim("Cannot connect to $host. Timeout error"), E_USER_NOTICE);
-            return;
+            return false;
         }
 
         $read = array($this->fsock);
@@ -791,7 +791,7 @@ class Net_SSH2 {
         // on windows this returns a "Warning: Invalid CRT parameters detected" error
         if (!@stream_select($read, $write, $except, $timeout - $elapsed)) {
             user_error(rtrim("Cannot connect to $host. Banner timeout"), E_USER_NOTICE);
-            return;
+            return false;
         }
 
         stream_set_blocking($this->fsock, true);
