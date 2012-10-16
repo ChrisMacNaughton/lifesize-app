@@ -57,7 +57,8 @@ INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_
 	$start = microtime(true);
 	$totals = $db->query("SELECT SUM(  `RxV1PktsLost` ) AS RxV1, SUM(  `RxA1PktsLost` ) AS RxA1, SUM(  `RxV2PktsLost` ) AS RxV2, SUM(  `TxV1PktsLost` ) AS TxV1, SUM( `TxA1PktsLost` ) AS TxA1, SUM(  `TxV2PktsLost` ) AS TxV2, SUM(  `Duration` ) AS Duration
 FROM devices_history
-INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id")->fetch(PDO::FETCH_ASSOC);
+INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id
+WHERE devices_history.duration > 0")->fetch(PDO::FETCH_ASSOC);
 
 	$d = ($totals['Duration'] / 60);
 	$averages['RxV1'] = $totals['RxV1'] / $d;

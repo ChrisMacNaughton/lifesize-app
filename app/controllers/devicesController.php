@@ -15,7 +15,7 @@ class devicesController extends Controller {
 		);
 		$data['average_loss'] = json_decode($this->redis->get('cache.averages'), true);
 
-		$time_limit = -.001;
+		$time_limit = 0;
 		$loss7 = array();
 		$loss30 = array();
 		$loss60 = array();
@@ -210,17 +210,19 @@ AND devices_history.duration > $time_limit");
 FROM devices_history
 INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id
 WHERE companies_devices.id = :id
+AND devices_history.duration > $time_limit
 ORDER BY devices_history.id DESC 
 LIMIT 1
 ");
 		$stmt->execute(array(':id'=>$id));
 
 		$res = $stmt->fetch(PDO::FETCH_ASSOC);
-		$duration = $res['Duration'] / 60;
+		$duration = $res['Duration'];
+		$d = $duration/60;
 		unset($res['Duration']);
 		foreach($res as $name=>$loss){
 			if(isset($loss120[$name]) OR isset($loss90[$name]) OR isset($loss60[$name]) OR isset($loss30[$name]))
-				$loss0[$name] = array("name"=>$name, "loss"=>($duration > 0)?$loss / $duration:0);	
+				$loss0[$name] = array("name"=>$name, "loss"=>($d > 0)?$loss / $d:0);
 		}
 
 		/*
