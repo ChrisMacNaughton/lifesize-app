@@ -660,12 +660,13 @@ while(time() <= $end){
 				if($res){
 					//print(sprintf("%s:%s| Updated %s (%s)\n", $time, $worker_id,$device['id'], $name));
 					
-					$updated_log_stmt = array(
+					$updated_log_stmt->execute(array(
 						':time'=>$time,
 						':id'=>$worker_id,
 						':message'=>"Updated",
 						':detail'=>$device['id'],
 						':update_time'=>$update_time
+						));
 				} else{
 					//print(sprintf("Error updating %s:\n", $device['id']));print_r($update_stmt->errorInfo());
 				}
