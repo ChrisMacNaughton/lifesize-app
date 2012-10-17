@@ -291,6 +291,24 @@
 			    		</select>
 			    	</div>
 			    </div>
+			    <div class="control-group">Video Call Audio Output</label>
+				    <div class="controls">
+				    	<select name="video_call_audio_output">
+				    		<option {% if device.video_call_audio_output == "phone"%}selected="selected" {%endif%}value="phone">Phone</option>
+				    		<option {% if device.video_call_audio_output == "line_out"%}selected="selected" {%endif%}value="line_out">Line Out</option>
+				    		<option {% if device.video_call_audio_output == "hd_out"%}selected="selected" {%endif%}value="hd_out">HD Out</option>
+			    		</select>
+			    	</div>
+			    </div>
+			    <div class="control-group">Voice Call Audio Output</label>
+				    <div class="controls">
+				    	<select name="voice_call_audio_output">
+				    		<option {% if device.voice_call_audio_output == "phone"%}selected="selected" {%endif%}value="phone">Phone</option>
+				    		<option {% if device.voice_call_audio_output == "line_out"%}selected="selected" {%endif%}value="line_out">Line Out</option>
+				    		<option {% if device.voice_call_audio_output == "hd_out"%}selected="selected" {%endif%}value="hd_out">HD Out</option>
+			    		</select>
+			    	</div>
+			    </div>
 				<input type="hidden" name="section" value="audio">
 				<input type="submit" value="Save">
 			</form>
