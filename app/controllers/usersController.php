@@ -1,8 +1,8 @@
 <?php
 
 class usersController extends Controller{
-	public function __construct($app, $db, $writedb){
-		parent::__construct($app, $db, $writedb);
+	public function __construct($app, $db, $writedb, $redis){
+		parent::__construct($app, $db, $writedb, $redis);
 		require 'system/classes/passwordHash.php';
 		$this->hasher = new PasswordHash(14,false);
 	}

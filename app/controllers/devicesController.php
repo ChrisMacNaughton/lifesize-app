@@ -397,6 +397,15 @@ LIMIT 1
 									$options[':target']='codecs';
 									$options[':details'] = implode(' ',$var);
 									break;
+								case "active_microphone_volume":
+									$options[':target']="gain";
+									$options[';details']=$var;
+									break;
+								case "line_in_volume":
+									$options[':object']="volume";
+									$options[':target']="line-in";
+									$options[':details']=$var;
+									break;
 							}
 							$edit_stmt->execute($options);
 						}
