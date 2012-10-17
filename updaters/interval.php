@@ -23,7 +23,13 @@ try {
 } catch (PDOException $e) {
     throw new Exception('Service is unavailable', 513);
 }
-
+$log_stmt = $db->prepare("INSERT INTO updater_log (time, worker_id, message, detail, type) VALUES (unix_timestamp(), :id, :message, :detail, 'interval')");
+$id = 'interval-'.getmypid().'-'.substr(sha1(rand(-1000,1000)), 0,5);
+$log_stmt->execute(array(
+	':id'=>$id,
+	':message'=>"Initialized Interval",
+	':detail'=>''
+	));
 if($redis->get('cleaned') < time() - 1800){
 	print("Updating Updaters List\n");
 	$redis->set('cleaned',time());
