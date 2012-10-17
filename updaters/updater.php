@@ -1,8 +1,7 @@
 <?php
-/*
+
 if(!isset($argv))
 	die("Must be run from the command line");
-*/
 
 if(!isset($argv) OR (isset($argv[1]) AND $argv[1] == "debug"))
 	define("DEBUG", true);
@@ -61,7 +60,7 @@ function to_seconds($duration) {
 require dirname(__FILE__).'/../system/classes/loggedPDO.php';
 //print($dbhost);
 try {
-	$db = new loggedPDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass);
+	$db = new PDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass);
 } catch (PDOException $e) {
     //$app['errors'][]= $e->getMessage();
     throw new Exception('Service is unavailable', 513);
@@ -219,6 +218,7 @@ $check_for_hash = $db->prepare("SELECT count(*) AS count FROM devices WHERE id =
 $update_stmt2 = $db->prepare("UPDATE companies_devices SET hash = :hash WHERE id = :id");
 $cleanup = $db->prepare("UPDATE devices SET online=0, licensekey='', updated = 0, updating=0, `serial` = 'New Device' WHERE id = 'da39a3ee5e6b4b0d3255bfef95601890afd80709'");
 $log_stmt = $db->prepare("INSERT INTO updater_log (time, worker_id, message, detail, type) VALUES (:time, :id, :message, :detail, 'updater')");
+$update_log_stmt = $db->prepare("INSERT INTO updater_log (time, worker_id, message, detail, type, update_time) VALUES (:time, :id, :message, :detail, 'updater',:update_time)");
 $history_start_stmt = $db->prepare("SELECT id FROM devices_history WHERE device_id = :id ORDER BY id DESC limit 1");
 $history_stmt = $db->prepare("INSERT INTO devices_history VALUES(:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46,:47,:48,:49, :50)");
 $update_device_hash = $db->prepare("UPDATE companies_devices SET hash = :hash WHERE id = :id");
@@ -363,7 +363,6 @@ while(time() <= $end){
 					sleep(5);
 					continue;
 				}
-				//echo $serial . " => " . $id;exit("\n\n");
 
 				$get_edits_stmt->execute(array(':id'=>$device['id']));
 				$edits = $get_edits_stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -545,6 +544,7 @@ while(time() <= $end){
 					));
 				} else {
 					$in_call = 1;
+					/*
 					$active_call = explode(chr(0x0a), $ssh->exec('status call active'));
 					$active_call = explode(',',$active_call[0]);
 					$call_time = to_seconds($active_call[10]);
@@ -569,6 +569,7 @@ while(time() <= $end){
 							':active'=>0
 						));
 					}
+					*/
 				}
 				$type = "camera";
 
@@ -658,12 +659,13 @@ while(time() <= $end){
 				//print("Updated: " . $name . " at " . time() . "(Hash is ".$device['hash'] . " | generated: ".$id.")(quitting at " . $end . ")\n");
 				if($res){
 					//print(sprintf("%s:%s| Updated %s (%s)\n", $time, $worker_id,$device['id'], $name));
-					$log_stmt->execute(array(
+					
+					$updated_log_stmt = array(
 						':time'=>$time,
 						':id'=>$worker_id,
 						':message'=>"Updated",
-						':detail'=>$device['id'] . " | Took ". $update_time ." seconds"
-					));
+						':detail'=>$device['id'],
+						':update_time'=>$update_time
 				} else{
 					//print(sprintf("Error updating %s:\n", $device['id']));print_r($update_stmt->errorInfo());
 				}
@@ -689,5 +691,5 @@ $log_stmt->execute(array(
 					));
 
 print("Closing!\n");
-if(DEBUG)	print_r($db->printlog());
+//if(DEBUG)	print_r($db->printlog());
 print("\n");

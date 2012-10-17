@@ -24,7 +24,8 @@ try {
     throw new Exception('Service is unavailable', 513);
 }
 
-if($redis->get('cleaned') < time() - 3600){
+if($redis->get('cleaned') < time() - 1800){
+	print("Updating Updaters List\n");
 	$redis->set('cleaned',time());
 	$devices = $db->query("SELECT companies_devices.id
 FROM companies_devices
@@ -45,6 +46,7 @@ ORDER BY devices.updated")->fetchAll(PDO::FETCH_ASSOC);
 if($redis->get('stats_generated') < time() - 15 * 60){
 	$redis->set('stats_generated', time());
 	
+	print("Updating Stats\n");
 	/*
 	SELECT AVG( (
 `RxV1PktsLost` +  `RxA1PktsLost` +  `RxV2PktsLost`
@@ -67,11 +69,5 @@ WHERE devices_history.duration > 0")->fetch(PDO::FETCH_ASSOC);
 	$averages['TxV1'] = $totals['TxV1'] / $d;
 	$averages['TxA1'] = $totals['TxA1'] / $d;
 	$averages['TxV2'] = $totals['TxV2'] / $d;
-	//print("Global Averages:\n");
-	//print_r($averages);
-	//$final = microtime(true);
-	//$total = $final - $start;
-	//print("Generated in " . round($total, 4) . " seconds\n");
-	//$redis->del('stats_generated');
 	$redis->set('cache.averages', json_encode($averages));
 }
