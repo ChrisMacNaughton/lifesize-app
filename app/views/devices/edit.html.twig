@@ -282,6 +282,15 @@
 				    	<div id="slider_line_in_volume" style="width: 220px;"></div>
 			    	</div>
 			    </div>
+			    <div class="control-group">
+				    <label class="control-label" for="audio_mute_device">Audio Mute</label>
+				    <div class="controls">
+				    	<select name="audio_mute_device">
+				    		<option {% if device.audio_mute_device == "all"%}selected="selected" {%endif%}value="all">All Inputs</option>
+				    		<option {% if device.audio_mute_device == "active_mic"%}selected="selected" {%endif%}value="active_mic">Active Microphone Only</option>
+			    		</select>
+			    	</div>
+			    </div>
 				<input type="hidden" name="section" value="audio">
 				<input type="submit" value="Save">
 			</form>

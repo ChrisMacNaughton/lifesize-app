@@ -399,11 +399,15 @@ LIMIT 1
 									break;
 								case "active_microphone_volume":
 									$options[':target']="gain";
-									$options[';details']=$var;
+									$options[':details']=$var;
 									break;
 								case "line_in_volume":
 									$options[':object']="volume";
 									$options[':target']="line-in";
+									$options[':details']=$var;
+									break;
+								case "audio_mute_device":
+									$options[':target']="mute-device";
 									$options[':details']=$var;
 									break;
 							}
