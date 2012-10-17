@@ -52,10 +52,10 @@ function to_seconds($duration) {
 
 
 
-require dirname(__FILE__).'/../system/classes/loggedPDO.php';
+//require dirname(__FILE__).'/../system/classes/loggedPDO.php';
 //print($dbhost);
 try {
-	$db = new loggedPDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass);
+	$db = new PDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass);
 } catch (PDOException $e) {
     //$app['errors'][]= $e->getMessage();
     throw new Exception('Service is unavailable', 513);
@@ -272,7 +272,7 @@ while(time() <= $end){
 		$device = $stmt->fetch(PDO::FETCH_ASSOC);
 		//print_r($device);
 		if($device['active'] == 0){
-			print(microtime(true) . " | Inactive company, skipping " . $device . "\n");
+			print(microtime(true) . " | Inactive company, skipping " . $device['name'] . "\n");
 			continue;
 		}
 		$duration = $device['duration'];
@@ -388,6 +388,140 @@ while(time() <= $end){
 					}
 				}
 				//print_r($edits);
+				
+				//print_r($options);
+				//print(sprintf("New data for %s is\n\tOnline: %s\n\tName: %s\n\tMake: %s\n\tModel: %s\n\tIn Call:%s\n\tVersion:%s\n", $device['name'], $online, $name, $make, $model, $in_call, $version));
+				/*
+				*	START GET CONFIG
+				*/
+				$settings = array();
+				$options = array(
+					':id'=>"INVALID_ENTRY",					
+					':name'=>"INVALID_ENTRY",
+					':make'=>"INVALID_ENTRY",
+					':model'=>"INVALID_ENTRY",
+					':call'=>"INVALID_ENTRY",
+					':version'=>"INVALID_ENTRY",
+					':license'=>"INVALID_ENTRY",
+					':type'=>"INVALID_ENTRY",
+					':serial'=>"INVALID_ENTRY",
+					':online'=>"INVALID_ENTRY",
+					':auto_answer'=>"INVALID_ENTRY",
+					':auto_answer_mute'=>"INVALID_ENTRY",
+					':incoming_call'=>"INVALID_ENTRY",
+					':outgoing_call'=>"INVALID_ENTRY",
+					':incoming_total'=>"INVALID_ENTRY",
+					':outgoing_total'=>"INVALID_ENTRY",
+					':auto_bw'=>"INVALID_ENTRY",
+					':max_calltime'=>"INVALID_ENTRY",
+					':max_redials'=>"INVALID_ENTRY",
+					':auto_multiway'=>"INVALID_ENTRY",
+					':codecs'=>"INVALID_ENTRY",
+					':active_mic'=>"INVALID_ENTRY",
+					':lock'=>"INVALID_ENTRY",
+					':telepresence'=>"INVALID_ENTRY",
+					':far_control'=>"INVALID_ENTRY",
+					':far_use'=>"INVALID_ENTRY",
+					':far_set'=>"INVALID_ENTRY",
+					':line_out_treble'=>"INVALID_ENTRY",
+					':line_out_bass'=>"INVALID_ENTRY",
+					':active_microphone_volume'=>"INVALID_ENTRY",
+					':line_in_volume'=>"0",
+					':audio_mute_device'=>"",
+					':video_call_audio_output'=>"INVALID_ENTRY",
+					':voice_call_audio_output'=>"INVALID_ENTRY",
+					':status_tone_volume'=>"INVALID_ENTRY",
+					':ring_tone_volume'=>"INVALID_ENTRY",
+					':dtmf_tone_volume'=>"INVALID_ENTRY",
+				);
+				$entries = array(
+					':active_mic'=>'active-mic',
+					':auto_answer'=>'auto-answer',
+					':auto_answer_mute'=>'auto-mute',
+					'max'=>'max-speed',
+					'total'=>'total-bw',
+					':auto_bw'=>'auto-bandwidth',
+					':max_calltime'=>'max-time',
+					':max_redials'=>'max-redial-entries',
+					':auto_multiway'=>'auto-multiway',
+					':codecs'=>'codecs',
+					':audio_active_microphone'=>'active-mic',
+					':telepresence'=>'telepresence',
+					':lock'=>'lock',
+					':far_control'=>'far-control',
+					':far_set'=>'far-set-preset',
+					':far_use'=>'far-use-preset',
+					':audio_mute_device'=>'mute-device',
+					':voice_call_audio_output'=>'audio-output',
+					':video_call_audio_output'=>'video-output',
+					':dtmf_tone_volume'=>'dtmf',
+					':ring_tone_volume'=>'ring-tone',
+					':status_tone_volume'=>'status-tone',
+					'eq'=>'eq',
+					':active_microphone_volume'=>'gain',
+					':line_in_volume'=>'line-in'
+				);
+				$res = $ssh->exec("get config");
+				$array = explode("\n", $res);
+				foreach($array as $entry){
+					//print("$entry\n");
+					if(substr($entry, 0, 1)!= '#'){
+						$tmp = explode(" ", $entry);
+						$key = (isset($tmp[2]))?array_search($tmp[2], $entries):false;
+						if($tmp[0] == "set" and !($key===false)){
+							$tmp = explode(' ',$entry);
+							$name = $tmp[1];
+							unset($tmp[0]);
+							unset($tmp[1]);
+							$setting = $tmp[2];
+							unset($tmp[2]);
+							$vals = str_replace('"', '', implode(' ',$tmp));
+							$settings[$name][$key] = $vals;
+						}
+					}
+				}
+				if(DEBUG) print_r($settings);
+				foreach($settings as $cat=>$cats){
+					foreach($cats as $name=>$setting){
+						if($cat == "audio" AND $name == ":codecs"){
+							$settings['audio'][':codecs'] = json_encode(explode(' ', $setting));
+						}
+						if($cat == "call" AND $name == "max"){
+							unset($settings['call']['max']);
+							$res = explode(' ',$setting);
+							$settings['call'][':incoming_call'] = ($res[1] == "auto")?0:$res[1];
+							$settings['call'][':outgoing_call'] = ($res[3] == "auto")?0:$res[3];
+						}
+						if($cat == "call" AND $name == "total"){
+							unset($settings['call']['total']);
+							$res = explode(' ',$setting);
+							$settings['call'][':incoming_total'] = ($res[1] == "" OR $res[1] == "auto")?0:$res[1];
+							$settings['call'][':outgoing_total'] = ($res[3] == "" OR $res[1] == "auto")?0:$res[3];
+						}
+						if($cat == "audio" AND $name == "eq"){
+							unset($settings['audio']['eq']);
+							$res = explode(' ',$setting);
+							$settings['audio'][':line_out_bass'] = $res[1];
+							$settings['audio'][':line_out_treble'] = $res[3];
+						}
+						if($cat == "camera" AND $name == "lock"){
+							$res = explode(' ', $setting);
+							$settings['camera']['lock'] = $res[2];
+						}
+						
+					}
+				}
+				foreach($settings as $cat=>$cats){
+					foreach($cats as $name=>$setting){
+						$options[$name]=$settings[$cat][$name];
+					}
+				}
+
+
+				/*
+				*	END GET CONFIG
+				*/
+
 				$online = 1;	
 				//get licensekey from device
 				$res = ($ssh->exec('get system licensekey -t maint'));
@@ -448,162 +582,26 @@ while(time() <= $end){
 						));
 					}
 				}
-				//get auto-answer from device
-				$s = microtime(true);
-				$auto_answer = assign('get call auto-answer', 'auto_answer', $device);
-
-				$times['auto-answer'] = microtime(true) - $s;
-				$s = microtime(true);
-				$auto_answer_mute = assign('get call auto-mute', 'auto_answer_mute', $device);
-				$times['auto-mute'] = microtime(true) - $s;
-				$s = microtime(true);
-				//get max-call-speed-mute from device
-				$res = clean($ssh->exec('get call max-speed'));
-				if($res){
-					$res = explode(',', $res);
-					$incoming_call_bandwidth = ($res[0] != "auto")?$res[0]:0;
-					$outgoing_call_bandwidth = ($res[1] != "auto")?$res[1]:0;
-				} else {
-					$incoming_call_bandwidth = $device['incoming_call_bandwidth'];
-					$outgoing_call_bandwidth = $device['outgoing_call_bandwidth'];
-				}
-				$times['call-bw'] = microtime(true) - $s;
-				$s = microtime(true);
-				//get max-bw from device
-				$res = clean($ssh->exec('get call total-bw'));
-				if($res){
-					$res = explode(',', $res);
-					$incoming_total_bandwidth = ($res[0] != "")?$res[0]:0;
-					$outgoing_total_bandwidth = ($res[1] != "")?$res[1]:0;
-				} else {
-					print_r($res);
-					$incoming_total_bandwidth = $device['incoming_total_bandwidth'];
-					$outgoing_total_bandwidth = $device['outgoing_total_bandwidth'];
-				}
-				$times['total-bw'] = microtime(true) - $s;
-				$s = microtime(true);
-				//auto-bandwitdh
-				$res = clean($ssh->exec('get call auto-bandwidth'));
-				if($res){
-					$auto_bandwidth = ($res == 'on')?'on':'off';
-				} else {
-					$auto_bandwidth = $device['auto_bandwidth'];
-				}
-				$times['auto-bw'] = microtime(true) - $s;
-				$s = microtime(true);
-				//max_calltime
-				$max_calltime = assign('get call max-time', 'max_calltime', $device);
-				$times['max_calltime'] = microtime(true) - $s;
-				$s = microtime(true);
-				//max_redials
-				$max_redials = assign('get call max-redial-entries','max_redials', $device);
-				$times['max-redials'] = microtime(true) - $s;
-				$s = microtime(true);
-				//auto_multiway
-				$auto_multiway = assign('get call auto-multiway', 'auto_multiway', $device);
-				$times['auto-multiway'] = microtime(true) - $s;
-				$s = microtime(true);
-				//audio_codecs
-				$res = clean($ssh->exec('get audio codecs'));
-				if($res){
-					$res = explode(' ', rtrim($res));
-					//$res = 
-					$codecs = json_encode($res);
-				} else {
-					$codecs = $device['audio_codecs'];
-				}
-				$times['codecs'] = microtime(true) - $s;
-				$s = microtime(true);
-				//audio active mic
-				$active_mic = assign('get audio active-mic', 'audio_active_microphone', $device);
-				$times['active-mic'] = microtime(true) - $s;
-				$s = microtime(true);
-				$telepresence = assign('get system telepresence', 'telepresence', $device);
-				$times['telepresence'] = microtime(true) - $s;
-				$s = microtime(true);
-				$lock = assign("get camera lock", 'camera_lock', $device);
-				$times['camera-lock'] = microtime(true) - $s;
-				$s = microtime(true);
-				$far_control = assign("get camera far-control", 'camera_far_control', $device);
-				$times['far-control'] = microtime(true) - $s;
-				$s = microtime(true);
-				$far_set_preset = assign("get camera far-set-preset", 'camera_far_set_preset', $device);
-				$times['far-set'] = microtime(true) - $s;
-				$s = microtime(true);
-				$far_use_preset = assign("get camera far-use-preset", 'camera_far_use_preset', $device);
-				$times['far-set'] = microtime(true) - $s;
-
-				$audio_mute_device = assign("get audio mute-device", "audio_mute_device", $device);
-				//print("Audio Mute Device:$audio_mute_device\n");
-				$voice_call_audio_output = assign("get audio audio-output", "voice_call_audio_output", $device);
-				$video_call_audio_output= assign("get audio video-output", "video_call_audio_output", $device);
-				$dtmf_tone_volume = assign("get volume dtmf", "dtmf_tone_volume", $device);
-				$ring_tone_volume = assign("get volume ring-tone", "ring_tone_volume", $device);
-				$status_tone_volume = assign("get volume status-tone", "status_tone_volume", $device);
-				$s =null;
-				if(strpos($lock, ',')){
-					$lock = explode(',',$lock);
-					$lock = $lock[1];
-				}
-				$res = clean($ssh->exec("get audio eq"));
-				if($res){
-					$res = explode(',', $res);
-					$lineout_bass = $res[0];
-					$lineout_treble = $res[1];
-				} else {
-					$lineout_treble = $device['line_out_treble'];
-					$lineout_bass = $device['line_out_bass'];
-				}$line_in_volume = assign('get volume line-in', 'line_in_volume',$device);
-				$active_microphone_volume = assign("get audio gain", "active_microphone_volume", $device);
 				$type = "camera";
-				$options = array(
+				
+				$update_stmt2->execute(array(
 					':hash'=>sha1($serial),
 					':id'=>$device['id']
-				);
-				$update_stmt2->execute($options);
-				//print_r($options);
-				//print(sprintf("New data for %s is\n\tOnline: %s\n\tName: %s\n\tMake: %s\n\tModel: %s\n\tIn Call:%s\n\tVersion:%s\n", $device['name'], $online, $name, $make, $model, $in_call, $version));
-				$update_time = microtime(true) - $update_start_time;
-				$options = array(
-					':id'=>sha1($serial),					
-					':name'=>$name,
-					':make'=>$make,
-					':model'=>$model,
-					':call'=>$in_call,
-					':version'=>$version,
-					':license'=>$licensekey,
-					':type'=>$type,
-					':serial'=>$serial,
-					':online'=>$online,
-					':auto_answer'=>$auto_answer,
-					':auto_answer_mute'=>$auto_answer_mute,
-					':incoming_call'=>$incoming_call_bandwidth,
-					':outgoing_call'=>$outgoing_call_bandwidth,
-					':incoming_total'=>$incoming_total_bandwidth,
-					':outgoing_total'=>$outgoing_total_bandwidth,
-					':auto_bw'=>$auto_bandwidth,
-					':max_calltime'=>$max_calltime,
-					':max_redials'=>$max_redials,
-					':auto_multiway'=>$auto_multiway,
-					':codecs'=>$codecs,
-					':active_mic'=>$active_mic,
-					':lock'=>$lock,
-					':telepresence'=>$telepresence,
-					':far_control'=>$far_control,
-					':far_use'=>$far_use_preset,
-					':far_set'=>$far_set_preset,
-					':line_out_treble'=>$lineout_treble,
-					':line_out_bass'=>$lineout_bass,
-					':active_microphone_volume'=>$active_microphone_volume,
-					':line_in_volume'=>$line_in_volume,
-					':audio_mute_device'=>$audio_mute_device,
-					':video_call_audio_output'=>$video_call_audio_output,
-					':voice_call_audio_output'=>$voice_call_audio_output,
-					':status_tone_volume'=>$status_tone_volume,
-					':ring_tone_volume'=>$ring_tone_volume,
-					':dtmf_tone_volume'=>$dtmf_tone_volume
-				);
+				));
 
+				$update_time = microtime(true) - $update_start_time;
+				$options[':id']=sha1($serial);				
+				$options[':name']=$name;
+				$options[':make']=$make;
+				$options[':model']=$model;
+				$options[':call']=$in_call;
+				$options[':version']=$version;
+				$options[':license']=$licensekey;
+				$options[':type']=$type;
+				$options[':serial']=$serial;
+				$options[':online']=$online;
+				
+				
 				$update_options = array(
 					':hash'=>$options[':id'],
 					':id'=>$device['id']
@@ -611,15 +609,20 @@ while(time() <= $end){
 				$update_stmt2->execute($update_options);
 				$check_for_hash->execute(array(':id'=>$options[':id']));
 				$count = $check_for_hash->fetch(PDO::FETCH_ASSOC);
-				//print_r($options);
+
+				if(DEBUG) print_r($options);
+				if(DEBUG) print("Count: " .count($options) . "\n");
+				if(DEBUG) break;
 				if($count['count'] == 0){
 					$res = $new_device_stmt->execute($options);
+					//print_r($new_device_stmt->errorInfo());
 					//print("New!\n");
 				} else{
 					$res = $update_stmt->execute($options);
+					//print_r($update_stmt->errorInfo());
 					//print("Updating!\n");
 				}
-
+				
 				/*
 				get call history
 				*/
@@ -680,6 +683,7 @@ while(time() <= $end){
 				} else{
 					//print(sprintf("Error updating %s:\n", $device['id']));print_r($update_stmt->errorInfo());
 				}
+				
 			}
 			//echo $licensekey . "\n";
 		}
@@ -688,6 +692,7 @@ while(time() <= $end){
 		if(DEBUG){
 			print_r($times);
 		}
+		if(DEBUG) break;
 	}
 }
 }
