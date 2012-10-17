@@ -71,3 +71,34 @@ WHERE devices_history.duration > 0")->fetch(PDO::FETCH_ASSOC);
 	$averages['TxV2'] = $totals['TxV2'] / $d;
 	$redis->set('cache.averages', json_encode($averages));
 }
+
+if($redis->get('device_stats_generated') < time() - 15 * 60){
+	print("Updating device stats!\n");
+	$redis->set('device_stats_generated', time());
+	
+	print("Updating Stats\n");
+
+	$start = microtime(true);
+	$models = $db->query("SELECT distinct model as model FROM devices WHERE model IS NOT null")->fetchAll(PDO::FETCH_ASSOC);
+
+	foreach($models as $model){
+		$model = $model['model'];
+		$totals = $db->query("SELECT SUM(  `RxV1PktsLost` ) AS RxV1, SUM(  `RxA1PktsLost` ) AS RxA1, SUM(  `RxV2PktsLost` ) AS RxV2, SUM(  `TxV1PktsLost` ) AS TxV1, SUM( `TxA1PktsLost` ) AS TxA1, SUM(  `TxV2PktsLost` ) AS TxV2, SUM( devices_history.duration ) AS Duration
+FROM devices_history
+INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id
+INNER JOIN devices ON devices.id = devices_history.device_id
+WHERE devices_history.duration >0
+	AND devices.model = '$model'")->fetch(PDO::FETCH_ASSOC);
+		$d = ($totals['Duration'] / 60);
+	$averages[$model]['RxV1'] = $totals['RxV1'] / $d;
+	$averages[$model]['RxA1'] = $totals['RxA1'] / $d;
+	$averages[$model]['RxV2'] = $totals['RxV2'] / $d;
+	$averages[$model]['TxV1'] = $totals['TxV1'] / $d;
+	$averages[$model]['TxA1'] = $totals['TxA1'] / $d;
+	$averages[$model]['TxV2'] = $totals['TxV2'] / $d;
+	}
+	//print_r($averages);
+	$redis->set('cache.device_averages', json_encode($averages));
+	//$redis->del('device_stats_generated');
+}
+

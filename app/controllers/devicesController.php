@@ -14,7 +14,7 @@ class devicesController extends Controller {
 			'headercolor'=>'66cc66',
 		);
 		$data['average_loss'] = json_decode($this->redis->get('cache.averages'), true);
-
+		$data['device_averages'] = json_decode($this->redis->get('cache.device_averages'), true);
 		$time_limit = 0;
 		$loss7 = array();
 		$loss30 = array();
