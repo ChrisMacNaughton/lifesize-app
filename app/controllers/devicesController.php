@@ -14,7 +14,7 @@ class devicesController extends Controller {
 			'headercolor'=>'66cc66',
 		);
 		$data['average_loss'] = json_decode($this->redis->get('cache.averages'), true);
-		$data['device_averages'] = json_decode($this->redis->get('cache.device_averages'), true);
+
 		$time_limit = 0;
 		$loss7 = array();
 		$loss30 = array();
@@ -267,6 +267,8 @@ LIMIT 1
 		ksort($data['loss120']);
 		$data['loss_names'] = array_keys($data['average_loss']);
 		$data['device'] = $this->user->devices[$id];
+		$avg = json_decode($this->redis->get('cache.device_averages'), true);
+		$data['device_averages'] = $avg[$data['device']['model']];
 		$this->render('devices/view.html.twig', $data);
 	}
 	public function verifyAction($id){

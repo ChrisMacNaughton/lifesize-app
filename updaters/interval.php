@@ -79,6 +79,7 @@ WHERE devices_history.duration > 0")->fetch(PDO::FETCH_ASSOC);
 }
 
 if($redis->get('device_stats_generated') < time() - 15 * 60){
+	$averages = array();
 	print("Updating device stats!\n");
 	$redis->set('device_stats_generated', time());
 	
