@@ -23,7 +23,7 @@ class devicesController extends Controller {
 		$loss120 = array();
 		$loss = array();
 		$call_counts = array();
-		$min_loss = 0.005;
+		$min_loss = -0.1;
 		/*
 		$stmt = $this->db->prepare("SELECT SUM(  `RxV1PktsLost` ) AS RxV1, SUM(  `RxA1PktsLost` ) AS RxA1, SUM(  `RxV2PktsLost` ) AS RxV2, SUM(  `TxV1PktsLost` ) AS TxV1, SUM( `TxA1PktsLost` ) AS TxA1, SUM(  `TxV2PktsLost` ) AS TxV2, SUM(  `Duration` ) AS Duration
 FROM devices_history
@@ -249,6 +249,7 @@ LIMIT 1
 			$duration = $duration / 24;
 			$duration_scale = "days";
 		}
+
 		$data['loss0'] = $loss0;
 		$data['loss7'] = $loss7;
 		$data['loss30'] = $loss30;
@@ -264,7 +265,7 @@ LIMIT 1
 		ksort($data['loss90']);
 		ksort($data['average_loss']);
 		ksort($data['loss120']);
-
+		$data['loss_names'] = array_keys($data['average_loss']);
 		$data['device'] = $this->user->devices[$id];
 		$this->render('devices/view.html.twig', $data);
 	}
