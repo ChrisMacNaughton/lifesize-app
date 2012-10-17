@@ -295,8 +295,8 @@
 				    <div class="controls">
 				    	<select name="video_call_audio_output">
 				    		<option {% if device.video_call_audio_output == "phone"%}selected="selected" {%endif%}value="phone">Phone</option>
-				    		<option {% if device.video_call_audio_output == "line_out"%}selected="selected" {%endif%}value="line_out">Line Out</option>
-				    		<option {% if device.video_call_audio_output == "hd_out"%}selected="selected" {%endif%}value="hd_out">HD Out</option>
+				    		<option {% if device.video_call_audio_output == "room"%}selected="selected" {%endif%}value="room">Line Out</option>
+				    		<option {% if device.video_call_audio_output == "hdmi"%}selected="selected" {%endif%}value="hdmit">HD Out</option>
 			    		</select>
 			    	</div>
 			    </div>
@@ -304,9 +304,44 @@
 				    <div class="controls">
 				    	<select name="voice_call_audio_output">
 				    		<option {% if device.voice_call_audio_output == "phone"%}selected="selected" {%endif%}value="phone">Phone</option>
-				    		<option {% if device.voice_call_audio_output == "line_out"%}selected="selected" {%endif%}value="line_out">Line Out</option>
-				    		<option {% if device.voice_call_audio_output == "hd_out"%}selected="selected" {%endif%}value="hd_out">HD Out</option>
+				    		<option {% if device.voice_call_audio_output == "room"%}selected="selected" {%endif%}value="room">Line Out</option>
+				    		<option {% if device.voice_call_audio_output == "hdmi"%}selected="selected" {%endif%}value="hdmi">HD Out</option>
 			    		</select>
+			    	</div>
+			    </div>
+			    <div class="control-group">
+				    <label class="control-label" for="line_out_treble">Line Out Treble</label>
+				    <div class="controls">
+				    	<div class="input-append"><input type="text" id="line_out_treble" disabled="disabled" name="line_out_treble" value="{{device.line_out_treble}}"><span class="add-on">dB</span></div>
+				    	<div id="slider_line_out_treble" style="width: 220px;"></div>
+			    	</div>
+			    </div>
+			    <div class="control-group">
+				    <label class="control-label" for="line_out_bass">Line Out Bass</label>
+				    <div class="controls">
+				    	<div class="input-append"><input type="text" id="line_out_bass" disabled="disabled" name="line_out_bass" value="{{device.line_out_bass}}"><span class="add-on">dB</span></div>
+				    	<div id="slider_line_out_bass" style="width: 220px;"></div>
+			    	</div>
+			    </div>
+			    <div class="control-group">
+				    <label class="control-label" for="ring_tone_volume">Ring Tone Volume</label>
+				    <div class="controls">
+				    	<input type="text" id="ring_tone_volume" disabled="disabled" name="ring_tone_volume" value="{{device.ring_tone_volume}}">
+				    	<div id="slider_ring_tone_volume" style="width: 220px;"></div>
+			    	</div>
+			    </div>
+			    <div class="control-group">
+				    <label class="control-label" for="dtmf_tone_volume">DTMF Tone Volume</label>
+				    <div class="controls">
+				    	<input type="text" id="dtmf_tone_volume" disabled="disabled" name="ring_tone_volume" value="{{device.dtmf_tone_volume}}">
+				    	<div id="slider_dtmf_tone_volume" style="width: 220px;"></div>
+			    	</div>
+			    </div>
+			     <div class="control-group">
+				    <label class="control-label" for="status_tone_volume">Status Tone Volume</label>
+				    <div class="controls">
+				    	<input type="text" id="status_tone_volume" disabled="disabled" name="status_tone_volume" value="{{device.status_tone_volume}}">
+				    	<div id="slider_status_tone_volume" style="width: 220px;"></div>
 			    	</div>
 			    </div>
 				<input type="hidden" name="section" value="audio">
@@ -588,6 +623,51 @@ function selectAllOptions(selStr)
             step: 1,
             slide: function( event, ui ) {
                 $( "#line_in_volume" ).val( ui.value );
+            }
+        });
+        $( "#slider_line_out_treble" ).slider({
+            value:{{device.line_out_treble}},
+            min: -10,
+            max: 10,
+            step: 1,
+            slide: function( event, ui ) {
+                $( "#line_out_treble" ).val( ui.value);
+            }
+        });
+        $( "#slider_line_out_bass" ).slider({
+            value:{{device.line_out_bass}},
+            min: -10,
+            max: 10,
+            step: 1,
+            slide: function( event, ui ) {
+                $( "#line_out_bass" ).val( ui.value);
+            }
+        });
+        $( "#slider_ring_tone_volume" ).slider({
+            value:{{device.ring_tone_volume}},
+            min: 0,
+            max: 10,
+            step: 1,
+            slide: function( event, ui ) {
+                $( "#ring_tone_volume" ).val( ui.value);
+            }
+        });
+         $( "#slider_dtmf_tone_volume" ).slider({
+            value:{{device.dtmf_tone_volume}},
+            min: 0,
+            max: 10,
+            step: 1,
+            slide: function( event, ui ) {
+                $( "#dtmf_tone_volume" ).val( ui.value);
+            }
+        });
+          $( "#slider_status_tone_volume" ).slider({
+            value:{{device.status_tone_volume}},
+            min: 0,
+            max: 10,
+            step: 1,
+            slide: function( event, ui ) {
+                $( "#status_tone_volume" ).val( ui.value);
             }
         });
     });

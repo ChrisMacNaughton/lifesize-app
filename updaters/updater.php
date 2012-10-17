@@ -1,6 +1,11 @@
 <?php
 if(!isset($argv))
 	die("Must be run from the command line");
+
+if(isset($argv[1]) AND $argv[1] == "debug")
+	define("DEBUG", true);
+else
+	define("DEBUG", false);
 date_default_timezone_set("UTC");
 $worker_id = getmypid().'-'.substr(sha1(rand(-1000,1000)), 0,5);
 require_once 'mySSH.php';
@@ -28,6 +33,9 @@ function clean($command){
 function assign($clean, $name, $device){
 	global $ssh;
 	$res = clean($ssh->exec($clean));
+	if(DEBUG)print("$name:");
+	if(DEBUG)print_r($res);
+	if(DEBUG)print("\n");
 	if($res){
 		$ret = $res;
 	} else {
@@ -95,7 +103,12 @@ D.line_out_bass,
 D.line_out_treble,
 D.line_in_volume,
 D.active_microphone_volume,
-D.audio_mute_device
+D.audio_mute_device,
+D.voice_call_audio_output,
+D.video_call_audio_output,
+D.status_tone_volume,
+D.ring_tone_volume,
+D.dtmf_tone_volume
 FROM companies_devices AS CD
 INNER JOIN companies ON companies.id = CD.company_id
 INNER JOIN devices AS D ON CD.hash = D.id
@@ -150,7 +163,12 @@ $update_stmt = $db->prepare("UPDATE devices
 	line_out_bass=:line_out_bass,
 	active_microphone_volume=:active_microphone_volume,
 	line_in_volume=:line_in_volume,
-	audio_mute_device=:audio_mute_device
+	audio_mute_device=:audio_mute_device,
+	voice_call_audio_output=:voice_call_audio_output,
+	video_call_audio_output=:video_call_audio_output,
+	status_tone_volume=:status_tone_volume,
+	ring_tone_volume=:ring_tone_volume,
+	dtmf_tone_volume=:dtmf_tone_volume
 	WHERE id = :id");
 $new_device_stmt = $db->prepare("INSERT INTO devices
 	SET id=:id,
@@ -185,7 +203,12 @@ $new_device_stmt = $db->prepare("INSERT INTO devices
 	line_out_bass=:line_out_bass,
 	active_microphone_volume=:active_microphone_volume,
 	line_in_volume=:line_in_volume,
-	audio_mute_device=:audio_mute_device");
+	audio_mute_device=:audio_mute_device,
+	voice_call_audio_output=:voice_call_audio_output,
+	video_call_audio_output=:video_call_audio_output,
+	status_tone_volume=:status_tone_volume,
+	ring_tone_volume=:ring_tone_volume,
+	dtmf_tone_volume=:dtmf_tone_volume");
 $check_for_hash = $db->prepare("SELECT count(*) AS count FROM devices WHERE id = :id");
 $update_stmt2 = $db->prepare("UPDATE companies_devices SET hash = :hash WHERE id = :id");
 $cleanup = $db->prepare("UPDATE devices SET online=0, licensekey='', updated = 0, updating=0, `serial` = 'New Device' WHERE id = 'da39a3ee5e6b4b0d3255bfef95601890afd80709'");
@@ -215,7 +238,7 @@ if(DEV_ENV){
 $end = $start + $max_runtime;
 
 while(time() <= $end){
-
+	$times = array();
 	$time = time();
 	$cleanup_log_stmt->execute(array(':time'=>$time));
 
@@ -268,7 +291,7 @@ while(time() <= $end){
 			//print("Locked!\n");
 
 			
-			//print($device['id'] . "\n");
+			if(DEBUG)print($device['id'] . "\n");
 			$update_start_time = microtime(true);
 			$ssh = new mySSH($device['ip']);
 			if($ssh===false){
@@ -294,9 +317,9 @@ while(time() <= $end){
 					));
 				}
 			} else {
-
+				$ssh->exec("set help-mode off");
 				$online_stmt->execute(array(':id'=>$device['hash']));
-				//print("Logged in!\n");
+				if(DEBUG)print("Logged in!\n");
 
 				//echo $serial . " => " . $id;exit("\n\n");
 				
@@ -346,7 +369,9 @@ while(time() <= $end){
 					$update_device_hash->execute(array(':hash'=>$device_id, ':id'=>$device['id']));
 					continue;
 				}
-				if($device['updated'] > time() - 60){
+				$updated = time() - $device['updated'];
+				if($updated < 60){
+					if(DEBUG) print("Device was updated $updated seconds ago\n");
 					sleep(5);
 					continue;
 				}
@@ -509,6 +534,12 @@ while(time() <= $end){
 				$times['far-set'] = microtime(true) - $s;
 
 				$audio_mute_device = assign("get audio mute-device", "audio_mute_device", $device);
+				//print("Audio Mute Device:$audio_mute_device\n");
+				$voice_call_audio_output = assign("get audio audio-output", "voice_call_audio_output", $device);
+				$video_call_audio_output= assign("get audio video-output", "video_call_audio_output", $device);
+				$dtmf_tone_volume = assign("get volume dtmf", "dtmf_tone_volume", $device);
+				$ring_tone_volume = assign("get volume ring-tone", "ring_tone_volume", $device);
+				$status_tone_volume = assign("get volume status-tone", "status_tone_volume", $device);
 				$s =null;
 				if(strpos($lock, ',')){
 					$lock = explode(',',$lock);
@@ -565,7 +596,12 @@ while(time() <= $end){
 					':line_out_bass'=>$lineout_bass,
 					':active_microphone_volume'=>$active_microphone_volume,
 					':line_in_volume'=>$line_in_volume,
-					':audio_mute_device'=>$audio_mute_device
+					':audio_mute_device'=>$audio_mute_device,
+					':video_call_audio_output'=>$video_call_audio_output,
+					':voice_call_audio_output'=>$voice_call_audio_output,
+					':status_tone_volume'=>$status_tone_volume,
+					':ring_tone_volume'=>$ring_tone_volume,
+					':dtmf_tone_volume'=>$dtmf_tone_volume
 				);
 
 				$update_options = array(
@@ -649,7 +685,7 @@ while(time() <= $end){
 		}
 		$cleanup->execute();
 		$ssh = null;
-		if(isset($argv[1]) AND $argv[1] == 'debug'){
+		if(DEBUG){
 			print_r($times);
 		}
 	}

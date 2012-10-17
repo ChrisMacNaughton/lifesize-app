@@ -410,6 +410,37 @@ LIMIT 1
 									$options[':target']="mute-device";
 									$options[':details']=$var;
 									break;
+								case "video_call_audio_output":
+									$options[':target']='video-output';
+									$options[':details']=$var;
+									break;
+								case "audio_call_audio_output":
+									$options[':target']='audio-output';
+									$options[':details']=$var;
+									break;
+								case "line_out_treble":
+									$options[':target']="eq -t";
+									$options[':details']=$var;
+									break;
+								case "line_out_bass":
+									$options[':target']="eq -b";
+									$options[':details']=$var;
+									break;
+								case "ring_tone_volume":
+									$options[':object']="volume";
+									$options[':target']="ring-tone";
+									$options[':details'] = $var;
+									break;
+								case "status_tone_volume":
+									$options[':object']="volume";
+									$options[':target']="status-tone";
+									$options[':details'] = $var;
+									break;
+								case "dtmf_tone_volume":
+									$options[':object']="volume";
+									$options[':target']="dtmf";
+									$options[':details'] = $var;
+									break;
 							}
 							$edit_stmt->execute($options);
 						}
