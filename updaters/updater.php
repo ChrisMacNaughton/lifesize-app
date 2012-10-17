@@ -1,11 +1,17 @@
 <?php
+/*
 if(!isset($argv))
 	die("Must be run from the command line");
+*/
 
-if(isset($argv[1]) AND $argv[1] == "debug")
+if(!isset($argv) OR (isset($argv[1]) AND $argv[1] == "debug"))
 	define("DEBUG", true);
 else
 	define("DEBUG", false);
+
+if(!isset($argv))
+	header("Content-Type: text/plain");
+
 date_default_timezone_set("UTC");
 $worker_id = getmypid().'-'.substr(sha1(rand(-1000,1000)), 0,5);
 require_once 'mySSH.php';
@@ -52,10 +58,10 @@ function to_seconds($duration) {
 
 
 
-//require dirname(__FILE__).'/../system/classes/loggedPDO.php';
+require dirname(__FILE__).'/../system/classes/loggedPDO.php';
 //print($dbhost);
 try {
-	$db = new PDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass);
+	$db = new loggedPDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass);
 } catch (PDOException $e) {
     //$app['errors'][]= $e->getMessage();
     throw new Exception('Service is unavailable', 513);
@@ -224,7 +230,11 @@ $log_stmt->execute(array(
 	));
 
 $cleanup_log_stmt = $db->prepare("DELETE FROM updater_log WHERE `time` < (:time - 86400)");
-$offline_alarm = $db->prepare("INSERT INTO devices_alarms (`active`,`device_id`,`alarm_id`) VALUES(:active, :id, 'alarm-jfu498hf') ON DUPLICATE KEY UPDATE devices_alarms SET active = :active WHERE device_id = :id AND alarm_id = 'alarm-jfu498hf'");
+$check_offline_alarm = $db->prepare("SELECT count(*) AS count FROM devices_alarms WHERE device_id = :id AND alarm_id = 'alarm-jfu498hf'");
+$new_offline_alarm = $db->prepare("INSERT INTO devices_alarms (`active`,`device_id`,`alarm_id`)
+VALUES(:active, :id, 'alarm-jfu498hf')");
+$update_offline_alarm = $db->prepare("UPDATE devices_alarms SET active = :active
+	WHERE device_id = :id AND alarm_id = 'alarm-jfu498hf'");
 $high_loss_stmt = $db->prepare("UPDATE devices_alarms SET active = :active WHERE device_id = :id AND alarm_id = 'alarm-abwo7froseb'");
 $get_edits_stmt = $db->prepare("SELECT * FROM edits WHERE device_id = :id AND completed = 0 ORDER BY added");
 $edit_completed_stmt = $db->prepare("UPDATE edits SET completed = 1 WHERE id = :id");
@@ -298,10 +308,9 @@ while(time() <= $end){
 				$offline_stmt->execute(array(':id'=>$device['hash']));
 			}
 			$pw = ($device['password'] != '')?$device['password'] : 'lifesize';
+			//if(DEBUG) print("Logging in with auto: $pw\n");
+
 			if(!$ssh->login('auto', $pw)){
-				/* TODO: 
-				*	implement a password incorrect error
-				*/
 				$offline_stmt->execute(array(':id'=>$device['hash']));
 				//print_r($offline_stmt->errorInfo());
 				$log_stmt->execute(array(
@@ -311,55 +320,34 @@ while(time() <= $end){
 							':detail'=>$device['id']
 						));
 				if($device['online'] == 0){
-					$offline_alarm->execute(array(
-						':id'=>$device['id'],
-						':active'=>1
-					));
-				}
-			} else {
-				$ssh->exec("set help-mode off");
-				$online_stmt->execute(array(':id'=>$device['hash']));
-				if(DEBUG)print("Logged in!\n");
-
-				//echo $serial . " => " . $id;exit("\n\n");
-				
-				$get_edits_stmt->execute(array(':id'=>$device['id']));
-				$edits = $get_edits_stmt->fetchAll(PDO::FETCH_ASSOC);
-				foreach($edits as $edit){
-					$command = $edit['verb'] . ' ' . $edit['object'] . ' ' . $edit['target'] . ' ' . $edit['details'];
-					$res = explode(chr(0x0a), $ssh->exec($command));
-					//print("Edit: ".$command . "\n");
-					if(array_search('ok,00', $res)){
-						$edit_completed_stmt->execute(array(':id'=>$edit['id']));
+					$check_offline_alarm->execute(array(':id'=>$device['id']));
+					$res = $check_offline_alarm->fetch(PDO::FETCH_ASSOC);
+					if($res['count'] != 0){
+						$update_offline_alarm->execute(array(
+							':id'=>$device['id'],
+							':active'=>1
+						));
+					}else{
+						$new_offline_alarm->execute(array(
+							':id'=>$device['id'],
+							':active'=>1
+						));
 					}
 				}
-				
-
-				
-				
-				$update_start_time = microtime(true);
-			$ssh = new mySSH($device['ip']);
-			$pw = ($device['password'] != '')?$device['password'] : 'lifesize';
-			if(!$ssh->login('auto', $pw)){
-				$offline_stmt->execute(array(':id'=>$device['hash']));
-				//print_r($offline_stmt->errorInfo());
-				$log_stmt->execute(array(
-							':time'=>$time,
-							':id'=>$worker_id,
-							':message'=>"Tried",
-							':detail'=>$device['id']
-						));
-				if($device['online'] == 0){
-					$offline_alarm->execute(array(
-						':id'=>$device['id'],
-						':active'=>1
-					));
-				}
 			} else {
-				$offline_alarm->execute(array(
-						':id'=>$device['id'],
-						':active'=>0
-					));
+				$check_offline_alarm->execute(array(':id'=>$device['id']));
+					$res = $check_offline_alarm->fetch(PDO::FETCH_ASSOC);
+					if($res['count'] != 0){
+						$update_offline_alarm->execute(array(
+							':id'=>$device['id'],
+							':active'=>0
+						));
+					}else{
+						$new_offline_alarm->execute(array(
+							':id'=>$device['id'],
+							':active'=>0
+						));
+					}
 				$res = explode(chr(0x0a), $ssh->exec("get system serial"));
 				$serial = $res[0];
 
@@ -480,7 +468,7 @@ while(time() <= $end){
 						}
 					}
 				}
-				if(DEBUG) print_r($settings);
+				//if(DEBUG) print_r($settings);
 				foreach($settings as $cat=>$cats){
 					foreach($cats as $name=>$setting){
 						if($cat == "audio" AND $name == ":codecs"){
@@ -528,7 +516,7 @@ while(time() <= $end){
 				if($res){
 					$licensekey = explode(chr(0x0a), $res);
 					$licensekey = $licensekey[0];
-					$new_license->execute(array(':license'=>$licensekey,':id'=>$device['id']));
+					$new_license->execute(array(':license'=>$licensekey,':id'=>$device['hash']));
 				}
 				//get name from device
 				$name = assign('get system name', 'name', $device);
@@ -549,14 +537,14 @@ while(time() <= $end){
 					$version = $device['version'];
 				}
 				$res = explode(chr(0x0a), $ssh->exec('status call active'));
-				if(array_search('ok,00', $res)){
+				if(array_search('ok,00', $res) AND $res[0] == ''){
 					$in_call = ($res[0] == '')?0 : 1;
 					$high_loss_stmt->execute(array(
 						':id'=>$device['id'],
 						':active'=>0
 					));
 				} else {
-					$in_call = $device['in_call'];
+					$in_call = 1;
 					$active_call = explode(chr(0x0a), $ssh->exec('status call active'));
 					$active_call = explode(',',$active_call[0]);
 					$call_time = to_seconds($active_call[10]);
@@ -583,11 +571,6 @@ while(time() <= $end){
 					}
 				}
 				$type = "camera";
-				
-				$update_stmt2->execute(array(
-					':hash'=>sha1($serial),
-					':id'=>$device['id']
-				));
 
 				$update_time = microtime(true) - $update_start_time;
 				$options[':id']=sha1($serial);				
@@ -610,9 +593,9 @@ while(time() <= $end){
 				$check_for_hash->execute(array(':id'=>$options[':id']));
 				$count = $check_for_hash->fetch(PDO::FETCH_ASSOC);
 
-				if(DEBUG) print_r($options);
-				if(DEBUG) print("Count: " .count($options) . "\n");
-				if(DEBUG) break;
+				//if(DEBUG) print_r($options);
+				//if(DEBUG) print("Count: " .count($options) . "\n");
+				
 				if($count['count'] == 0){
 					$res = $new_device_stmt->execute($options);
 					//print_r($new_device_stmt->errorInfo());
@@ -623,6 +606,7 @@ while(time() <= $end){
 					//print("Updating!\n");
 				}
 				
+				//if(DEBUG) break;
 				/*
 				get call history
 				*/
@@ -692,9 +676,7 @@ while(time() <= $end){
 		if(DEBUG){
 			print_r($times);
 		}
-		if(DEBUG) break;
 	}
-}
 }
 
 $redis->decr('workers.count');
@@ -706,4 +688,6 @@ $log_stmt->execute(array(
 						':detail'=>"Max Execution time reached"
 					));
 
-print("Closing!");
+print("Closing!\n");
+if(DEBUG)	print_r($db->printlog());
+print("\n");

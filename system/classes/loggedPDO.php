@@ -16,7 +16,10 @@ class LoggedPDO extends PDO
         $result = parent::query($query);
         $time = microtime(true) - $start;
         LoggedPDO::$log[] = array('query' => $query,
-                                  'time' => round($time * 1000, 3));
+                                  'time' => round($time * 1000, 3),
+                                  'errors'=>$result->errorInfo(),
+                                  'vars'=>''
+                                  );
         return $result;
     }
 
@@ -33,7 +36,7 @@ class LoggedPDO extends PDO
         //echo '<table border=1><tr><th>Query</th><th>Time (ms)</th></tr>';
         foreach(self::$log as $entry) {
             $totalTime += $entry['time'];
-            $final[] = array('entry'=>$entry['query'], 'time'=>$entry['time']);
+            $final[] = array('entry'=>$entry['query'], 'time'=>$entry['time'], 'vars'=>$entry['vars'], 'errors'=>$entry['errors']);
         }
         $final['meta'] = array(
         	'count'=>count(self::$log),
@@ -63,7 +66,9 @@ class LoggedPDOStatement {
         $result = $this->statement->execute($vars);
         $time = microtime(true) - $start;
         LoggedPDO::$log[] = array('query' => '[PS] ' . $this->statement->queryString,
-                                  'time' => round($time * 1000, 3));
+                                  'time' => round($time * 1000, 3),
+                                  'vars'=>$vars,
+                                  'errors'=>$this->statement->errorInfo());
         return $result;
     }
     /**
