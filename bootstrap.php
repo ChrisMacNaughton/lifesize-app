@@ -15,10 +15,13 @@ $single_server = array(
     'host'     => $redis_server,
     'port'     => 6379,
 );
-
-$redis = new Predis\Client($single_server);
-$redis->auth($redis_pass);
-
+try{
+	$redis = new Predis\Client($single_server);
+	$redis->auth($redis_pass);
+}
+catch(Exception $e){
+	$redis=false;
+}
 try {
 	$db = new loggedPDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass);
 } catch (PDOException $e) {

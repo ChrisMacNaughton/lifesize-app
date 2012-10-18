@@ -13,7 +13,23 @@ class devicesController extends Controller {
 		$data=array(
 			'headercolor'=>'66cc66',
 		);
-		$data['average_loss'] = json_decode($this->redis->get('cache.averages'), true);
+		if($this->redis){
+			$data['average_loss'] = json_decode($this->redis->get('cache.averages'), true);
+		} else {
+			$totals = $this->db->query("SELECT SUM(  `RxV1PktsLost` ) AS RxV1, SUM(  `RxA1PktsLost` ) AS RxA1, SUM(  `RxV2PktsLost` ) AS RxV2, SUM(  `TxV1PktsLost` ) AS TxV1, SUM( `TxA1PktsLost` ) AS TxA1, SUM(  `TxV2PktsLost` ) AS TxV2, SUM(  `Duration` ) AS Duration
+			FROM devices_history
+			INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id
+			WHERE devices_history.duration > 0")->fetch(PDO::FETCH_ASSOC);
+
+			$d = ($totals['Duration'] / 60);
+			$averages['RxV1'] = $totals['RxV1'] / $d;
+			$averages['RxA1'] = $totals['RxA1'] / $d;
+			$averages['RxV2'] = $totals['RxV2'] / $d;
+			$averages['TxV1'] = $totals['TxV1'] / $d;
+			$averages['TxA1'] = $totals['TxA1'] / $d;
+			$averages['TxV2'] = $totals['TxV2'] / $d;
+			$data['average_loss'] = $averages;
+		}
 
 		$time_limit = 0;
 		$loss7 = array();
@@ -267,8 +283,33 @@ LIMIT 1
 		ksort($data['loss120']);
 		$data['loss_names'] = array_keys($data['average_loss']);
 		$data['device'] = $this->user->devices[$id];
-		$avg = json_decode($this->redis->get('cache.device_averages'), true);
-		$data['device_averages'] = $avg[$data['device']['model']];
+		if($this->redis){
+			$avg = json_decode($this->redis->get('cache.device_averages'), true);
+			$data['device_averages'] = $avg[$data['device']['model']];
+		} else {
+			$averages = array();
+			$model = $data['device']['model'];
+			$totals = $this->db->query("SELECT SUM(  `RxV1PktsLost` ) AS RxV1, SUM(  `RxA1PktsLost` ) AS RxA1, SUM(  `RxV2PktsLost` ) AS RxV2, SUM(  `TxV1PktsLost` ) AS TxV1, SUM( `TxA1PktsLost` ) AS TxA1, SUM(  `TxV2PktsLost` ) AS TxV2, SUM( devices_history.duration ) AS Duration
+			FROM devices_history
+			INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id
+			INNER JOIN devices ON devices.id = devices_history.device_id
+			WHERE devices_history.duration >0
+			AND devices.model = '$model'")->fetch(PDO::FETCH_ASSOC);
+			echo "<!--";print("SELECT SUM(  `RxV1PktsLost` ) AS RxV1, SUM(  `RxA1PktsLost` ) AS RxA1, SUM(  `RxV2PktsLost` ) AS RxV2, SUM(  `TxV1PktsLost` ) AS TxV1, SUM( `TxA1PktsLost` ) AS TxA1, SUM(  `TxV2PktsLost` ) AS TxV2, SUM( devices_history.duration ) AS Duration
+			FROM devices_history
+			INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id
+			INNER JOIN devices ON devices.id = devices_history.device_id
+			WHERE devices_history.duration >0
+			AND devices.model = '$model'");echo"-->";
+				$d = ($totals['Duration'] / 60);
+			$averages['RxV1'] = $totals['RxV1'] / $d;
+			$averages['RxA1'] = $totals['RxA1'] / $d;
+			$averages['RxV2'] = $totals['RxV2'] / $d;
+			$averages['TxV1'] = $totals['TxV1'] / $d;
+			$averages['TxA1'] = $totals['TxA1'] / $d;
+			$averages['TxV2'] = $totals['TxV2'] / $d;
+			$data['device_averages'] = $averages;
+		}
 		$this->render('devices/view.html.twig', $data);
 	}
 	public function verifyAction($id){
