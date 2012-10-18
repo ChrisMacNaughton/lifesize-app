@@ -87,8 +87,6 @@ if(RESET OR $redis->get('device_stats_generated') < time() - 15 * 60){
 	$averages = array();
 	print("Updating device stats!\n");
 	$redis->set('device_stats_generated', time());
-	
-	print("Updating Stats\n");
 
 	$start = microtime(true);
 	$models = $db->query("SELECT distinct model as model FROM devices WHERE model IS NOT null")->fetchAll(PDO::FETCH_ASSOC);
