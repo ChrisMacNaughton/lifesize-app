@@ -275,12 +275,12 @@ while(time() <= $end){
 	//print_r($device);
 	if(!is_null($device)){
 		
-		//print("\tUpdating $device!\n");
+		if(DEBUG)print("Updating $device!\n");
 		$hash = $device;
 		$stmt->execute(array(':id'=>$hash));
-		//print("id: $hash\n");
+		if(DEBUG)print("\tid: $hash\n");
 		$device = $stmt->fetch(PDO::FETCH_ASSOC);
-		//print_r($device);
+		if(DEBUG)print("\tIP:" .$device['ip'] . "\n");
 		if($device['active'] == 0){
 			print(microtime(true) . " | Inactive company, skipping " . $device['name'] . "\n");
 			continue;
@@ -300,8 +300,6 @@ while(time() <= $end){
 		if ($res) {
 			//print("Locked!\n");
 
-			
-			if(DEBUG)print($device['id'] . "\n");
 			$update_start_time = microtime(true);
 			$ssh = new mySSH($device['ip']);
 			if($ssh===false){
@@ -355,8 +353,9 @@ while(time() <= $end){
 
 				if($device['hash'] != $device_id){
 					$update_device_hash->execute(array(':hash'=>$device_id, ':id'=>$device['id']));
-					continue;
+					//print("Hash: $device_id, ID: ".$device['id'] . "\n");
 				}
+				$device['hash'] = $device_id;
 				$updated = time() - $device['updated'];
 				if($updated < 60){
 					if(DEBUG) print("Device was updated $updated seconds ago\n");

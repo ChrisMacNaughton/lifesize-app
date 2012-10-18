@@ -21,6 +21,7 @@ try{
 }
 catch(Exception $e){
 	$redis=false;
+	print("<!-- No Redis -->");
 }
 try {
 	$db = new loggedPDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass);

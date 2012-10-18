@@ -2,6 +2,11 @@
 set_time_limit(0);
 if(!isset($argv))
 	die("Must be run from the command line");
+if(isset($argv[1]) AND $argv[1] == "-f"){
+	define('RESET', true);
+} else
+	define('RESET', false);
+
 date_default_timezone_set("UTC");
 
 error_reporting(E_ALL^E_USER_NOTICE);
@@ -30,7 +35,7 @@ $log_stmt->execute(array(
 	':message'=>"Initialized Interval",
 	':detail'=>''
 	));
-if($redis->get('cleaned') < time() - 1800){
+if(RESET OR $redis->get('cleaned') < time() - 1800){
 	print("Updating Updaters List\n");
 	$redis->set('cleaned',time());
 	$devices = $db->query("SELECT companies_devices.id
@@ -49,7 +54,7 @@ ORDER BY devices.updated")->fetchAll(PDO::FETCH_ASSOC);
 	
 }
 
-if($redis->get('stats_generated') < time() - 15 * 60){
+if(RESET OR $redis->get('stats_generated') < time() - 15 * 60){
 	$redis->set('stats_generated', time());
 	
 	print("Updating Stats\n");
@@ -78,7 +83,7 @@ WHERE devices_history.duration > 0")->fetch(PDO::FETCH_ASSOC);
 	$redis->set('cache.averages', json_encode($averages));
 }
 
-if($redis->get('device_stats_generated') < time() - 15 * 60){
+if(RESET OR $redis->get('device_stats_generated') < time() - 15 * 60){
 	$averages = array();
 	print("Updating device stats!\n");
 	$redis->set('device_stats_generated', time());
