@@ -129,7 +129,7 @@ ORDER BY D.updated
 */
 $duration_stmt = $db->prepare("UPDATE devices SET duration = :duration WHERE id = :id");
 $rsrv = $db->prepare("UPDATE devices SET updating = unix_timestamp() WHERE id = :id AND updating = :updating");
-$offline_stmt = $db->prepare("UPDATE devices SET online = 0, updated = unix_timestamp() WHERE id = :id");
+$offline_stmt = $db->prepare("UPDATE devices SET online = 0, updated = unix_timestamp(), in_call = 0 WHERE id = :id");
 $online_stmt = $db->prepare("UPDATE devices SET online = 1, updated = unix_timestamp() WHERE id = :id");
 $checked_stmt = $db->prepare("UPDATE companies_devices SET checked = unix_timestamp() WHERE id = :id");
 $serial_stmt = $db->prepare("SELECT * FROM devices WHERE `serial` = :serial");
@@ -246,7 +246,9 @@ if(DEV_ENV){
 	$max_runtime = 120;
 }
 $end = $start + $max_runtime;
-
+$key = new Crypt_RSA();
+$key->loadKey(file_get_contents('/../keys/id_rsa'));
+$public_key = file_get_contents('/../keys/id_rsa.pub');
 while(time() <= $end){
 	$times = array();
 	$time = time();
@@ -307,31 +309,36 @@ while(time() <= $end){
 			}
 			$pw = ($device['password'] != '')?$device['password'] : 'lifesize';
 			//if(DEBUG) print("Logging in with auto: $pw\n");
-
-			if(!$ssh->login('auto', $pw)){
-				$offline_stmt->execute(array(':id'=>$device['hash']));
-				//print_r($offline_stmt->errorInfo());
-				$log_stmt->execute(array(
-							':time'=>$time,
-							':id'=>$worker_id,
-							':message'=>"Tried",
-							':detail'=>$device['id']
-						));
-				if($device['online'] == 0){
-					$check_offline_alarm->execute(array(':id'=>$device['id']));
-					$res = $check_offline_alarm->fetch(PDO::FETCH_ASSOC);
-					if($res['count'] != 0){
-						$update_offline_alarm->execute(array(
-							':id'=>$device['id'],
-							':active'=>1
-						));
-					}else{
-						$new_offline_alarm->execute(array(
-							':id'=>$device['id'],
-							':active'=>1
-						));
+			if(!$ssh->login('username', $key){
+				if(!$ssh->login('auto', $pw)){
+					$offline_stmt->execute(array(':id'=>$device['hash']));
+					//print_r($offline_stmt->errorInfo());
+					$log_stmt->execute(array(
+								':time'=>$time,
+								':id'=>$worker_id,
+								':message'=>"Tried",
+								':detail'=>$device['id']
+							));
+					if($device['online'] == 0){
+						$check_offline_alarm->execute(array(':id'=>$device['id']));
+						$res = $check_offline_alarm->fetch(PDO::FETCH_ASSOC);
+						if($res['count'] != 0){
+							$update_offline_alarm->execute(array(
+								':id'=>$device['id'],
+								':active'=>1
+							));
+						}else{
+							$new_offline_alarm->execute(array(
+								':id'=>$device['id'],
+								':active'=>1
+							));
+						}
 					}
 				}
+				/*
+				*	Add key to the device
+				*
+				*/
 			} else {
 				$check_offline_alarm->execute(array(':id'=>$device['id']));
 					$res = $check_offline_alarm->fetch(PDO::FETCH_ASSOC);
