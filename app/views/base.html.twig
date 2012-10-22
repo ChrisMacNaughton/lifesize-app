@@ -54,7 +54,7 @@ html {
 		<div class="container">
 			{% block afterbrand %}{%endblock %}
 			<a class="brand" href="http://control.vc">ControlVC</a>
-			{% if active != 'login' %}
+			{% if active != 'login' and active != 'register'%}
 			<div class="nav-collapse collapse">
 				<ul class="nav">
 					<li class="{% if active == 'dashboard' %}active{%endif%}">
@@ -73,6 +73,11 @@ html {
 					<li class="{% if active == 'company' %}active{%endif%}">
 						<a href="{{root}}company">Company</a>
 					</li>
+					{% if perms b-and app.permissions['users/index'] %}
+					<li class="{% if active == 'users' %}active{%endif%}">
+						<a href="{{root}}users">Users</a>
+					</li>
+					{% endif %}
 					{% endif %}
 					{% if perms b-and app.permissions['admin/index'] %}
 					<li class="{% if active == 'admin' %}active{%endif%}">

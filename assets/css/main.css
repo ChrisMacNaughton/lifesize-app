@@ -9,6 +9,23 @@
 	-moz-transition: all .2s linear;
 	transition: all .2s linear;
 }
+.subscription{
+  border: 2px solid #33ff33;
+  border-radius: 5px;
+}
+.subscription h4 {
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+  margin: 15px;
+  margin-left: 25px;
+  margin-right: 25px;
+}
+.subscription h1 {
+  text-align: center;
+}
+.subscription p{
+  margin: 10px;
+}
 .good {
   color: #009933;
 }

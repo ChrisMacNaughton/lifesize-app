@@ -7,6 +7,8 @@ class devicesController extends Controller {
 		);
 		$data['headercolor'] = '99ff99';
 		$data['devices'] = $this->user->devices;
+		$comp = $this->user->getCompanyDetails();
+		$data['subscription'] = $comp['plan_id'];
 		$this->render('devices/index.html.twig', $data);
 	}
 	public function viewAction($id){

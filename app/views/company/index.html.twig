@@ -4,6 +4,97 @@
 
 {% block body %}
 <div class="row">
-Current Subscription: {{company.plan}}{% if perms b-and app.permissions['company/edit'] %}<a class="btn btn-success" href="company/edit/plan">Change</a>{% endif %}
+Current Subscription: {{company.plan}}{% if perms b-and app.permissions['company/edit'] %}<a class="btn btn-success" {% if company.last4 == null%}disabled="disabled"{% else %}href="{{root}}company/edit/plan"{%endif%}>Change</a>{% endif %}
 </div>
+<div class="row">
+	<p>Card on File:
+	{% if company.last4 == null %}
+None <button class="btn btn-info" id="add_card">Update Card</button>
+{% else %}
+<span id="last4">************{{company.last4}}</span><span id="status" style="display: none;">Updated</span> <button class="btn btn-info" id="add_card">Update Card</button>
+{% endif %}</p>
+</div>
+<div id="dialog-form" title="Add a Card" style="display: none;">
+	<p class="validateTips">All form fields are required.</p>
+
+	<form>
+	<fieldset>
+		<Label>Cardholder Name</label>
+		<input type="text" class="cardholder-name">
+		<label>Card Number</label>
+		<input type="text" class="card-number">
+		<label>Expiration (MM/YYYY)</label>
+		<input type="text" size="2" max="2" class="card-expiry-month" style="width: 30px;"/>
+		<span> / </span>
+		<input type="text" size="4" max="4" class="card-expiry-year" style="width: 50px;"/>
+		<label>CVC</label>
+		<input type="text" class="cvc" max="4" size="4">
+	</fieldset>
+	</form>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{parent()}}
+<script type="text/javascript" src="https://js.stripe.com/v1/"></script>
+<script type="text/javascript">
+//live key
+Stripe.setPublishableKey('pk_iOeM8zk9ybZLiIfFhKmbBKpw45kFE');
+
+$(document).ready(function() {
+	var name = $( ".cardholder-name" ),
+			card = $( ".card-number" ),
+			month = $( ".card-expiry-month" ),
+			year = $(".card-expiry-year"),
+			cvc = $(".cvc"),
+			allFields = $( [] ).add( card ).add( month ).add( year ).add( cvc );
+	$( "#dialog-form" ).dialog({
+			autoOpen: false,
+			height: 450,
+			width: 350,
+			modal: true,
+			buttons: {
+				"Add a Card": function() {
+					Stripe.createToken({
+						number: $( ".card-number" ).val(),
+						cvc: $(".cvc").val(),
+						exp_month: $('.card-expiry-month').val(),
+                        exp_year: $('.card-expiry-year').val(),
+						name: $('.cardholder-name').val()
+					}, stripeResponseHandler);
+					$( this ).dialog( "close" );
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			},
+			close: function() {
+				allFields.val( "" );
+			}
+		});
+		$( "#add_card" )
+			.button()
+			.click(function() {
+				$( "#dialog-form" ).dialog( "open" );
+			});
+	});
+function stripeResponseHandler(status, response) {
+	console.log(response);
+	$.ajax({
+		url: "company/addCard/{{company.id}}",
+		data: response,
+		type: "POST"
+	}).done(function(data){
+		console.log(data);
+		data = $.parseJSON(data);
+		console.log('test2');
+		console.log(data);
+		if(data['old'] != data['new'])
+		{
+			$('#last4').text(data['Last4']);
+			$('#status').fadeToggle("slow").fadeToggle("slow");
+		}
+	});
+}
+</script>
 {% endblock %}

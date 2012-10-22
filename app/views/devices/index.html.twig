@@ -1,10 +1,12 @@
 {% extends 'base.html.twig'%}
 {% block afterbrand %}
 	{% if perms b-and app.permissions['devices/delete'] %}
-		<a class="right btn btn-small btn-danger" href="{{root}}devices/delete">Delete Devices</a>
+		<a class="right btn btn-small btn-danger" href="{{root}}devices/delete">Delete</a>
 	{% endif %}
 	{% if perms b-and app.permissions['devices/add'] %}
-		<a class="right btn btn-small btn-success" href="{{root}}devices/add">New Device</a>
+		{% if subscription != 'plan-sdioybs0' or devices|length == 0 %}
+		<a class="right btn btn-small btn-success" href="{{root}}devices/add">New</a>
+		{% endif %}
 	{% endif %}
 {% endblock %}
 {% block title %}Devices {% endblock %}

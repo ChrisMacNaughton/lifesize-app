@@ -145,8 +145,16 @@ class User {
 			}
 		}
 	}
-	public function getInfo(){
-		return $this->info;
+	public function getInfo($id){
+		if($id == $this->info['id'])
+			return $this->info;
+		else {
+			$stmt = $this->db->prepare("SELECT users.*, levels.name as levelName, levels.level as level, L.permission AS permissions, users.timezone as timezone FROM users INNER JOIN levels ON users.level = levels.id INNER JOIN levels_permissions AS L ON L.level_id = users.level WHERE users.id = :id LIMIT 1");
+			$stmt->execute(array('id'=>$id));
+			$user = $stmt->fetch(PDO::FETCH_ASSOC);
+			unset($user['password']);
+			return $user;
+		}
 	}
 	public function getID(){
 		return $this->info['id'];
@@ -154,5 +162,37 @@ class User {
 
 	public function is_logged_in(){
 		return $this->logged_in;
+	}
+	/*
+	*	var $user =  array(
+	*		id=>,
+	*		name=>,
+	*		email=>,
+	*		level=>,
+	*		timezone=>,
+	*		companyId=>
+	*	)
+	*
+	*/
+	public function newUser($user){
+		$stmt = $this->db->prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
+		$stmt->execute(array(':email'=>$user['email']));
+		$res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		if(count($res) != 0){
+			return false;
+		}
+		$stmt = $this->db->prepare("INSERT INTO users (id, name, email, password, level, timezone, `as`) VALUES (:id, :name, :email, :password, :level, :timezone, :companyId)");
+		$company_stmt = $this->db->prepare("INSERT INTO users_companies (user_id, company_id, added, own) VALUES (:user_id, :companyId, unix_timestamp(), 1)");
+		
+		$stmt->execute($user);
+		$company_stmt->execute(array(
+			'user_id'=>$user['id'],
+			'companyId'=>$user['companyId']
+		));
+		return true;
+	}
+	public function getPlan(){
+		$key = array_search($this->info['as'], $this->companies);
+		return $this->companies[$key]['plan_id'];
 	}
 }

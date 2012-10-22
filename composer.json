@@ -2,6 +2,7 @@
 	"require": {
 		"amazonwebservices/aws-sdk-for-php": "1.5.*",
 		"twig/twig": "1.*",
-		"predis/predis": "*"
+		"predis/predis": "*",
+		"stripe/stripe-php": "1.7.*"
 	}
 }

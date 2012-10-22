@@ -8,9 +8,10 @@ $app = array(
 *	Initialize DB
 */
 
-require 'system/config.php';
-require 'system/classes/loggedPDO.php';
-require 'vendor/autoload.php';
+require_once 'system/config.php';
+//require 'system/classes/loggedPDO.php';
+require_once 'vendor/autoload.php';
+Stripe::setApiKey($stripe_key);
 $single_server = array(
     'host'     => $redis_server,
     'port'     => 6379,
@@ -24,18 +25,18 @@ catch(Exception $e){
 	print("<!-- No Redis -->");
 }
 try {
-	$db = new loggedPDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass);
+	$db = new PDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass);
 } catch (PDOException $e) {
     //$app['errors'][]= $e->getMessage();
     die("Database connection failed");
 }
 try {
-	$writedb = new loggedPDO('mysql:dbname=' . $write_dbname . ';host=' . $write_dbhost, $write_dbuser, $write_dbpass);
+	$writedb = new PDO('mysql:dbname=' . $write_dbname . ';host=' . $write_dbhost, $write_dbuser, $write_dbpass);
 } catch (PDOException $e) {
     //$app['errors'][]= $e->getMessage();
     die("Database connection failed");
 }
-require 'system/classes/user.php';
+require_once 'system/classes/user.php';
 $user = new User($db, $writedb);
 define('TIMEZONE',$user->getTimezone());
 date_default_timezone_set(TIMEZONE);

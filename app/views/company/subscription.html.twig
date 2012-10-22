@@ -1,0 +1,67 @@
+{% extends 'base.html.twig'%}
+{% block title%}Company{% endblock %}
+{% block name %}Company<small>{{company.name}}</small>{% endblock %}
+
+{% block body %}
+<div class="row">
+	<div class="span12">
+		Current Subscription: {{company.plan}}
+	</div>
+	<div class="row">
+		<div class="span4 subscription">
+			<h4>Free</h4>
+			<h1>Free</h1>
+			<form method="post">
+				<input type="hidden" name="plan" value="Free">
+				<center>{% if devices_count > 1%}<a class="btn btn-info" id="freeTooltip" rel="tooltip" title="You have more than 1 device in your account" DISABLED="DISABLED">Choose</a>{%else %}<input type="submit" class="btn btn-info" value="Choose" />{% endif %}</center>
+			</form>
+			<ul>
+				<li>1 Device</li>
+				<li>Email Support</li>
+			</ul>
+		</div>
+		<div class="span4 subscription">
+			<h4>Basic</h4>
+			<h1>${{plans.basic.price}}<small>/Device/Month</small></h1>
+			<form method="post">
+				<input type="hidden" name="plan" value="Basic">
+				<center><input type="submit" class="btn btn-info" value="Choose"/></center>
+			</form>
+			<center><p class="muted">${{devices_count * plans.basic.price}} / month with your current devices</p></center>
+			<ul>
+				<li>Device Monitoring Only</li>
+				<li>Email Support</li>
+			</ul>
+		</div>
+		<div class="span4 subscription">
+			<h4>Professional</h4>
+			<h1>${{plans.pro.price}}<small>/Device/Month</small></h1>
+			<form method="post">
+				<input type="hidden" name="plan" value="Pro">
+				<center><input type="submit" class="btn btn-info" value="Choose"/></center>
+			</form>
+			<center><p class="muted">${{devices_count * plans.pro.price}} / month with your current devices</p></center>
+			<ul>
+				<li>Device Management</li>
+				<li>Email / Phone Support</li>
+			</ul>
+		</div>
+	</div>
+	<br />
+	<div class="row subscription">
+			<h4>Enterprise</h4>
+			<p>Contact us if your needs aren't expressed in the other plans</p>
+			<center><a href="{{root}}contact" class="btn btn-info">Choose</a></center><br />
+		</div>
+</div>
+{% endblock %}
+{% block javascripts %}
+{{parent()}}
+<script type="text/javascript" >
+$(document).ready(function(){
+	$('#freeTooltip').tooltip(
+		delay={ show: 0, hide: 100 }
+	);
+});
+</script>
+{% endblock %}

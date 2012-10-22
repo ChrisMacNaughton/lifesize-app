@@ -1,0 +1,17 @@
+{% extends 'base.html.twig'%}
+{% block title%}{{users.name}}{% endblock %}
+{% block name %}{{users.name}}<small>{{users.email}}</small>{% endblock %}
+
+{% block body %}
+<div class="row">
+	<div class="span12">
+		<form method="post" class="form form-inline">
+			<input type="hidden" name="update" value="password">
+			<input type="password" name="password" placeholder="New Password">
+			<input type="password" name="password2" placeholder="Confirm">
+			<input type="submit" value="Save">
+		</form>
+	</div>
+	
+</div>
+{% endblock %}

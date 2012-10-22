@@ -1,0 +1,120 @@
+{% extends 'base.html.twig' %}
+
+{% block title%}Register{{parent()}}{%endblock %}
+{% block name %}Register!<small>Already registered? <a href="login">Login</a>!{%endblock%}
+{% block body %}
+<div class="row">
+	<div class="span7 offset2">
+		<form action="" method="post" class="form-horizontal">
+			<input type="hidden" name="action" value="register" />
+			<legend>User Information</legend>
+			<div class="control-group">
+				<label class="control-label" for="inputName">Name</label>
+				<div class="controls">
+					<input type="text" name="name" id="inputName" placeholder="Name">
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="inputEmail">Email</label>
+				<div class="controls">
+					<input type="text" name="email" id="inputEmail" placeholder="Email">
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="inputPhone">Phone</label>
+				<div class="controls">
+					<input type="text" name="phone" id="inputPhone" placeholder="Phone">
+				</div>
+			</div>
+			<legend>Company Information</legend>
+			<div class="control-group">
+				<label class="control-label" for="inputCompany">Name</label>
+				<div class="controls">
+					<input type="text" name="companyName" id="inputCompany" placeholder="Company Name">
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="inputAddress">Address</label>
+				<div class="controls">
+					<textarea rows="3" name="companyAddress" id="inputAddress"></textarea>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="inputCompany">City</label>
+				<div class="controls">
+					<input type="text" name="companyCity" id="inputCity" placeholder="City">
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="inputState">State</label>
+				<div class="controls">
+					<select name="companyState" id="inputState">
+						<option value="AL">AL</option>
+						<option value="AK">AK</option>
+						<option value="AZ">AZ</option>
+						<option value="AR">AR</option>
+						<option value="CA">CA</option>
+						<option value="CO">CO</option>
+						<option value="CT">CT</option>
+						<option value="DE">DE</option>
+						<option value="DC">DC</option>
+						<option value="FL">FL</option>
+						<option value="GA">GA</option>
+						<option value="HI">HI</option>
+						<option value="ID">ID</option>
+						<option value="IL">IL</option>
+						<option value="IN">IN</option>
+						<option value="IA">IA</option>
+						<option value="KS">KS</option>
+						<option value="KY">KY</option>
+						<option value="LA">LA</option>
+						<option value="ME">ME</option>
+						<option value="MD">MD</option>
+						<option value="MA">MA</option>
+						<option value="MI">MI</option>
+						<option value="MN">MN</option>
+						<option value="MS">MS</option>
+						<option value="MO">MO</option>
+						<option value="MT">MT</option>
+						<option value="NE">NE</option>
+						<option value="NV">NV</option>
+						<option value="NH">NH</option>
+						<option value="NJ">NJ</option>
+						<option value="NM">NM</option>
+						<option value="NY">NY</option>
+						<option value="NC">NC</option>
+						<option value="ND">ND</option>
+						<option value="OH">OH</option>
+						<option value="OK">OK</option>
+						<option value="OR">OR</option>
+						<option value="PA">PA</option>
+						<option value="RI">RI</option>
+						<option value="SC">SC</option>
+						<option value="SD">SD</option>
+						<option value="TN">TN</option>
+						<option value="TX">TX</option>
+						<option value="UT">UT</option>
+						<option value="VT">VT</option>
+						<option value="VA">VA</option>
+						<option value="WA">WA</option>
+						<option value="WV">WV</option>
+						<option value="WI">WI</option>
+						<option value="WY">WY</option>
+					</select>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="inputZip">Zip Code</label>
+				<div class="controls">
+					<input type="text" name="companyZip" id="inputZip" placeholder="Zip Code">
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="controls">
+					<button type="submit" class="btn">Register</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+{% endblock %}

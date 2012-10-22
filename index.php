@@ -1,6 +1,8 @@
 <?php
 
-error_reporting(E_ALL);
+error_reporting(E_ALL^E_NOTICE);
+require_once 'system/classes/phpErrors.php';
+\php_error\reportErrors();
 require_once 'bootstrap.php';
 require_once 'app/controllers/controller.php';
 $controllerName = "dashboardController";
@@ -23,3 +25,4 @@ if(file_exists('app/controllers/' . strtolower($app['controller']) . 'Controller
 
 $controller = new $controllerName($app, $db, $writedb, $redis);
 $controller->$actionName($app['detail']);
+
