@@ -1,9 +1,12 @@
 <?php
 
 error_reporting(E_ALL^E_NOTICE);
-require_once 'system/classes/phpErrors.php';
-\php_error\reportErrors();
+
 require_once 'bootstrap.php';
+if(DEV_ENV){
+	require_once 'system/classes/phpErrors.php';
+	\php_error\reportErrors();
+}
 require_once 'app/controllers/controller.php';
 $controllerName = "dashboardController";
 $actionName = "indexAction";

@@ -248,8 +248,6 @@ if(DEV_ENV){
 	$max_runtime = 120;
 }
 $end = $start + $max_runtime;
-//$key = new Crypt_RSA();
-//$key->loadKey(file_get_contents(dirname(__FILE__).'/../keys/id_rsa'));
 while(time() <= $end){
 	$times = array();
 	$time = time();

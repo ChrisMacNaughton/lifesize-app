@@ -53,9 +53,11 @@ class usersController extends Controller {
 						'Body.Text.Data' => $message
 					)
 				);
+				session_write_close();
 				header("Location: ".PROTOCOL.ROOT."/users/add");
 			} else {
 				$_SESSION['errors'][] = "Error with the registration, please try a different email";
+				session_write_close();
 				header("Location: ".PROTOCOL.ROOT."/users/add");
 			}
 		}
@@ -106,6 +108,25 @@ class usersController extends Controller {
 			$template = "users/view.html.twig";
 		}
 		$this->render($template, $data);
+	}
+	public function deleteAction(){
+		header("Content-Type: application/json");
+		if(!isset($_POST['id'])){
+			$this->render("users/delete.json.twig", array("Success"=>false));
+		}
+		if($_POST['id'] == $this->user->getID()){
+			$this->render("users/delete.json.twig", array("Success"=>false));
+		}
+		$opts = array(':id'=>$_POST['id']);
+		
+		$stmt = $this->db->prepare("DELETE FROM companies_users WHERE user_id = :id");
+		$stmt->execute($opts);
+		$stmt = $this->db->prepare("DELETE FROM users_alarms WHERE user_id = :id");
+		$stmt->execute($opts);
+		$stmt = $this->db->prepare("DELETE FROM users WHERE id = :id");
+		$stmt->execute($opts);
+		
+		$this->render("users/delete.json.twig", array("Success"=>true));
 	}
 	public function editAction($id){
 		$data = array(

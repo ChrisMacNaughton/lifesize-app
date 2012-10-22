@@ -48,5 +48,6 @@ class Controller{
 		$data['app'] = $this->app;
 		
 		echo $twig->render($file, $data);
+		exit();
 	}
 }
