@@ -16,11 +16,13 @@ class companyController extends Controller {
 		$token = $_POST['id'];
 		$card = $_POST['card'];
 		$company = $this->user->getCompanyDetails();
+
 		//$oldFingerprint = $this->stripe->active_card->fingerprint;
 		if($company['customer_id'] == null){
 			$response = Stripe_Customer::create(array(
-			  "description" => "Customer for test@example.com",
-			  "card" => $token // obtained with Stripe.js
+				'email'=>$company['created_by'],
+				"description" => $company['id'],
+				"card" => $token // obtained with Stripe.js
 			));
 			$oldFingerprint = '';
 			$stmt = $this->db->prepare("UPDATE companies SET customer_id = :customer_id WHERE id = :id");
@@ -66,7 +68,43 @@ class companyController extends Controller {
 				$data['company'] = $this->user->getCompanyDetails();
 				if($data['company']['last4'] == null){
 					$_SESSION['errors'][] = "You must have a card added to your account to change your subscription";
+					session_write_close();
 					header("Location: ".PROTOCOL.ROOT."/company");
+					exit();
+				}
+				if(isset($_POST['plan'])){
+					$cu = Stripe_Customer::retrieve($data['company']['customer_id']);
+					$stmt = $this->db->prepare("UPDATE companies SET plan_id = :plan WHERE id = :company_id");
+					$opts = array('company_id'=>$data['company']['id']);
+					switch($_POST['plan']){
+						case "Pro":
+							$opts['plan']="plan-osr7y078";
+							$cu->updateSubscription(array("prorate" => true, "plan" => "pro-".$this->user->deviceCount()));
+							break;
+						case "Basic":
+							$opts['plan']="plan-soenri7";
+							$cu->updateSubscription(array("prorate" => true, "plan" => "basic-".$this->user->deviceCount()));
+							break;
+						case "Free":
+							if($this->user->deviceCount() > 1){
+								$_SESSION['errors'][] = "Invalid Plan, you have too many devices";
+								session_write_close();
+								header("Location: ".PROTOCOL.ROOT."/company/edit/plan");
+								exit();
+							}
+							$opts['plan']="plan-sdioybs0";
+							$cu->updateSubscription(array("prorate" => true, "plan" => "free"));
+							break;
+						default:
+							$_SESSION['errors'][] = "Invalid Plan";
+							session_write_close();
+							header("Location: ".PROTOCOL.ROOT."/company/edit/plan");
+							exit();
+							break;
+					}
+					$stmt->execute($opts);
+					session_write_close();
+					header("Location: ".PROTOCOL.ROOT."/company/edit/plan");
 					exit();
 				}
 				$stmt = $this->db->prepare("SELECT * FROM subscriptions WHERE id = :id");
@@ -76,10 +114,10 @@ class companyController extends Controller {
 				$data['devices_count'] = count($this->user->devices);
 				$data['plans'] = array(
 					'basic'=>array(
-						'price'=>5,
+						'price'=>10,
 					),
 					'pro'=>array(
-						'price'=>10,
+						'price'=>15,
 					),
 				);
 				$this->render("company/subscription.html.twig", $data);

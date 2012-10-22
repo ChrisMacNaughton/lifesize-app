@@ -112,3 +112,32 @@ WHERE devices_history.duration >0
 	//$redis->del('device_stats_generated');
 }
 
+if($redis->get('companies_cleaned') < time() - 30 * 60){
+	require_once (dirname(__FILE__).'/../vendor/autoload.php');
+
+	Stripe::setApiKey($stripe_key);
+	$customers = Stripe_Customer::all();
+	$stmt = $db->prepare("UPDATE companies SET plan_id = :id, last4=:last4 WHERE customer_id = :customer_id");
+	$plan_stmt = $db->prepare("SELECT id FROM subscriptions WHERE name = :name");
+	foreach($customers['data'] as $customer){
+		$customer_id = $customer['id'];
+		$plan_id = $customer['subscription']['plan']['name'];
+		//print("Plan ID: $plan_id\n");
+		if(strpos($plan_id, '-')){
+			$plan = explode('-',$plan_id);
+			$plan_name = $plan[0];
+		} else {
+			$plan_name = $plan_id;
+		}
+		print("Plan Name: $plan_name\n");
+		$last4 = $customer['active_card']['last4'];
+		$plan_stmt->execute(array(':name'=>$plan_name));
+		$s = $plan_stmt->fetch(PDO::FETCH_ASSOC);
+		$id = $s['id'];
+		print_r($s);
+		$options = array(':id'=>$id, ':customer_id'=>$customer_id, ':last4'=>$last4);
+
+		$stmt->execute($options);
+		print_r($options);
+	}
+}

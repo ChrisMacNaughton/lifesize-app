@@ -48,7 +48,7 @@ class User {
 			$this->clean();
 			$this->permissions = $result['permissions'];
 			$this->logged_in = true;
-			$stmt = $this->db->prepare("SELECT U.user_id, C.*, U.added, U.own from users_companies as U INNER JOIN companies as C ON C.id = U.Company_id WHERE user_id = :id");
+			$stmt = $this->db->prepare("SELECT U.user_id, C.*, U.added, U.own, S.name AS planName from users_companies as U INNER JOIN companies as C ON C.id = U.Company_id INNER JOIN subscriptions AS S ON S.id = C.plan_id WHERE user_id = :id");
 			$stmt->execute(array(':id'=>$this->info['id']));
 			$this->companies = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -127,6 +127,9 @@ class User {
 			}
 			$this->devices = $devices;
 	}
+	public function deviceCount(){
+		return count($this->devices);
+	}
 	public function getCompany(){
 		return $this->info['as'];
 	}
@@ -144,6 +147,10 @@ class User {
 				return $this->companies[$key];
 			}
 		}
+	}
+	public function customerID(){
+		$id = $this->companies[$this->info['as']]['customer_id'];
+		return $id;
 	}
 	public function getInfo($id){
 		if($id == $this->info['id'])

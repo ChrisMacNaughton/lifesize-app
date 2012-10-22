@@ -355,6 +355,12 @@ LIMIT 1
 		$this->render("devices/verify.html.twig", $data);
 	}
 	public function editAction($id){
+		if($this->user->getPlan() == "Basic"){
+			$_SESSION['errors'][] = "You mumst upgrade your subscription to edit devices";
+			session_write_close();
+			header("Location: ".PROTOCOL.ROOT."/devices/view/".$id);
+			exit();
+		}
 		$data = array(
 			'headercolor'=>'66ff66'
 		);
@@ -606,13 +612,12 @@ LIMIT 1
 		if(isset($_POST['id'])){
 			//delete the device if my company owns it
 			$id = $_POST['id'];
-			echo "<!-- Deleting $id -->";
 
-			$stmt = $this->writedb->prepare("DELETE FROM companies_devices WHERE device_id = :id AND company_id = :company AND own = 1");
+			$stmt = $this->writedb->prepare("DELETE FROM companies_devices WHERE id = :id AND company_id = :company AND own = 1");
 			$stmt->execute(array(':id'=>$id, ':company'=>$this->user->getCompany()));
 			$affected = $stmt->rowCount();
 			if($affected > 0){
-				$stmt = $this->writedb->prepare("DELETE FROM companies_devices WHERE device_id = :id");
+				$stmt = $this->writedb->prepare("DELETE FROM companies_devices WHERE id = :id");
 				$stmt->execute(array(':id'=>$id));
 				$stmt = $this->writedb->prepare("DELETE FROM devices WHERE id = :id");
 				$stmt->execute(array(':id'=>$id));
@@ -621,6 +626,12 @@ LIMIT 1
 			} else {
 				$stmt = $this->writedb->prepare("DELETE FROM companies_devices WHERE device_id = :id AND company_id = :company");
 				$stmt->execute(array(':id'=>$id, ':company'=>$this->user->getCompany()));
+			}
+			$company = $this->user->getCompanydetails();
+			if($company['plan_id'] != 'plan-sdfb834rdfg'){
+				$this->user->updateDevices();
+				$c = Stripe_Customer::retrieve($company['customer_id']);
+				$c->updateSubscription(array("prorate" => true, "plan" => strtolower($company['planName'])."-".$this->user->deviceCount()));
 			}
 			header("Location: ".PROTOCOL.ROOT . "/devices/delete");
 				

@@ -4,15 +4,17 @@
 
 {% endblock %}
 {% block name %}Device <div style="display: inline-block; line-height: 0;"><small>{% if device.name == null%}{{device.id}}{% else %}{{device.name}}{%endif%}<br />{{device.ip}}</small></div>
-{% if device.own == 1 and device.verified == 0 %}
-	{% if perms b-and app.permissions['devices/edit']%}
-		<a class="btn btn-small btn-inverse noprint" href="{{root}}devices/verify/{{device.id}}">Verify Device</a>
-	{% endif %}
-{% endif %}
-{% if device.own == 1 and device.verified == 1 %}
-	{% if perms b-and app.permissions['devices/edit'] %}
-		<a class="btn btn-small btn-inverse noprint" href="{{root}}devices/edit/{{device.id}}">Edit Device</a>
-	{% endif %}
+{% if user.planName != "Basic" %}
+    {% if device.own == 1 and device.verified == 0 %}
+    	{% if perms b-and app.permissions['devices/edit']%}
+    		<a class="btn btn-small btn-inverse noprint" href="{{root}}devices/verify/{{device.id}}">Verify Device</a>
+    	{% endif %}
+    {% endif %}
+    {% if device.own == 1 and device.verified == 1 %}
+    	{% if perms b-and app.permissions['devices/edit'] %}
+    		<a class="btn btn-small btn-inverse noprint" href="{{root}}devices/edit/{{device.id}}">Edit Device</a>
+    	{% endif %}
+    {% endif %}
 {% endif %}
 {% endblock %}
 {% block body %}
