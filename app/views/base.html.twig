@@ -60,6 +60,7 @@ mixpanel.people.set({
     "plan":"{{user.plan}}",
     "registered":{%if user.registered == 1 %}true{%else %}false{%endif%}
 });
+mixpanel.name_tag('{{user.email}}');
 mixpanel.track('Visited: {{active}}');
 </script>
 <!-- end Mixpanel -->
