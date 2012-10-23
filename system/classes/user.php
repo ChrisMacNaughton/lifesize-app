@@ -50,9 +50,12 @@ class User {
 			$this->logged_in = true;
 			$stmt = $this->db->prepare("SELECT U.user_id, C.*, U.added, U.own, S.name AS planName from users_companies as U INNER JOIN companies as C ON C.id = U.Company_id INNER JOIN subscriptions AS S ON S.id = C.plan_id WHERE user_id = :id");
 			$stmt->execute(array(':id'=>$this->info['id']));
-			$this->companies = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-			$this->info['plan'] = $this->getPlan();
+			$companies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+			foreach($companies as $comp){
+				$this->companies[$comp['id']] = $comp;
+			}
+			$this->info['plan'] = $this->companies[$this->info['as']]['planName'];
+			//print("<!--");print_r($this->info);print("-->");
 			$this->updateDevices();
 		}
 	}
