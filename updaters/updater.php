@@ -368,7 +368,7 @@ while(time() <= $end){
 						$new_offline_alarm->execute(array(
 							':id'=>$device['id'],
 							':active'=>0,
-							':updated'=>0
+							':updated'=>time()
 						));
 					}
 				$res = explode(chr(0x0a), $ssh->exec("get system serial"));
