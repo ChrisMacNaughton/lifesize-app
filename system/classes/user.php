@@ -51,6 +51,7 @@ class User {
 			$stmt = $this->db->prepare("SELECT U.user_id, C.*, U.added, U.own, S.name AS planName from users_companies as U INNER JOIN companies as C ON C.id = U.Company_id INNER JOIN subscriptions AS S ON S.id = C.plan_id WHERE user_id = :id");
 			$stmt->execute(array(':id'=>$this->info['id']));
 			$this->companies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 			$this->info['plan'] = $this->getPlan();
 			$this->updateDevices();
 		}
@@ -164,7 +165,6 @@ class User {
 			$stmt->execute(array('id'=>$id));
 			$user = $stmt->fetch(PDO::FETCH_ASSOC);
 			unset($user['password']);
-			$user['plan'] = $this->getPlan();
 			return $user;
 		}
 	}
@@ -205,6 +205,6 @@ class User {
 	}
 	public function getPlan(){
 		//$key = array_search($this->info['as'], $this->companies);
-		return $this->companies[$this->getCompany()]['plan_id'];
+		return $this->companies[$this->info['as']]['plan_id'];
 	}
 }
