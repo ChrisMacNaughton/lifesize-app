@@ -59,7 +59,7 @@ function to_seconds($duration) {
 
 
 
-require dirname(__FILE__).'/../system/classes/loggedPDO.php';
+//require dirname(__FILE__).'/../system/classes/loggedPDO.php';
 //print($dbhost);
 try {
 	$db = new PDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass);
@@ -235,9 +235,9 @@ $log_stmt->execute(array(
 
 $cleanup_log_stmt = $db->prepare("DELETE FROM updater_log WHERE `time` < (:time - 86400)");
 $check_offline_alarm = $db->prepare("SELECT count(*) AS count FROM devices_alarms WHERE device_id = :id AND alarm_id = 'alarm-jfu498hf'");
-$new_offline_alarm = $db->prepare("INSERT INTO devices_alarms (`active`,`device_id`,`alarm_id`)
-VALUES(:active, :id, 'alarm-jfu498hf')");
-$update_offline_alarm = $db->prepare("UPDATE devices_alarms SET active = :active
+$new_offline_alarm = $db->prepare("INSERT INTO devices_alarms (`active`,`device_id`,`alarm_id`, `updated`)
+VALUES(:active, :id, 'alarm-jfu498hf', unit_timestamp())");
+$update_offline_alarm = $db->prepare("UPDATE devices_alarms SET active = :active, updated = unix_timestamp()
 	WHERE device_id = :id AND alarm_id = 'alarm-jfu498hf'");
 $high_loss_stmt = $db->prepare("UPDATE devices_alarms SET active = :active WHERE device_id = :id AND alarm_id = 'alarm-abwo7froseb'");
 $get_edits_stmt = $db->prepare("SELECT * FROM edits WHERE device_id = :id AND completed = 0 ORDER BY added");
@@ -355,10 +355,13 @@ while(time() <= $end){
 				$check_offline_alarm->execute(array(':id'=>$device['id']));
 					$res = $check_offline_alarm->fetch(PDO::FETCH_ASSOC);
 					if($res['count'] != 0){
-						$update_offline_alarm->execute(array(
-							':id'=>$device['id'],
-							':active'=>0
-						));
+						$alarm_active = $db->query("SELECT active FROM devices_alarms WHERE device_id = '" . $device['id'] . "' AND alarm_id = 'alarm-jfu498hf'")->fetch(PDO::FETCH_ASSOC);
+						if($alarm_active['active'] != 1){
+							$update_offline_alarm->execute(array(
+								':id'=>$device['id'],
+								':active'=>0
+							));
+						}
 					}else{
 						$new_offline_alarm->execute(array(
 							':id'=>$device['id'],
