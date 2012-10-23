@@ -66,7 +66,7 @@ class usersController extends Controller {
 			session_write_close();
 				header("Location: ".PROTOCOL.ROOT."/users/add");
 		}
-		$data['levels'] = $this->db->query("SELECT name, id FROM levels WHERE level != 0")->fetchAll(PDO::FETCH_ASSOC);
+		$data['levels'] = $this->db->query("SELECT name, id FROM levels WHERE level > 0")->fetchAll(PDO::FETCH_ASSOC);
 		$this->render("users/add.html.twig", $data);
 	}
 	public function viewAction($id){
@@ -271,7 +271,7 @@ class usersController extends Controller {
 
 			$new_user = $this->user->newUser($user);
 			if($new_user){
-				
+
 				$stmt = $this->db->prepare("INSERT INTO companies (id, created, name, address, city, state, zip, created_by, active, :phone) VALUES (:id, unix_timestamp(), :name, :address, :city, :state, :zip, :created_by, 1, :phone)");
 				$company['created_by'] = $user['id'];
 				
