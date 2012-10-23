@@ -83,11 +83,11 @@ $res = $db->query($query)->fetch(PDO::FETCH_ASSOC);
 $current_devices = $res["count"];
 */
 $server_id = gethostname();
-$current_devices = $redis->get("workers.$server_id.count");
+//$current_devices = $redis->get("workers.$server_id.count");
 if (($current_devices == $max_updaters OR $current_devices > $max_updaters) AND !DEV_ENV){
 	die('Already at max updaters of ' . $max_updaters . " ( $current_devices )\n");
 }
-$redis->incr("workers.$server_id.count");
+//$redis->incr("workers.$server_id.count");
 $redis->incr('workers.count');
 $res = $db->query("SELECT value AS version FROM `settings` WHERE `setting` = 'worker_version'")->fetch(PDO::FETCH_ASSOC);
 $worker_version = $res['version'];
@@ -699,7 +699,7 @@ while(time() <= $end){
 }
 
 $redis->decr('workers.count');
-$redis->decr("workers.$server_id.count");
+//$redis->decr("workers.$server_id.count");
 $log_stmt->execute(array(
 						':time'=>$time,
 						':id'=>$worker_id,
