@@ -569,7 +569,8 @@ while(time() <= $end){
 					$version = $device['version'];
 				}
 				$res = explode(chr(0x0a), $ssh->exec('status call active'));
-				if(array_search('ok,00', $res) AND $res[0] == ''){
+				$tmp = explode(',',$res[0]);
+				if(array_search('ok,00', $res) AND ($res[0] == '' OR $tmp[2] == "Terminationg"){
 					$in_call = ($res[0] == '')?0 : 1;
 					$high_loss_stmt->execute(array(
 						':id'=>$device['id'],
