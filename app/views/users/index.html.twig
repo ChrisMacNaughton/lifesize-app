@@ -7,7 +7,7 @@
 	<div class="span6">
 		<ul class="userList">
 			{% for user in users %}
-			<li id="{{user.id}}">{{user.name}}( <a href="mailto:{{user.email}}">{{user.email}}</a> ){% if perms b-and app.permissions['users/index'] %}: <a href="{{root}}users/view/{{user.id}}">View</a>{% endif %}{% if perms b-and app.permissions['users/edit'] %} | <a href="{{root}}users/edit/{{user.id}}">Edit</a>{% endif %}{% if perms b-and app.permissions['users/delete'] %} | <a href="javascript:deleteUser('{{user.id}}')" class="btn btn-mini btn-danger">Delete</a>{% endif %}</li>
+			<li style="display: block; padding: 4px;" id="{{user.id}}">{{user.name}} ( <a href="mailto:{{user.email}}">{{user.email}}</a> )<span class="pull-right">{% if perms b-and app.permissions['users/index'] %} <a href="{{root}}users/view/{{user.id}}" style="padding-right: 15px;">View</a>{% endif %}{% if perms b-and app.permissions['users/edit'] %}<a href="{{root}}users/edit/{{user.id}}" style="padding-right: 15px;">Edit</a>{% endif %}{% if perms b-and app.permissions['users/delete'] %}<a href="javascript:deleteUser('{{user.id}}')" class="btn btn-mini btn-danger">Delete</a>{% endif %}</span></li>
 			{% endfor %}
 		</ul>
 	</div>

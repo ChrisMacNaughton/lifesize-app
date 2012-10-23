@@ -55,6 +55,7 @@ class User {
 				$this->companies[$comp['id']] = $comp;
 			}
 			$this->info['plan'] = $this->companies[$this->info['as']]['planName'];
+			$this->info['created_company'] = ($this->companies[$this->info['as']]['created_by'] == $this->info['id'])?true:false;
 			//print("<!--");print_r($this->info);print("-->");
 			$this->updateDevices();
 		}
