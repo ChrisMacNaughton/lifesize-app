@@ -562,20 +562,27 @@ while(time() <= $end){
 					));
 				} else {
 					$in_call = 1;
-					/*
-					$active_call = explode(chr(0x0a), $ssh->exec('status call active'));
-					$active_call = explode(',',$active_call[0]);
-					$call_time = to_seconds($active_call[10]);
+					
+					$active_call = explode(chr(0x0a), $ssh->exec('status call active -?'));
+					
+					$call = explode(chr(0x0a),$active_call[0]);
+					$headers = explode(",", $call[0]);
+					//print_r($headers);
+					$active_call = explode(",", $active_call[1]);
+					//print_r($active_call);
+					$call_time = to_seconds($active_call[array_search("Duration", $headers)]);
 
-					$call_stats = explode(chr(0x0a), $ssh->exec('status call statistics'));
-					$call_stats = explode(',',$call_stats[0]);
+					$call_stats = explode(chr(0x0a), $ssh->exec('status call statistics -?'));
 
-					$cumu_pkt_loss = $call_stats[12] + $call_stats[17] + $call_stats[21] + $call_stats[27];
+					$call_headers = explode(",",$call_stats[0]);
+					$call_stats = explode(",",$call_stats[1]);
 
-					$pkt_loss = $call_stats[11] + $call_stats[16] + $call_stats[20] + $call_stats[26];
+					$cumu_pkt_loss = $call_stats[array_search('ARX Cumu Loss', $call_headers)] + $call_stats[array_search('VRX Cumu Loss', $call_headers)] + $call_stats[array_search('ATX Cumu Loss', $call_headers)] + $call_stats[array_search('VTX Cumu Loss', $call_headers)];
+
+					$pkt_loss = $call_stats[array_search('ARX Pkt Loss', $call_headers)] + $call_stats[array_search('VRX Pkt Loss', $call_headers)] + $call_stats[array_search('ATX Pkt Loss', $call_headers)] + $call_stats[array_search('VTX Pkt Loss', $call_headers)];
 
 					$loss_per_sec = $cumu_pkt_loss / $call_time;
-
+					
 					if($loss_per_sec > 5){
 						$high_loss_stmt->execute(array(
 							':id'=>$device['id'],
@@ -587,7 +594,7 @@ while(time() <= $end){
 							':active'=>0
 						));
 					}
-					*/
+					
 				}
 				$type = "camera";
 

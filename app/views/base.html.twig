@@ -51,6 +51,9 @@ html {
 	{% endif %}
 <div class="navbar navbar-inverse navbar-fixed-top noprint">
 	<div class="navbar-inner">
+		{% if perms b-and app.permissions['admin/index'] %}
+			<a href="{{root}}admin" class="pull-right btn btn-info">Admin</a>
+		{% endif %}
 		<div class="container">
 			{% block afterbrand %}{%endblock %}
 			<a class="brand" href="http://control.vc">ControlVC</a>
@@ -79,11 +82,7 @@ html {
 					</li>
 					{% endif %}
 					{% endif %}
-					{% if perms b-and app.permissions['admin/index'] %}
-					<li class="{% if active == 'admin' %}active{%endif%}">
-						<a href="{{root}}admin">Admin</a>
-					</li>
-					{% endif %}
+					
 					<li>
 						<a href="{{root}}logout">Logout</a>
 					</li>
