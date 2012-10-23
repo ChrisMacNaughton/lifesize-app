@@ -151,6 +151,7 @@ class usersController extends Controller {
 				case "as":
 					$stmt = $this->writedb->prepare("UPDATE users SET `as` = :as WHERE id = :id");
 					$stmt->execute(array(':as'=>$_POST['as'], ':id'=>$id));
+					$this->user->updateUser();
 					break;
 				case "password":
 					if($_POST['password'] == $_POST['password2']){
