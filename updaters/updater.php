@@ -84,9 +84,11 @@ $current_devices = $res["count"];
 */
 $server_id = gethostname();
 //$current_devices = $redis->get("workers.$server_id.count");
+/*
 if (($current_devices == $max_updaters OR $current_devices > $max_updaters) AND !DEV_ENV){
 	die('Already at max updaters of ' . $max_updaters . " ( $current_devices )\n");
 }
+*/
 //$redis->incr("workers.$server_id.count");
 $redis->incr('workers.count');
 $res = $db->query("SELECT value AS version FROM `settings` WHERE `setting` = 'worker_version'")->fetch(PDO::FETCH_ASSOC);
