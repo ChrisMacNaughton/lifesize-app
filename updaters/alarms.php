@@ -64,7 +64,7 @@ INNER JOIN companies_devices ON companies_devices.id = devices_alarms.device_id
 INNER JOIN devices ON companies_devices.hash = devices.id
 INNER JOIN alarms ON alarms.id = devices_alarms.alarm_id
 WHERE devices_alarms.active =1");
-$users_stmt = $db->prepare("SELECT users.name, users.email, users.id, users.updated
+$users_stmt = $db->prepare("SELECT users.name, users.email, users.id
 FROM users
 INNER JOIN users_alarms ON users_alarms.user_id = users.id
 WHERE users_alarms.enabled = 1
@@ -72,25 +72,32 @@ AND users_alarms.notified < :time
 AND users_alarms.alarm_id = :alarm
 AND users_alarms.device_id = :device
 AND users_alarms.notified < :updated");
-$update_stmt = $db->prepare("UPDATE users_alarms SET notified = :time WHERE alarm_id = :alarm AND device_id = :device AND user_id = :user");
+$update_stmt = $db->prepare("UPDATE users_alarms SET notified = unix_timestamp() WHERE alarm_id = :alarm AND device_id = :device AND user_id = :user");
 $messages = array(
-	'Offline'=>"Hi, %s
+	'alarm-jfu498hf'=>"Hi, %s
 \tYour video conferencing device, %s (%s), went offline on %s.
 
 The ControlVC Team
 
-\tIf you'd like to change your settings about which alarms to enable, please login to https://app.control.vc and modify your enabled alarms!"
+\tIf you'd like to change your settings about which alarms to enable, please login to https://app.control.vc and modify your enabled alarms!",
+"alarm-abwo7froseb"=>"Hi, %s
+\tYour video conferencing device, %s (%s), went had exceedingly high packet loss on %s.
+
+The ControlVC Team
+
+\tIf you'd like to change your settings about which alarms to enable, please login to https://app.control.vc and modify your enabled alarms!",
+
 );
 print("Starting Loop\n");
 while(time() <= $end){
 	$stmt->execute();
 	$alarms = $stmt->fetchAll(PDO::FETCH_ASSOC);
-	print_r($alarms);
+	//print_r($alarms);
 	if(count($alarms) == 0){
-		sleep(1);
+		sleep(5);
 	} else {
 		foreach($alarms as $alarm){
-			//print_r($alarm);
+			print_r($alarm);
 			$opts = array(
 				':time'=>$alarm['updated'],
 				':alarm'=>$alarm['alarm_id'],
@@ -100,12 +107,11 @@ while(time() <= $end){
 			//print_r($opts);
 			$users_stmt->execute($opts);
 			$users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
-			print_r($users);
 			if(count($users) > 0){
 				//print_r($users);
 				foreach ($users as $user){
 					print_r($user);
-					/*
+					$updated = true;
 					$response = $ses->send_email(
 					    'support@control.vc', // Source (aka From)
 					    array('ToAddresses' => array( // Destination (aka To)
@@ -113,18 +119,17 @@ while(time() <= $end){
 					    )),
 					    array( // Message (short form)
 					        'Subject.Data' => 'Device Alarm!',
-					        'Body.Text.Data' => sprintf($messages[$alarm['alarmname']], $user['name'], $alarm['devicename'], $alarm['ip'], date('M. d Y \a\t h:i a', $alarm['updated']))
+					        'Body.Text.Data' => sprintf($messages[$alarm['alarm_id']], $user['name'], $alarm['devicename'], $alarm['ip'], date('M. d Y \a\t h:i a', $alarm['updated']))
 					    )
 					);
 					if($response->isOK()){
 						$update_stmt->execute(array(
-							':time'=>time(),
 							':alarm'=>$alarm['alarm_id'],
 							':device'=>$alarm['device_id'],
 							':user'=>$user['id']
 						));
 					}
-					*/
+					
 				}
 			}
 			/*
@@ -148,6 +153,11 @@ while(time() <= $end){
 			}
 			*/
 		}
-		sleep(1);
+		if($updated){
+			$updated = false;
+			continue;
+		} else {
+			sleep(5);
+		}
 	}
 }
