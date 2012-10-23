@@ -85,6 +85,7 @@ print("Starting Loop\n");
 while(time() <= $end){
 	$stmt->execute();
 	$alarms = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	print_r($alarms);
 	if(count($alarms) == 0){
 		sleep(1);
 	} else {

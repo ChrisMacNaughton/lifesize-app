@@ -237,7 +237,7 @@ $cleanup_log_stmt = $db->prepare("DELETE FROM updater_log WHERE `time` < (:time 
 $check_offline_alarm = $db->prepare("SELECT count(*) AS count FROM devices_alarms WHERE device_id = :id AND alarm_id = 'alarm-jfu498hf'");
 $new_offline_alarm = $db->prepare("INSERT INTO devices_alarms (`active`,`device_id`,`alarm_id`, `updated`)
 VALUES(:active, :id, 'alarm-jfu498hf', unit_timestamp())");
-$update_offline_alarm = $db->prepare("UPDATE devices_alarms SET active = :active, updated = unix_timestamp()
+$update_offline_alarm = $db->prepare("UPDATE devices_alarms SET active = :active, updated = :updated
 	WHERE device_id = :id AND alarm_id = 'alarm-jfu498hf'");
 $high_loss_stmt = $db->prepare("UPDATE devices_alarms SET active = :active WHERE device_id = :id AND alarm_id = 'alarm-abwo7froseb'");
 $get_edits_stmt = $db->prepare("SELECT * FROM edits WHERE device_id = :id AND completed = 0 ORDER BY added");
@@ -326,7 +326,8 @@ while(time() <= $end){
 						if($res['count'] != 0){
 							$update_offline_alarm->execute(array(
 								':id'=>$device['id'],
-								':active'=>1
+								':active'=>1,
+								':updated'=>time()
 							));
 						}else{
 							$new_offline_alarm->execute(array(
@@ -355,17 +356,19 @@ while(time() <= $end){
 				$check_offline_alarm->execute(array(':id'=>$device['id']));
 					$res = $check_offline_alarm->fetch(PDO::FETCH_ASSOC);
 					if($res['count'] != 0){
-						$alarm_active = $db->query("SELECT active FROM devices_alarms WHERE device_id = '" . $device['id'] . "' AND alarm_id = 'alarm-jfu498hf'")->fetch(PDO::FETCH_ASSOC);
+						$alarm_active = $db->query("SELECT active,updated FROM devices_alarms WHERE device_id = '" . $device['id'] . "' AND alarm_id = 'alarm-jfu498hf'")->fetch(PDO::FETCH_ASSOC);
 						if($alarm_active['active'] != 1){
 							$update_offline_alarm->execute(array(
 								':id'=>$device['id'],
-								':active'=>0
+								':active'=>0,
+								':updated'=>$alarm_active['updated']
 							));
 						}
 					}else{
 						$new_offline_alarm->execute(array(
 							':id'=>$device['id'],
-							':active'=>0
+							':active'=>0,
+							':updated'=>0
 						));
 					}
 				$res = explode(chr(0x0a), $ssh->exec("get system serial"));
