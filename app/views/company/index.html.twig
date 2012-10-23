@@ -5,7 +5,7 @@
 {% block body %}
 <div class="row span5">
 	<div class="span5">
-	Current Subscription: {{company.plan}}{% if perms b-and app.permissions['company/edit'] %}<a class="btn btn-success pull-right" {% if company.last4 == null%}disabled="disabled"{% else %}href="{{root}}company/edit/plan"{%endif%}>Change</a>{% endif %}
+	Current Subscription: {{company.plan}}{% if perms b-and app.permissions['company/edit'] %}<a class="btn btn-success pull-right" href="{{root}}company/edit/plan">Change</a>{% endif %}
 	</div>
 	<div class="span5">
 		<p>Card on File:

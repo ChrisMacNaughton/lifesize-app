@@ -204,7 +204,7 @@ class User {
 		return true;
 	}
 	public function getPlan(){
-		$key = array_search($this->info['as'], $this->companies);
-		return $this->companies[$key]['plan_id'];
+		//$key = array_search($this->info['as'], $this->companies);
+		return $this->companies[$this->getCompany()]['plan_id'];
 	}
 }

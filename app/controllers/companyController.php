@@ -66,12 +66,6 @@ class companyController extends Controller {
 			case "plan":
 				$data = array('headercolor'=>'00cccc');
 				$data['company'] = $this->user->getCompanyDetails();
-				if($data['company']['last4'] == null){
-					$_SESSION['errors'][] = "You must have a card added to your account to change your subscription";
-					session_write_close();
-					header("Location: ".PROTOCOL.ROOT."/company");
-					exit();
-				}
 				if(isset($_POST['plan'])){
 					$cu = Stripe_Customer::retrieve($data['company']['customer_id']);
 					$stmt = $this->db->prepare("UPDATE companies SET plan_id = :plan WHERE id = :company_id");

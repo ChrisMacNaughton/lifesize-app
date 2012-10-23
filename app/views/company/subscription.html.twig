@@ -26,7 +26,7 @@
 			<h1>${{plans.basic.price}}<small>/Device/Month</small></h1>
 			<form method="post">
 				<input type="hidden" name="plan" value="Basic">
-				<center><input type="submit" class="btn btn-info" value="Choose"/></center>
+				<center><input type="submit" class="btn btn-info" value="Choose"{% if company.last4 == null or company.plan == "Basic" %} disabled="disabled"{% endif %} /></center>
 			</form>
 			<center><p class="muted">${{devices_count * plans.basic.price}} / month with your current devices</p></center>
 			<ul>
@@ -39,7 +39,7 @@
 			<h1>${{plans.pro.price}}<small>/Device/Month</small></h1>
 			<form method="post">
 				<input type="hidden" name="plan" value="Pro">
-				<center><input type="submit" class="btn btn-info" value="Choose"/></center>
+				<center><input type="submit" class="btn btn-info" value="Choose"{% if company.last4 == null or company.plan == "Pro" %} disabled="disabled"{% endif %}/></center>
 			</form>
 			<center><p class="muted">${{devices_count * plans.pro.price}} / month with your current devices</p></center>
 			<ul>
