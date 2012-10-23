@@ -232,6 +232,7 @@ class usersController extends Controller {
 
 				setcookie('controlVC_uid', $user['id'], $expires,'/', ROOT, $secure);
 				setcookie('controlVC_hash', $hash, $expires,'/', ROOT, $secure);
+				$this->db->query("UPDATE users SET last_login = unix_timestamp() WHERE id = '" . $user['id'] . "'");
 				$return = true;
 			}
 		} else {
