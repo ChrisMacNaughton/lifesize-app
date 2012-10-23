@@ -53,6 +53,8 @@ class User {
 			$companies = $stmt->fetchAll(PDO::FETCH_ASSOC);
 			foreach($companies as $comp){
 				$this->companies[$comp['id']] = $comp;
+				if($comp['own'] == 1)
+					$this->info['owned'] = $comp['id'];
 			}
 			$this->info['plan'] = $this->companies[$this->info['as']]['planName'];
 			//print("<!--");print_r($this->info);print("-->");
