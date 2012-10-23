@@ -55,6 +55,7 @@ mixpanel.people.set({
     "$email": "{{user.email}}",
     "$created":"{{user.created|date("Y-m-d H:i:s")}}",
     "$last_login":"{{user.last_login|date("Y-m-d H:i:s")}}",
+    "$name":"{{user.name}}",
     "company": "{{user.as}}",
     "plan":"{{user.plan}}",
     "created_by":"{{user.created_company}}"
