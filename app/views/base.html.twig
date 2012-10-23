@@ -53,6 +53,7 @@ mixpanel.init("eded07b033c690bd0e255bdc354007fb");
 mixpanel.people.identify("{{user.as}}\\{{user.id}}");
 mixpanel.people.set({
     "$email": "{{user.email}}",
+    "$created":"{{user.created|date("Y-m-d H:i:s")}}",
     "company": "{{user.as}}",
     "plan":"{{user.plan}}"
 });

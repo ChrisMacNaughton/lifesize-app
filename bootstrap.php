@@ -7,7 +7,6 @@ $app = array(
 *	Incliude config / class for db
 *	Initialize DB
 */
-
 require_once 'system/config.php';
 //require 'system/classes/loggedPDO.php';
 require_once 'vendor/autoload.php';

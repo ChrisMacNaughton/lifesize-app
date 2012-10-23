@@ -198,7 +198,7 @@ class User {
 		}
 		$stmt = $this->db->prepare("INSERT INTO users (id, name, email, password, level, timezone, `as`) VALUES (:id, :name, :email, :password, :level, :timezone, :companyId)");
 		$company_stmt = $this->db->prepare("INSERT INTO users_companies (user_id, company_id, added, own) VALUES (:user_id, :companyId, unix_timestamp(), 1)");
-		
+		$user['created'] = time();
 		$stmt->execute($user);
 		$company_stmt->execute(array(
 			'user_id'=>$user['id'],
