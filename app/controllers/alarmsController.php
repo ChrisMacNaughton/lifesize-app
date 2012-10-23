@@ -40,7 +40,7 @@ ORDER BY alarms.name, devices.online DESC, devices.name, devices.id");
 		$stmt->execute(array(':id'=>$this->user->getCompany()));
 		$alarms = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		$devices_alarms_stmt = $this->db->prepare("SELECT active FROM devices_alarms WHERE device_id = :device AND alarm_id = :alarm");
-		$user_alarms_stmt =  $this->db->prepare("SELECT enabled FROM users_alarms WHERE device_id = :device AND alarm_id = :alarm");
+		$user_alarms_stmt =  $this->db->prepare("SELECT enabled FROM users_alarms WHERE device_id = :device AND alarm_id = :alarm AND user_id = :user");
 		foreach($alarms as $key=>$alarm){
 			$options = array(
 				':device'=>$alarm['deviceid'],
@@ -49,7 +49,7 @@ ORDER BY alarms.name, devices.online DESC, devices.name, devices.id");
 			$devices_alarms_stmt->execute($options);
 			$res = $devices_alarms_stmt->fetch(PDO::FETCH_ASSOC);
 			$active = $res['active'];
-
+			$options[':user']=$this->user->getID();
 			$user_alarms_stmt->execute($options);
 			$res = $user_alarms_stmt->fetch(PDO::FETCH_ASSOC);
 			$enabled = $res['enabled'];
