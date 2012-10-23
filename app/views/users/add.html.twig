@@ -3,7 +3,7 @@
 {% block name %}Users{% endblock %}
 {% block afterbrand %}<a href="{{root}}users/add" class="right btn btn-small btn-success">New User</a>{% endblock %}
 {% block body %}
-<form action="" method="post" class="form-horizontal">
+<form action="{% if debug%}?debug=true{%endif%}" method="post" class="form-horizontal">
 	<input type="hidden" name="action" value="add" />
 	<legend>User Information</legend>
 	<div class="control-group">

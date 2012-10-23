@@ -66,6 +66,7 @@ class usersController extends Controller {
 			session_write_close();
 				header("Location: ".PROTOCOL.ROOT."/users/add");
 		}
+		$data['debug'] = (isset($_GET['debug']))?$_GET['debug']:false;
 		$data['levels'] = $this->db->query("SELECT name, id FROM levels WHERE level > 0")->fetchAll(PDO::FETCH_ASSOC);
 		$this->render("users/add.html.twig", $data);
 	}

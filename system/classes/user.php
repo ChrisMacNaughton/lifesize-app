@@ -196,15 +196,22 @@ class User {
 		if(count($res) != 0){
 			return false;
 		}
-		$stmt = $this->db->prepare("INSERT INTO users (id, name, email, password, level, timezone, `as`) VALUES (:id, :name, :email, :password, :level, :timezone, :companyId)");
+		$stmt = $this->db->prepare("INSERT INTO users (id, name, email, password, level, timezone, `as`, `created`) VALUES (:id, :name, :email, :password, :level, :timezone, :companyId, unix_timestamp())");
 		$company_stmt = $this->db->prepare("INSERT INTO users_companies (user_id, company_id, added, own) VALUES (:user_id, :companyId, unix_timestamp(), 1)");
-		$user['created'] = time();
-		$stmt->execute($user);
-		$company_stmt->execute(array(
-			'user_id'=>$user['id'],
-			'companyId'=>$user['companyId']
-		));
-		return true;
+		$res = $stmt->execute($user);
+		if($res){
+			$res = $company_stmt->execute(array(
+				'user_id'=>$user['id'],
+				'companyId'=>$user['companyId']
+			));
+			if($res)
+				return true;
+			return false;
+			
+		}
+		
+		return false;
+		
 	}
 	public function getPlan(){
 		//$key = array_search($this->info['as'], $this->companies);
