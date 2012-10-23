@@ -90,6 +90,7 @@ The ControlVC Team
 );
 print("Starting Loop\n");
 while(time() <= $end){
+	$updated = false;
 	$stmt->execute();
 	$alarms = $stmt->fetchAll(PDO::FETCH_ASSOC);
 	//print_r($alarms);
@@ -154,7 +155,6 @@ while(time() <= $end){
 			*/
 		}
 		if($updated){
-			$updated = false;
 			continue;
 		} else {
 			sleep(5);

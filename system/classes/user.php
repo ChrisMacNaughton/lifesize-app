@@ -51,7 +51,7 @@ class User {
 			$stmt = $this->db->prepare("SELECT U.user_id, C.*, U.added, U.own, S.name AS planName from users_companies as U INNER JOIN companies as C ON C.id = U.Company_id INNER JOIN subscriptions AS S ON S.id = C.plan_id WHERE user_id = :id");
 			$stmt->execute(array(':id'=>$this->info['id']));
 			$this->companies = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+			$this->info['plan'] = $this->getPlan();
 			$this->updateDevices();
 		}
 	}
@@ -156,10 +156,15 @@ class User {
 		if($id == $this->info['id'])
 			return $this->info;
 		else {
-			$stmt = $this->db->prepare("SELECT users.*, levels.name as levelName, levels.level as level, L.permission AS permissions, users.timezone as timezone FROM users INNER JOIN levels ON users.level = levels.id INNER JOIN levels_permissions AS L ON L.level_id = users.level WHERE users.id = :id LIMIT 1");
+			$stmt = $this->db->prepare("SELECT users.*, levels.name as levelName, levels.level as level, L.permission AS permissions
+				FROM users
+				INNER JOIN levels ON users.level = levels.id
+				INNER JOIN levels_permissions AS L ON L.level_id = users.level
+				WHERE users.id = :id LIMIT 1");
 			$stmt->execute(array('id'=>$id));
 			$user = $stmt->fetch(PDO::FETCH_ASSOC);
 			unset($user['password']);
+			$user['plan'] = $this->getPlan();
 			return $user;
 		}
 	}

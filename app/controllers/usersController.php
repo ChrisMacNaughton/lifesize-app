@@ -124,7 +124,7 @@ class usersController extends Controller {
 		}
 		$company = $this->user->getCompany();
 		$opts = array(':id'=>$_POST['id']);
-		$stmt = $this->db->query("SELECT own FROM users_companies WHERE user_id = :id AND company_id = :comp");
+		$stmt = $this->db->prepare("SELECT own FROM users_companies WHERE user_id = :id AND company_id = :comp");
 		$stmt->execute(array(':id'=>$_POST['id'],':comp'=>$company));
 		$tmp = $stmt->fetch(PDO::FETCH_ASSOC);
 		//remove user from company

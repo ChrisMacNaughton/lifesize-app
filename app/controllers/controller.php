@@ -24,7 +24,7 @@ class Controller{
 		if(DEV_ENV)
 			$twig->addExtension(new Twig_Extension_Debug());
 		
-		$data['user'] = $this->user;
+		$data['user'] = $this->user->getInfo($this->user->getID());
 		$data['perms'] = $this->user->permissions;
 		$data['active'] = $this->app['active'];
 		$data['root'] = PROTOCOL.ROOT."/";

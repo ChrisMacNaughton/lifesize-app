@@ -23,7 +23,7 @@ function deleteUser(id) {
 			{id: id},
 			function(data) {
 				//console.log(data);
-				if(data.Success == true) {
+				if(data == true) {
 					$('#' + id).remove();
 				} else{
 					alert("There was a problem, try again later");
