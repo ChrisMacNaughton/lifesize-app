@@ -17,15 +17,33 @@
 	<div class="span12">
 		<form method="post" class="form form-inline">
 			<input type="hidden" name="update" value="as">
-			<select name="as">
+			<select name="as" id="asSelect">
 				{% for comp in companies %}
 					<option{% if comp.id == me.as %} selected="selected"{% endif %} value="{{comp.id}}">{{comp.name}}</option>
 				{% endfor %}
 			</select>
-			<input type="submit" value="Update" />
+			<input type="submit" value="Update" id="updateButton"/>
 		</form>
 	</div>
 	{% endif %}
 	
 </div>
+{% endblock %}
+{% block javascripts %}
+{{parent()}}
+{% if companies|length > 1 %}
+<script type="text/javascript">
+$(document).ready(function(){
+	$("#updateButton").click(function() {
+		var newCompany = $("#asSelect").val();
+   		// This sends us an event every time a user clicks the button
+	    mixpanel.track("changingCompany", {
+	    	'oldCompany':'{{user.as}}',
+	    	'newCompany':newCompany
+	    }); 
+
+	});
+});
+</script>
+{% endif %}
 {% endblock %}

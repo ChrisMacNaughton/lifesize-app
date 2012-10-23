@@ -9,7 +9,18 @@
 		<input type="text" name="ip" placeholder="000.000.000.000">
 		<label>Password</label>
 		<input type="text" name="device_pass" placeholder="lifesize">
-		<label><input type="submit" value="Add"></label>
+		<label><input type="submit" value="Add" id="addbutton"></label>
 	</form>
 </div>
+{% endblock %}
+{% block javascripts %}
+{{parent()}}
+<script type="text/javascript">
+$(document).ready(function(){
+	$("#addButton").click(function() {
+   		// This sends us an event every time a user clicks the button
+	    mixpanel.track("newDevice"); 
+	});
+});
+</script>
 {% endblock %}

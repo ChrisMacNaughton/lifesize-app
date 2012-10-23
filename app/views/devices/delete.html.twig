@@ -38,3 +38,14 @@
 	{% endfor %}
 </div>
 {% endblock %}
+{% block javascripts %}
+{{parent()}}
+<script type="text/javascript">
+$(document).ready(function(){
+	$(".deleteButton").click(function() {
+   		// This sends us an event every time a user clicks the button
+	    mixpanel.track("deleteDevice"); 
+	});
+});
+</script>
+{% endblock %}
