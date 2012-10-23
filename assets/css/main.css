@@ -13,6 +13,10 @@
   border: 2px solid #33ff33;
   border-radius: 5px;
 }
+.current {
+  border: 2px solid #99ccff;
+  border-radius: 5px;
+}
 .subscription h4 {
   text-align: center;
   border-bottom: 1px solid #ccc;
@@ -68,7 +72,7 @@ body {
 ------------------------- */
 .jumbotron {
   position: relative;
-  padding: 20px 0;
+  padding: 8px 0;
   margin-bottom: 5px;
   color: #fff;
   text-align: center;

@@ -18,7 +18,7 @@ for($i=1; $i<=100; $i++){
 		$rate = $rates[$plan];
 		$amount = $i * $rate * 100;
 
-		$name = $plan . '-' . $i;
+		$name = $plan . '-' . $i . '-' . $rate;
 		try{
 			$tmp = Stripe_Plan::retrieve($name);
 			$tmp->delete();
@@ -32,7 +32,7 @@ for($i=1; $i<=100; $i++){
 			"currency" => "usd",
 			"id" => $name);
 		print_r($options);
-		//Stripe_Plan::create($options);
+		Stripe_Plan::create($options);
 
 	}
 }

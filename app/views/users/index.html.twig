@@ -7,7 +7,7 @@
 	<div class="span6">
 		<ul class="userList">
 			{% for user in users %}
-			<li id="{{user.id}}">{{user.name}}( <a href="mailto:{{user.email}}">{{user.email}}</a> ){% if perms b-and app.permissions['users/index'] %}: <a href="{{root}}users/view/{{user.id}}">View</a>{% endif %}{% if perms b-and app.permissions['users/edit'] %} | <a href="{{root}}users/edit/{{user.id}}">Edit</a>{% endif %}{% if perms b-and app.permissions['users/delete'] %} | <a href="javascript:deleteUser('{{user.id}}')">Delete</a>{% endif %}</li>
+			<li id="{{user.id}}">{{user.name}}( <a href="mailto:{{user.email}}">{{user.email}}</a> ){% if perms b-and app.permissions['users/index'] %}: <a href="{{root}}users/view/{{user.id}}">View</a>{% endif %}{% if perms b-and app.permissions['users/edit'] %} | <a href="{{root}}users/edit/{{user.id}}">Edit</a>{% endif %}{% if perms b-and app.permissions['users/delete'] %} | <a href="javascript:deleteUser('{{user.id}}')" class="btn btn-mini btn-danger">Delete</a>{% endif %}</li>
 			{% endfor %}
 		</ul>
 	</div>
@@ -19,11 +19,14 @@
 function deleteUser(id) {
 	if (window.confirm("Are you sure you want to delete this user?")){
 		$.post(
-			'{{root}}/users/delete',
+			'{{root}}users/delete',
 			{id: id},
 			function(data) {
-				if(data == true) {
+				//console.log(data);
+				if(data.Success == true) {
 					$('#' + id).remove();
+				} else{
+					alert("There was a problem, try again later");
 				}
 			}
 		);

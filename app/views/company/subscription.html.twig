@@ -8,7 +8,7 @@
 		Current Subscription: {{company.plan}}
 	</div>
 	<div class="row">
-		<div class="span4 subscription">
+		<div class="span4 subscription{% if company.plan == 'Free' %} current{%endif%}">
 			<h4>Free</h4>
 			<h1>Free</h1>
 			<form method="post">
@@ -21,7 +21,7 @@
 				<li>Email Support</li>
 			</ul>
 		</div>
-		<div class="span4 subscription">
+		<div class="span4 subscription{% if company.plan == 'Basic' %} current{%endif%}">
 			<h4>Basic</h4>
 			<h1>${{plans.basic.price}}<small>/Device/Month</small></h1>
 			<form method="post">
@@ -34,7 +34,7 @@
 				<li>Email Support</li>
 			</ul>
 		</div>
-		<div class="span4 subscription">
+		<div class="span4 subscription{% if company.plan == 'Pro' %} current{%endif%}">
 			<h4>Professional</h4>
 			<h1>${{plans.pro.price}}<small>/Device/Month</small></h1>
 			<form method="post">

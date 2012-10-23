@@ -49,8 +49,10 @@ $redirect = ($user->is_logged_in())?false:true;
 $file = explode('/', __file__);
 $key = array_search('bootstrap.php', $file) - 1;
 define('BASE_DIR', $file[$key]);
-
-$req = explode('/', $_SERVER['REQUEST_URI']);
+$path = explode('?',  $_SERVER['REQUEST_URI']);
+$tmp = explode('.', $path[0]);
+$format = isset($tmp[1])?$tmp[1]:'html';
+$req = explode('/', $tmp[0]);
 unset($req[0]);
 if($req[1] == BASE_DIR){
 	unset($req[1]);

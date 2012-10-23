@@ -3,7 +3,7 @@
 error_reporting(E_ALL^E_NOTICE);
 
 require_once 'bootstrap.php';
-if(DEV_ENV){
+if(DEV_ENV && isset($_GET['debug']) && $_GET['debug'] == 'true'){
 	require_once 'system/classes/phpErrors.php';
 	\php_error\reportErrors();
 }

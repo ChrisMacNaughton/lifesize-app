@@ -53,13 +53,18 @@ class usersController extends Controller {
 						'Body.Text.Data' => $message
 					)
 				);
-				session_write_close();
-				header("Location: ".PROTOCOL.ROOT."/users/add");
 			} else {
-				$_SESSION['errors'][] = "Error with the registration, please try a different email";
-				session_write_close();
-				header("Location: ".PROTOCOL.ROOT."/users/add");
+				$stmt = $this->db->prepare("SELECT id FROM users WHERE email = :email");
+				$stmt->execute(array(':email'=>$user['email']));
+				$res = $stmt->fetch(PDO::FETCH_ASSOC);
+				$id = $res['id'];
+				$stmt = $this->db->prepare("INSERT INTO users_companies (`user_id`,`company_id`,`adda=ed`,`own`) VALUES(:id, :comp, unix_timestamp(), 0)");
+				$stmt->execute(array(':id'=>$user['id'], ':comp'=>$user['companyId']));
+				$_SESSION['flash'][] = "Success adding this user!";
+				
 			}
+			session_write_close();
+				header("Location: ".PROTOCOL.ROOT."/users/add");
 		}
 		$data['levels'] = $this->db->query("SELECT name, id FROM levels WHERE level != 0")->fetchAll(PDO::FETCH_ASSOC);
 		$this->render("users/add.html.twig", $data);
@@ -117,15 +122,23 @@ class usersController extends Controller {
 		if($_POST['id'] == $this->user->getID()){
 			$this->render("users/delete.json.twig", array("Success"=>false));
 		}
+		$company = $this->user->getCompany();
 		$opts = array(':id'=>$_POST['id']);
-		
-		$stmt = $this->db->prepare("DELETE FROM companies_users WHERE user_id = :id");
-		$stmt->execute($opts);
-		$stmt = $this->db->prepare("DELETE FROM users_alarms WHERE user_id = :id");
-		$stmt->execute($opts);
-		$stmt = $this->db->prepare("DELETE FROM users WHERE id = :id");
-		$stmt->execute($opts);
-		
+		$stmt = $this->db->query("SELECT own FROM users_companies WHERE user_id = :id AND company_id = :comp");
+		$stmt->execute(array(':id'=>$_POST['id'],':comp'=>$company));
+		$tmp = $stmt->fetch(PDO::FETCH_ASSOC);
+		//remove user from company
+		$stmt = $this->db->prepare("DELETE FROM users_companies WHERE user_id = :id AND company_id = :comp");
+		$stmt->execute(array(':id'=>$_POST['id'],':comp'=>$company));
+		if($tmp['own'] == 1){ 
+			//remove the user completely
+			$stmt = $this->db->prepare("DELETE FROM users_companies WHERE user_id = :id");
+			$stmt->execute($opts);
+			$stmt = $this->db->prepare("DELETE FROM users_alarms WHERE user_id = :id");
+			$stmt->execute($opts);
+			$stmt = $this->db->prepare("DELETE FROM users WHERE id = :id");
+			$stmt->execute($opts);
+		}
 		$this->render("users/delete.json.twig", array("Success"=>true));
 	}
 	public function editAction($id){
