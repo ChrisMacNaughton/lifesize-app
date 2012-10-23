@@ -198,7 +198,7 @@ class User {
 		if(count($res) != 0){
 			return false;
 		}
-		$stmt = $this->db->prepare("INSERT INTO users (id, name, email, password, level, timezone, `as`, `created`) VALUES (:id, :name, :email, :password, :level, :timezone, :companyId, unix_timestamp())");
+		$stmt = $this->db->prepare("INSERT INTO users (id, name, email, password, level, timezone, `as`, `created`, `registered`) VALUES (:id, :name, :email, :password, :level, :timezone, :companyId, unix_timestamp(), :registered)");
 		$company_stmt = $this->db->prepare("INSERT INTO users_companies (user_id, company_id, added, own) VALUES (:user_id, :companyId, unix_timestamp(), 1)");
 		$res = $stmt->execute($user);
 		if($res){

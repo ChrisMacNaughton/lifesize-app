@@ -30,7 +30,8 @@ class usersController extends Controller {
 				'email'=>$_POST['email'],
 				'level'=>$_POST['level'],
 				'timezone'=>'GMT',
-				'companyId'=>$company['id']
+				'companyId'=>$company['id'],
+				'registered'=>0
 			);
 			include dirname(dirname(dirname(__file__))) . '/system/config.php';
 			$subject = "Control.VC Registration";
@@ -264,7 +265,8 @@ class usersController extends Controller {
 				'email'=>$_POST['email'],
 				'level'=>'lev-9rtud568d5',
 				'timezone'=>'GMT',
-				'companyId'=>$company['id']
+				'companyId'=>$company['id'],
+				'registered'=>1
 			);
 			$subject = "Control.VC Registration";
 			$message = sprintf("Hello, %s\n\nYour account on Control.VC has been opened.  To login, your account details are:\n\n\tEmail: %s\n\tPassword: %s\n\nWe look forward to helping you manage your video conferencing!\n\nThe ControlVC Team", $user['name'], $user['email'],$password);
