@@ -57,8 +57,7 @@ mixpanel.people.set({
     "$last_login":"{{user.last_login|date("Y-m-d H:i:s","GMT")}}",
     "$name":"{{user.name}}",
     "company": "{{user.as}}",
-    "plan":"{{user.plan}}",
-    "created_by":"{{user.created_company}}"
+    "plan":"{{user.plan}}"
 });
 mixpanel.track('Visited: {{active}}');
 </script>
