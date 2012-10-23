@@ -52,9 +52,8 @@ mixpanel.init("eded07b033c690bd0e255bdc354007fb");
 
 mixpanel.people.identify("{{user.as}}\\{{user.id}}");
 mixpanel.people.set({
-    "$email": "{{user.email}}",
-    "$created":"{{user.created|date("Y-m-d H:i:s")}}",
-    "$last_login":"{{user.last_login|date("Y-m-d H:i:s")}}",
+    "$email": "{{user.email}}",, "GMT")}}",
+    "$last_login":"{{user.last_login|date("Y-m-d H:i:s","GMT")}}",
     "$name":"{{user.name}}",
     "company": "{{user.as}}",
     "plan":"{{user.plan}}",
