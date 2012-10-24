@@ -696,14 +696,15 @@ while(time() <= $end){
 				/*
 				get call history
 				*/
-				
+				/*
 				$locale = explode(chr(0x0a), $ssh->exec('get locale gmt-offset'));
 
 				$change = str_split($locale[0]);
 				//print_r($change);
 				$timezone['direction'] = $change[0];
 				$timezone['change'] = $change[2] * 60 * 60;
-				$hist = explode(chr(0x0a), $ssh->exec("status call history -f -X -D |"));
+				*/
+				$hist = explode(chr(0x0a), $ssh->exec("status call history -f -X -D | -U"));
 				//print_r($hist);
 				$print = false;
 				$history_start_stmt->execute(array(':id'=>$options[':id']));
@@ -722,10 +723,6 @@ while(time() <= $end){
 								//echo $id."\n\n";
 								$data[$id] = $value;
 							}
-							$tmp = ($timezone['direction'] == '-') ? strtotime($data[':9']) + $timezone['change'] :strtotime($data[':9']) - $timezone['change'];
-							$data[':9'] = date('Y-m-d H:i:s',$tmp);
-							$tmp = ($timezone['direction'] == '-') ? strtotime($data[':10']) + $timezone['change'] :strtotime($data[':10']) - $timezone['change'];
-							$data[':10'] = date('Y-m-d H:i:s',$tmp);
 							$data[':11'] = to_seconds($data[':11']);
 							$duration += $data[':11'];
 							$history_stmt->execute($data);
