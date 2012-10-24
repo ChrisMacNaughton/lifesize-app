@@ -360,7 +360,7 @@ while(time() <= $end){
 					$res = $check_offline_alarm->fetch(PDO::FETCH_ASSOC);
 					if($res['count'] != 0){
 						$alarm_active = $db->query("SELECT active,updated FROM devices_alarms WHERE device_id = '" . $device['id'] . "' AND alarm_id = 'alarm-jfu498hf'")->fetch(PDO::FETCH_ASSOC);
-						if($alarm_active['active'] != 1){
+						if($alarm_active['active'] == 1){
 							$update_offline_alarm->execute(array(
 								':id'=>$device['id'],
 								':active'=>0,
