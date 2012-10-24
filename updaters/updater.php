@@ -235,7 +235,23 @@ $log_stmt->execute(array(
 	));
 $active_call_stmt = $db->prepare("INSERT INTO `vcdb`.`active_calls`
 	(`id`, `device_id`, `Incoming`, `Duration`, `Number`, `Muted`, `ATX_Pkts`, `ARX_Pkts`, `VTX_Pkts`, `VRX_Pkts`, `ATX_Pcnt`, `ARX_Pcnt`, `VTX_Pcnt`, `VRX_Pcnt`) VALUES
-	(NULL, :device_hash, :incoming, :duration, :number, :muted, :atx_pkts, :arx_pkts, :vtx_pkts, :vrx_pkts, :atx_pcnt, :arx_pcnt, :vtx_pcnt, :vrx_pcnt);");
+	(:id, :device_hash, :incoming, :duration, :number, :muted, :atx_pkts, :arx_pkts, :vtx_pkts, :vrx_pkts, :atx_pcnt, :arx_pcnt, :vtx_pcnt, :vrx_pcnt);");
+$update_active_call_stmt = $db->prepare("UPDATE `vcdb`.`active_calls` SET 
+	`Incoming`=:incoming,
+	`Duration`=:duration,
+	`Number`=:number,
+	`Muted`= :muted,
+	`ATX_Pkts`=:atx_pkts,
+	`ARX_Pkts`=:arx_pkts,
+	`VTX_Pkts`=:vtx_pkts,
+	`VRX_Pkts`=:vrx_pkts,
+	`ATX_Pcnt`=:atx_pcnt,
+	`ARX_Pcnt`=:arx_pcnt,
+	`VTX_Pcnt`=:vtx_pcnt,
+	`VRX_Pcnt`=:vrx_pcnt
+	WHERE id = :id AND device_id =  :device_hash");
+$active_call_check = $db->prepare("SELECT count(*) AS count FROM active_calls WHERE id=:id AND device_id = :hash");
+$no_active_calls = $db->prepare("DELETE FROM active_calls WHERE device_id = :device_hash");
 $cleanup_log_stmt = $db->prepare("DELETE FROM updater_log WHERE `time` < (:time - 86400)");
 $check_offline_alarm = $db->prepare("SELECT count(*) AS count FROM devices_alarms WHERE device_id = :id AND alarm_id = 'alarm-jfu498hf'");
 $new_offline_alarm = $db->prepare("INSERT INTO devices_alarms (`active`,`device_id`,`alarm_id`, `updated`)
@@ -565,7 +581,9 @@ while(time() <= $end){
 				} else {
 					$version = $device['version'];
 				}
-				$res = explode(chr(0x0a), $ssh->exec('status call active'));
+				$res = explode(chr(0x0a), $ssh->exec('status call active -?'));
+				$call_stats = explode(chr(0x0a), $ssh->exec('status call statistics -?'));
+
 				$tmp = explode(',',$res[0]);
 				if(array_search('ok,00', $res) AND ($res[0] == '' OR $tmp[2] == "Terminating")){
 					$in_call = ($res[0] == '')?0 : 1;
@@ -573,58 +591,70 @@ while(time() <= $end){
 						':id'=>$device['id'],
 						':active'=>0
 					));
-					//$no_active_calls->execute(':device_hash'=>sha1($serial));
+					$no_active_calls->execute(array(':device_hash'=>$device_id));
 				} else {
 					$in_call = 1;
 					
-					$active_call = explode(chr(0x0a), $ssh->exec('status call active -?'));
+					$active_call = $res;
 					
 					$call = explode(chr(0x0a),$active_call[0]);
 					$headers = explode(",", $call[0]);
 					//print_r($headers);
-					$active_call = explode(",", $active_call[1]);
+					unset($active_call[0]);
 					//print_r($active_call);
-					$call_time = to_seconds($active_call[array_search("Duration", $headers)]);
+					foreach($active_call as $ac){
+						if($ac == '' || $ac == "ok,00") break;
+						$active_call = explode(",", $ac);
+						//print_r($active_call);
+						$call_time = to_seconds($active_call[array_search("Duration", $headers)]);
 
-					$call_stats = explode(chr(0x0a), $ssh->exec('status call statistics -?'));
+						
+						$call_headers = explode(",",$call_stats[0]);
+						$call_stats = explode(",",$call_stats[1]);
 
-					$call_headers = explode(",",$call_stats[0]);
-					$call_stats = explode(",",$call_stats[1]);
+						$cumu_pkt_loss = $call_stats[array_search('ARX Cumu Loss', $call_headers)] + $call_stats[array_search('VRX Cumu Loss', $call_headers)] + $call_stats[array_search('ATX Cumu Loss', $call_headers)] + $call_stats[array_search('VTX Cumu Loss', $call_headers)];
 
-					$cumu_pkt_loss = $call_stats[array_search('ARX Cumu Loss', $call_headers)] + $call_stats[array_search('VRX Cumu Loss', $call_headers)] + $call_stats[array_search('ATX Cumu Loss', $call_headers)] + $call_stats[array_search('VTX Cumu Loss', $call_headers)];
+						$pkt_loss = $call_stats[array_search('ARX Pkt Loss', $call_headers)] + $call_stats[array_search('VRX Pkt Loss', $call_headers)] + $call_stats[array_search('ATX Pkt Loss', $call_headers)] + $call_stats[array_search('VTX Pkt Loss', $call_headers)];
 
-					$pkt_loss = $call_stats[array_search('ARX Pkt Loss', $call_headers)] + $call_stats[array_search('VRX Pkt Loss', $call_headers)] + $call_stats[array_search('ATX Pkt Loss', $call_headers)] + $call_stats[array_search('VTX Pkt Loss', $call_headers)];
+						$loss_per_sec = $cumu_pkt_loss / $call_time;
+						$active_call_options = array(
+							':id'=>$active_call[array_search("Call", $headers)],
+							':device_hash'=>$device_id,
+							':incoming'=>($active_call[array_search("Incoming", $headers)] == 'on')?1:0,
+							':duration'=>$call_time,
+							':number'=>$active_call[array_search("Number", $headers)],
+							':muted'=>($active_call[array_search("Muted", $headers)] == 'on')?1:0,
+							':atx_pkts'=>$call_stats[array_search('ATX Cumu Loss', $call_headers)],
+							':arx_pkts'=>$call_stats[array_search('ARX Cumu Loss', $call_headers)],
+							':vtx_pkts'=>$call_stats[array_search('VTX Cumu Loss', $call_headers)],
+							':vrx_pkts'=>$call_stats[array_search('VRX Cumu Loss', $call_headers)],
+							':atx_pcnt'=>$call_stats[array_search('ARX % Loss', $call_headers)],
+							':arx_pcnt'=>$call_stats[array_search('ATX % Loss', $call_headers)],
+							':vtx_pcnt'=>$call_stats[array_search('VTX % Loss', $call_headers)],
+							':vrx_pcnt'=>$call_stats[array_search('VRX % Loss', $call_headers)]
+						);
+						//print_r($active_call_options);
+						$active_call_check->execute(array(':id'=>$active_call_options[':id'], ':hash'=>$active_call_options[':device_hash']));
+						$res = $active_call_check->fetch(PDO::FETCH_ASSOC);
+						if($res['count'] == 0){
+							$active_call_stmt->execute($active_call_options);
+						} else {
+							$update_active_call_stmt->execute($active_call_options);
+							//print_r($update_active_call_stmt->errorInfo());
+						}
 
-					$loss_per_sec = $cumu_pkt_loss / $call_time;
-					$active_call_options = array(
-						':device_hash'=>$device_id,
-						':incoming'=>($active_call[array_search("Incoming", $headers)] == 'on')?1:0,
-						':duration'=>$call_time,
-						':number'=>$active_call[array_search("Number", $headers)],
-						':muted'=>($active_call[array_search("Muted", $headers)] == 'on')?1:0,
-						':atx_pkts'=>$call_stats[array_search('ATX Cumu Loss', $call_headers)],
-						':arx_pkts'=>$call_stats[array_search('ARX Cumu Loss', $call_headers)],
-						':vtx_pkts'=>$call_stats[array_search('VTX Cumu Loss', $call_headers)],
-						':vrx_pkts'=>$call_stats[array_search('VRX Cumu Loss', $call_headers)],
-						':atx_pcnt'=>$call_stats[array_search('ARX % Loss', $call_headers)],
-						':arx_pcnt'=>$call_stats[array_search('ATX % Loss', $call_headers)],
-						':vtx_pcnt'=>$call_stats[array_search('VTX % Loss', $call_headers)],
-						':vrx_pcnt'=>$call_stats[array_search('VRX % Loss', $call_headers)]
-					);
-					print_r($active_call_options);
-					//$active_call_stmt->execute($active_call_options);
-					if($loss_per_sec > 5){
-						$high_loss_stmt->execute(array(
-							':id'=>$device['id'],
-							':active'=>1
-						));
-					} else {
-						$high_loss_stmt->execute(array(
-							':id'=>$device['id'],
-							':active'=>0
-						));
+						if($loss_per_sec > 5){
+							$high_loss_stmt->execute(array(
+								':id'=>$device['id'],
+								':active'=>1
+							));
+						} else {
+							$high_loss_stmt->execute(array(
+								':id'=>$device['id'],
+								':active'=>0
+							));
+						}
 					}
-					
 				}
 				$type = "camera";
 
