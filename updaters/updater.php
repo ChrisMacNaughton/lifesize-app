@@ -596,7 +596,7 @@ while(time() <= $end){
 					$in_call = 1;
 					
 					$active_call = $res;
-					
+					$no_active_calls->execute(array(':device_hash'=>$device_id));
 					$call = explode(chr(0x0a),$active_call[0]);
 					$headers = explode(",", $call[0]);
 					//print_r($headers);

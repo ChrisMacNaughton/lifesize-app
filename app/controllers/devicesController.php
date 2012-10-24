@@ -257,25 +257,41 @@ LIMIT 1
 			$duration_scale = "days";
 		}
 		/*
-		*	2 Calls ago
+		*	Active Call
 		*/
-		$stmt = $this->db->prepare("SELECT  `RxV1PktsLost` AS RxV1,  `RxA1PktsLost` AS RxA1,  `RxV2PktsLost` AS RxV2,  `TxV1PktsLost` AS TxV1,  `TxA1PktsLost` AS TxA1,  `TxV2PktsLost` AS TxV2,  `Duration` 
-FROM devices_history
-INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id
+		$stmt = $this->db->prepare("SELECT active_calls.*
+FROM active_calls
+INNER JOIN companies_devices ON companies_devices.hash = active_calls.device_id
 WHERE companies_devices.id = :id
-AND devices_history.duration > $time_limit
-ORDER BY devices_history.id DESC 
-LIMIT 1 OFFSET 1
+ORDER BY active_calls.id DESC
+LIMIT 1
 ");
 		$stmt->execute(array(':id'=>$id));
-
 		$res = $stmt->fetch(PDO::FETCH_ASSOC);
-		$duration1 = $res['Duration'];
-		$d = $duration1/60;
-		unset($res['Duration']);
-		foreach($res as $name=>$loss){
-			if(isset($loss120[$name]) OR isset($loss90[$name]) OR isset($loss60[$name]) OR isset($loss30[$name]))
-				$loss1[$name] = array("name"=>$name, "loss"=>($d > 0)?$loss / $d:0);
+
+		if(count($res) > 0 AND $res){
+			$active_duration = $res['Duration'];
+			$d = $active_duration/60;
+			//unset($res['Duration']);
+			foreach($res as $name=>$loss){
+				$active_call[$name] = array("name"=>$name, "value"=>$loss);
+			}
+		} else {
+			$active_duration = 0;
+			$active_call=false;
+		}
+		$active_duration_scale = "seconds";
+		if($active_duration > 60){
+			$active_duration = $active_duration / 60;
+			$active_duration_scale = "minutes";
+		}
+		if($active_duration > 60){
+			$active_duration = $active_duration / 60;
+			$active_duration_scale = "hours";
+		}
+		if($active_duration > 24){
+			$active_duration = $active_duration / 24;
+			$active_duration_scale = "days";
 		}
 		/*
 		*	Finished with history queries
@@ -288,22 +304,9 @@ LIMIT 1 OFFSET 1
 			'RxA1'=>'Audio Receive',
 			'RxV2'=>'Video2 Receive'
 		);
-		$duration1_scale = "seconds";
-		if($duration1 > 60){
-			$duration1 = $duration1 / 60;
-			$duration1_scale = "minutes";
-		}
-		if($duration1 > 60){
-			$duration1 = $duration1 / 60;
-			$duration1_scale = "hours";
-		}
-		if($duration1 > 24){
-			$duration1 = $duration1 / 24;
-			$duration1_scale = "days";
-		}
+		
 
 		$data['loss0'] = $loss0;
-		$data['loss1'] = $loss1;
 		$data['loss7'] = $loss7;
 		$data['loss30'] = $loss30;
 		$data['loss60'] = $loss60;
@@ -311,8 +314,14 @@ LIMIT 1 OFFSET 1
 		$data['loss120'] = $loss120;
 		$data['duration']['count'] = $duration;
 		$data['duration']['scale'] = $duration_scale;
-		$data['duration1']['count'] = $duration1;
-		$data['duration1']['scale'] = $duration1_scale;
+		$data['active_duration']['count'] = $active_duration;
+		$data['active_duration']['scale'] = $active_duration_scale;
+		$data['active_call'] = $active_call;
+		foreach($data as $key=>$val){
+			if(is_array($val))
+				ksort($data[$key]);
+		}
+		/*
 		ksort($data['loss0']);
 		ksort($data['loss1']);
 		ksort($data['loss7']);
@@ -321,6 +330,7 @@ LIMIT 1 OFFSET 1
 		ksort($data['loss90']);
 		ksort($data['average_loss']);
 		ksort($data['loss120']);
+		*/
 		$data['loss_names'] = array_keys($data['average_loss']);
 		$data['device'] = $this->user->devices[$id];
 		if($this->redis){
@@ -671,7 +681,7 @@ LIMIT 1 OFFSET 1
 				$c = Stripe_Customer::retrieve($company['customer_id']);
 				$c->updateSubscription(array("prorate" => true, "plan" => strtolower($company['planName'])."-".$this->user->deviceCount()));
 			}
-			//header("Location: ".PROTOCOL.ROOT . "/devices/delete");
+			header("Location: ".PROTOCOL.ROOT . "/devices/delete");
 				
 			//redirect to clear post
 

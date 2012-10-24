@@ -33,6 +33,16 @@
 <div id="collapseOne" class="accordion-body collapse span12">
   <div class="accordion-inner span12">
 	<div class="row">
+        <div class="span4">
+            {% if active_call %}
+                <h4>Active Call<small> | Call Duration: {{'%.2f'|format(active_duration.count)}} {{active_duration.scale}}</small></h4>
+                    {% for l in active_call %}
+                        <pre>{{dump(l)}}</pre>
+                    {% endfor %}
+            {% else %}
+                    <p>No calls within this period</p>
+            {% endif %}
+        </div>
 		<div class="span4">
 			<h4>Last Call<small> | Call Duration: {{'%.2f'|format(duration.count)}} {{duration.scale}}</small></h4>
 			{% for l in loss0 %}
@@ -41,18 +51,10 @@
 				<p>No calls within this period</p>
 			{% endfor %}
 		</div>
-		<div class="span4">
-			<h4>2 Calls Ago<small> | Call Duration: {{'%.2f'|format(duration1.count)}} {{duration1.scale}}</small></h4>
-			{% for l in loss1 %}
-                <span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span><br />
-                {%else %}
-                <p>No calls within this period</p>
-            {% endfor %}
-		</div>
         <div class="span4">
             <h4>Averages</h4>
             Global | {{device.model}}<br />
-            {% for l in loss1 %}
+            {% for l in loss0 %}
                 {{packetnames[l.name]}}: {{'%.2f'| format(average_loss[l.name])}} | {{'%.2f'|format(device_averages[l.name])}}<br />
                 {%else %}
                 <p>No calls within this period</p>
