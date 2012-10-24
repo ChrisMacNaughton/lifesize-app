@@ -58,7 +58,8 @@ mixpanel.people.set({
     "$name":"{{user.name}}",
     "company": "{{user.owned}}",
     "plan":"{{user.plan}}",
-    "registered":{%if user.registered == 1 %}true{%else %}false{%endif%}
+    "registered":{%if user.registered == 1 %}true{%else %}false{%endif%},
+    "$last_seen":new Date()
 });
 mixpanel.name_tag('{{user.email}}');
 mixpanel.track('Visited: {{active}}');
