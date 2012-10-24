@@ -274,7 +274,7 @@ LIMIT 1
 			$d = $active_duration/60;
 			//unset($res['Duration']);
 			foreach($res as $name=>$loss){
-				$active_call[$name] = array("name"=>$name, "value"=>$loss);
+				$active_call[$name] =$loss;
 			}
 		} else {
 			$active_duration = 0;

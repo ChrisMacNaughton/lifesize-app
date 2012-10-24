@@ -36,11 +36,34 @@
         <div class="span4">
             {% if active_call %}
                 <h4>Active Call<small> | Call Duration: {{'%.2f'|format(active_duration.count)}} {{active_duration.scale}}</small></h4>
-                    {% for l in active_call %}
-                        <pre>{{dump(l)}}</pre>
-                    {% endfor %}
+                    <h5>Recieve:</h5>
+                    <div class="row" style="margin-top: -15px;">
+                        <div class="span2">
+                            <h6>Video</h6>
+                            Cumulative: {{active_call.VRX_Pkts}}<br />
+                            Percentage: {{active_call.VRX_Pcnt}}
+                        </div>
+                        <div class="span2">
+                            <h6>Audio</h6>
+                            Cumulative: {{active_call.ARX_Pkts}}<br />
+                            Percentage: {{active_call.ARX_Pcnt}}
+                        </div>
+                    </div>
+                    <h5>Transmit:</h5>
+                    <div class="row" style="margin-top: -15px;">
+                        <div class="span2">
+                            <h6>Video</h6>
+                            Cumulative: {{active_call.VTX_Pkts}}<br />
+                            Percentage: {{active_call.VTX_Pcnt}}
+                        </div>
+                        <div class="span2">
+                            <h6>Audio</h6>
+                            Cumulative: {{active_call.ATX_Pkts}}<br />
+                            Percentage: {{active_call.ATX_Pcnt}}
+                        </div>
+                    </div>
             {% else %}
-                    <p>No calls within this period</p>
+                    <p>No calls active</p>
             {% endif %}
         </div>
 		<div class="span4">
@@ -61,7 +84,16 @@
             {% endfor %}
         </div>
 	</div>
-	<div class="row">	<div class="span6">
+	<div class="row">
+        <div class="span4">
+            <h4>Last 7 Days<small>:{{call_counts[7]}} Calls</small></h4>
+            {% for l in loss7 %}
+                <span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.0f'|format(l.loss)}}</span><br />
+                {%else %}
+                <p>No calls within this period</p>
+            {% endfor %}
+        </div>
+        <div class="span4">
 			<h4>Last 30 Days<small>:{{call_counts[30]}} Calls</small></h4>
 			{% for l in loss30 %}
 				<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.0f'|format(l.loss)}}</span><br />
@@ -69,7 +101,7 @@
 				<p>No calls within this period</p>
 			{% endfor %}
 		</div>
-		<div class="span6">
+		<div class="span4">
 			<h4>Last 60 Days<small>:{{call_counts[60]}} Calls</small></h4>
 			{% for l in loss60 %}
 				<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span><br />
@@ -79,7 +111,7 @@
 		</div>
 	</div>
 	<div class="row">
-		<div class="span6">
+		<div class="span4">
 			<h4>Last 90 Days<small>:{{call_counts[90]}} Calls</small></h4>
 			{% for l in loss90 %}
 				<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span><br />
@@ -87,7 +119,7 @@
 				<p>No calls within this period</p>
 			{% endfor %}
 		</div>
-		<div class="span6">
+		<div class="span4">
 			<h4>Last 120 Days<small>:{{call_counts[120]}} Calls</small></h4>
 			{% for l in loss120 %}
 				<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span><br />
