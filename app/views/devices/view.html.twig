@@ -33,27 +33,36 @@
 <div id="collapseOne" class="accordion-body collapse span12">
   <div class="accordion-inner span12">
 	<div class="row">
-		<div class="span6">
+		<div class="span4">
 			<h4>Last Call<small> | Call Duration: {{'%.2f'|format(duration.count)}} {{duration.scale}}</small></h4>
 			{% for l in loss0 %}
-				<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span>(Avg:Global:{{'%.2f'| format(average_loss[l.name])}} | {{device.model}}: {{'%.2f'|format(device_averages[l.name])}})<br />
+				<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span><br />
 				{%else %}
 				<p>No calls within this period</p>
 			{% endfor %}
 		</div>
-		<div class="span6">
-			<h4>Last 7 Days<small>:{{call_counts[7]}} Calls</small></h4>
-			{% for l in loss7 %}
-				<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span>(Avg:Global:{{'%.2f'| format(average_loss[l.name])}} | {{device.model}}: {{'%.2f'|format(device_averages[l.name])}})<br />
-				{%else %}
-				<p>No calls within this period</p>
-			{% endfor %}
+		<div class="span4">
+			<h4>2 Calls Ago<small> | Call Duration: {{'%.2f'|format(duration1.count)}} {{duration1.scale}}</small></h4>
+			{% for l in loss1 %}
+                <span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span><br />
+                {%else %}
+                <p>No calls within this period</p>
+            {% endfor %}
 		</div>
+        <div class="span4">
+            <h4>Averages</h4>
+            Global | {{device.model}}<br />
+            {% for l in loss1 %}
+                {{packetnames[l.name]}}: {{'%.2f'| format(average_loss[l.name])}} | {{'%.2f'|format(device_averages[l.name])}}<br />
+                {%else %}
+                <p>No calls within this period</p>
+            {% endfor %}
+        </div>
 	</div>
 	<div class="row">	<div class="span6">
 			<h4>Last 30 Days<small>:{{call_counts[30]}} Calls</small></h4>
 			{% for l in loss30 %}
-				<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span>(Avg:Global:{{'%.2f'| format(average_loss[l.name])}} | {{device.model}}: {{'%.2f'|format(device_averages[l.name])}})<br />
+				<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.0f'|format(l.loss)}}</span><br />
 				{%else %}
 				<p>No calls within this period</p>
 			{% endfor %}
@@ -61,7 +70,7 @@
 		<div class="span6">
 			<h4>Last 60 Days<small>:{{call_counts[60]}} Calls</small></h4>
 			{% for l in loss60 %}
-				<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span>(Avg:Global:{{'%.2f'| format(average_loss[l.name])}} | {{device.model}}: {{'%.2f'|format(device_averages[l.name])}})<br />
+				<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span><br />
 				{%else %}
 				<p>No calls within this period</p>
 			{% endfor %}
@@ -71,7 +80,7 @@
 		<div class="span6">
 			<h4>Last 90 Days<small>:{{call_counts[90]}} Calls</small></h4>
 			{% for l in loss90 %}
-				<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span>(Avg:Global:{{'%.2f'| format(average_loss[l.name])}} | {{device.model}}: {{'%.2f'|format(device_averages[l.name])}})<br />
+				<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span><br />
 				{%else %}
 				<p>No calls within this period</p>
 			{% endfor %}
@@ -79,7 +88,7 @@
 		<div class="span6">
 			<h4>Last 120 Days<small>:{{call_counts[120]}} Calls</small></h4>
 			{% for l in loss120 %}
-				<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span>(Avg:Global:{{'%.2f'| format(average_loss[l.name])}} | {{device.model}}: {{'%.2f'|format(device_averages[l.name])}})<br />
+				<span class="{% if l.loss < average_loss[l.name]%}good{%else%}bad{%endif%}">{{packetnames[l.name]}}: {{'%.2f'|format(l.loss)}}</span><br />
 				{%else %}
 				<p>No calls within this period</p>
 			{% endfor %}

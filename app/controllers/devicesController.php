@@ -243,17 +243,6 @@ LIMIT 1
 				$loss0[$name] = array("name"=>$name, "loss"=>($d > 0)?$loss / $d:0);
 		}
 
-		/*
-		*	Finished with history queries
-		*/
-		$data['packetnames'] = array(
-			'TxV1'=>'Video1 Transmit',
-			'TxA1'=>'Audio Transmit',
-			'TxV2'=>'Video2 Transmit',
-			'RxV1'=>'Video1 Receive',
-			'RxA1'=>'Audio Receive',
-			'RxV2'=>'Video2 Receive'
-		);
 		$duration_scale = "seconds";
 		if($duration > 60){
 			$duration = $duration / 60;
@@ -267,8 +256,54 @@ LIMIT 1
 			$duration = $duration / 24;
 			$duration_scale = "days";
 		}
+		/*
+		*	2 Calls ago
+		*/
+		$stmt = $this->db->prepare("SELECT  `RxV1PktsLost` AS RxV1,  `RxA1PktsLost` AS RxA1,  `RxV2PktsLost` AS RxV2,  `TxV1PktsLost` AS TxV1,  `TxA1PktsLost` AS TxA1,  `TxV2PktsLost` AS TxV2,  `Duration` 
+FROM devices_history
+INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id
+WHERE companies_devices.id = :id
+AND devices_history.duration > $time_limit
+ORDER BY devices_history.id DESC 
+LIMIT 1 OFFSET 1
+");
+		$stmt->execute(array(':id'=>$id));
+
+		$res = $stmt->fetch(PDO::FETCH_ASSOC);
+		$duration1 = $res['Duration'];
+		$d = $duration1/60;
+		unset($res['Duration']);
+		foreach($res as $name=>$loss){
+			if(isset($loss120[$name]) OR isset($loss90[$name]) OR isset($loss60[$name]) OR isset($loss30[$name]))
+				$loss1[$name] = array("name"=>$name, "loss"=>($d > 0)?$loss / $d:0);
+		}
+		/*
+		*	Finished with history queries
+		*/
+		$data['packetnames'] = array(
+			'TxV1'=>'Video1 Transmit',
+			'TxA1'=>'Audio Transmit',
+			'TxV2'=>'Video2 Transmit',
+			'RxV1'=>'Video1 Receive',
+			'RxA1'=>'Audio Receive',
+			'RxV2'=>'Video2 Receive'
+		);
+		$duration1_scale = "seconds";
+		if($duration1 > 60){
+			$duration1 = $duration1 / 60;
+			$duration1_scale = "minutes";
+		}
+		if($duration1 > 60){
+			$duration1 = $duration1 / 60;
+			$duration1_scale = "hours";
+		}
+		if($duration1 > 24){
+			$duration1 = $duration1 / 24;
+			$duration1_scale = "days";
+		}
 
 		$data['loss0'] = $loss0;
+		$data['loss1'] = $loss1;
 		$data['loss7'] = $loss7;
 		$data['loss30'] = $loss30;
 		$data['loss60'] = $loss60;
@@ -276,7 +311,10 @@ LIMIT 1
 		$data['loss120'] = $loss120;
 		$data['duration']['count'] = $duration;
 		$data['duration']['scale'] = $duration_scale;
+		$data['duration1']['count'] = $duration1;
+		$data['duration1']['scale'] = $duration1_scale;
 		ksort($data['loss0']);
+		ksort($data['loss1']);
 		ksort($data['loss7']);
 		ksort($data['loss30']);
 		ksort($data['loss60']);
@@ -624,7 +662,7 @@ LIMIT 1
 				$stmt = $this->writedb->prepare("DELETE FROM devices_history WHERE device_id = :id");
 				$stmt->execute(array(':id'=>$id));
 			} else {
-				$stmt = $this->writedb->prepare("DELETE FROM companies_devices WHERE device_id = :id AND company_id = :company");
+				$stmt = $this->writedb->prepare("DELETE FROM companies_devices WHERE id = :id AND company_id = :company");
 				$stmt->execute(array(':id'=>$id, ':company'=>$this->user->getCompany()));
 			}
 			$company = $this->user->getCompanydetails();
@@ -633,7 +671,7 @@ LIMIT 1
 				$c = Stripe_Customer::retrieve($company['customer_id']);
 				$c->updateSubscription(array("prorate" => true, "plan" => strtolower($company['planName'])."-".$this->user->deviceCount()));
 			}
-			header("Location: ".PROTOCOL.ROOT . "/devices/delete");
+			//header("Location: ".PROTOCOL.ROOT . "/devices/delete");
 				
 			//redirect to clear post
 
