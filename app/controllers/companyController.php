@@ -1,7 +1,7 @@
 <?php
 
 class companyController extends Controller {
-	
+
 	public function indexAction(){
 		$data = array('headercolor'=>'00ffff');
 		$data['company'] = $this->user->getCompanyDetails();
@@ -12,7 +12,7 @@ class companyController extends Controller {
 		$this->render('company/index.html.twig', $data);
 	}
 	public function addCardAction($id){
-		
+
 		$token = $_POST['id'];
 		$card = $_POST['card'];
 		$company = $this->user->getCompanyDetails();
@@ -73,11 +73,14 @@ class companyController extends Controller {
 					switch($_POST['plan']){
 						case "Pro":
 							$opts['plan']="plan-osr7y078";
-							$cu->updateSubscription(array("prorate" => true, "plan" => "pro-".$this->user->deviceCount()));
+							$protate = true;
+							$cu->updateSubscription(array("prorate" => $prorate, "plan" => "pro-".$this->user->deviceCount()));
 							break;
 						case "Basic":
 							$opts['plan']="plan-soenri7";
-							$cu->updateSubscription(array("prorate" => true, "plan" => "basic-".$this->user->deviceCount()));
+							if($data['company']['plan_id'] == 'plan-osr7y078') $porate = false;
+							else $prorate = true;
+							$cu->updateSubscription(array("prorate" => $prorate, "plan" => "basic-".$this->user->deviceCount()));
 							break;
 						case "Free":
 							if($this->user->deviceCount() > 1){
@@ -87,7 +90,7 @@ class companyController extends Controller {
 								exit();
 							}
 							$opts['plan']="plan-sdioybs0";
-							$cu->updateSubscription(array("prorate" => true, "plan" => "free"));
+							$cu->updateSubscription(array("prorate" => false, "plan" => "free"));
 							break;
 						default:
 							$_SESSION['errors'][] = "Invalid Plan";

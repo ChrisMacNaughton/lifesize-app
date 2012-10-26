@@ -14,7 +14,7 @@ class usersController extends Controller {
 		$stmt->execute(array(':company'=>$this->user->getCompany()));
 		$data['users'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		$this->render("users/index.html.twig", $data);
-	}	
+	}
 	public function addAction(){
 		$data = array(
 			'headercolor'=>'3333ff',
@@ -36,7 +36,7 @@ class usersController extends Controller {
 			include dirname(dirname(dirname(__file__))) . '/system/config.php';
 			$subject = "Control.VC Registration";
 			$message = sprintf("Hello, %s\n\nYour account on Control.VC has been opened.  To login, your account details are:\n\n\tEmail: %s\n\tPassword: %s\n\nWe look forward to helping you manage your video conferencing!\n\nThe ControlVC Team", $user['name'], $user['email'],$password);
-			
+
 			//print("<!--Company: ");print_r($company);print("-->");
 
 			$new_user = $this->user->newUser($user);
@@ -62,7 +62,7 @@ class usersController extends Controller {
 				$stmt = $this->db->prepare("INSERT INTO users_companies (`user_id`,`company_id`,`adda=ed`,`own`) VALUES(:id, :comp, unix_timestamp(), 0)");
 				$stmt->execute(array(':id'=>$user['id'], ':comp'=>$user['companyId']));
 				$_SESSION['flash'][] = "Success adding this user!";
-				
+
 			}
 			session_write_close();
 				header("Location: ".PROTOCOL.ROOT."/users/add");
@@ -132,7 +132,7 @@ class usersController extends Controller {
 		//remove user from company
 		$stmt = $this->db->prepare("DELETE FROM users_companies WHERE user_id = :id AND company_id = :comp");
 		$stmt->execute(array(':id'=>$_POST['id'],':comp'=>$company));
-		if($tmp['own'] == 1){ 
+		if($tmp['own'] == 1){
 			//remove the user completely
 			$stmt = $this->db->prepare("DELETE FROM users_companies WHERE user_id = :id");
 			$stmt->execute($opts);
@@ -182,7 +182,7 @@ class usersController extends Controller {
 		}
 		$data['users'] = $this->user->getInfo($id);
 		$template = "users/edit.html.twig";
-		
+
 		$this->render($template, $data);
 	}
 	public function loginAction(){
@@ -246,7 +246,7 @@ class usersController extends Controller {
 		include dirname(dirname(dirname(__file__))) . '/system/config.php';
 		if(isset($_POST['action']) AND $_POST['action'] == 'register'){
 			unset($_POST['action']);
-			
+
 			$company = array(
 				'id'=>'comp-'.substr(sha1($_POST['companyName'] . microtime(true).rand(1,1000)), 0, 10),
 				'name'=>$_POST['companyName'],
@@ -270,15 +270,15 @@ class usersController extends Controller {
 			);
 			$subject = "Control.VC Registration";
 			$message = sprintf("Hello, %s\n\nYour account on Control.VC has been opened.  To login, your account details are:\n\n\tEmail: %s\n\tPassword: %s\n\nWe look forward to helping you manage your video conferencing!\n\nThe ControlVC Team", $user['name'], $user['email'],$password);
-			
+
 			//print("<!--Company: ");print_r($company);print("-->");
 
 			$new_user = $this->user->newUser($user);
 			if($new_user){
 
-				$stmt = $this->db->prepare("INSERT INTO companies (id, created, name, address, city, state, zip, created_by, active, :phone) VALUES (:id, unix_timestamp(), :name, :address, :city, :state, :zip, :created_by, 1, :phone)");
+				$stmt = $this->db->prepare("INSERT INTO companies (id, created, name, address, city, state, zip, created_by, active, phone) VALUES (:id, unix_timestamp(), :name, :address, :city, :state, :zip, :created_by, 1, :phone)");
 				$company['created_by'] = $user['id'];
-				
+
 				$stmt->execute($company);
 				$_SESSION['flash'][] = "Success registering, please check your email for your password";
 

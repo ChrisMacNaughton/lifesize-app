@@ -1,0 +1,11 @@
+{% extends 'admin/adminBase.html.twig'%}
+
+{% block subtitle %}Companies{% endblock %}
+
+{% block adminContent %}
+<ul>
+  {% for comp in companies %}
+    <li><a href="{{root}}admin/companies/{{comp.id}}">{{comp.name}}</a> - {{comp.planName}}</li>
+  {% endfor %}
+</ul>
+{% endblock %}

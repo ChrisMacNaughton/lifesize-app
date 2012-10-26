@@ -1,0 +1,20 @@
+{% extends 'admin/adminBase.html.twig'%}
+
+{% block subtitle %}Company - {{company.name}}{% endblock %}
+
+{% block adminContent %}
+<form method="post">
+  <input type="hidden" name="action" value="changePlan">
+  <select name="plan">
+    {% for plan in plans %}
+    <option value="{{plan.id}}" {% if company.plan_id == plan.id %} selected="selected" {%endif %}>{{plan.name}}</option>
+    {% endfor %}
+  </select>
+  <input type="submit" value="Update" />
+</form>
+<form method="post">
+  <input type="hidden" name="action" value="toggleActive">
+  <input type="hidden" name="active" value="{{company.active}}">
+  <input type="submit" class="btn {% if company.active == 1%}btn-success{% else %}btn-danger{%endif%}" value="Toggle Active ({% if company.active == 1%}Active{% else %}Inactive{%endif %})">
+</form>
+{% endblock %}
