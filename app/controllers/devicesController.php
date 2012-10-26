@@ -71,7 +71,7 @@ AND devices_history.duration > $time_limit");
 		$data['call_counts'][0] = $res['count'];
 
 		*/
-		
+
 		/*
 		*	Last 7 days
 		*/
@@ -89,7 +89,7 @@ AND devices_history.duration > $time_limit");
 		unset($res['Duration']);
 		foreach($res as $name=>$loss){
 			if($duration > 0 AND $loss / $duration > $min_loss){
-				$loss7[$name] = array("name"=>$name, "loss"=>$loss / $duration);	
+				$loss7[$name] = array("name"=>$name, "loss"=>$loss / $duration);
 			}
 		}
 		$stmt = $this->db->prepare("SELECT count(*) AS count
@@ -207,7 +207,7 @@ AND devices_history.duration > $time_limit");
 		unset($res['Duration']);
 		foreach($res as $name=>$loss){
 			if($duration > 0 AND $loss / $duration > $min_loss){
-				$loss120[$name] = array("name"=>$name, "loss"=>$loss / $duration);	
+				$loss120[$name] = array("name"=>$name, "loss"=>$loss / $duration);
 			}
 		}
 		$stmt = $this->db->prepare("SELECT count(*) AS count
@@ -224,12 +224,12 @@ AND devices_history.duration > $time_limit");
 		/*
 		*	Last Call
 		*/
-		$stmt = $this->db->prepare("SELECT  `RxV1PktsLost` AS RxV1,  `RxA1PktsLost` AS RxA1,  `RxV2PktsLost` AS RxV2,  `TxV1PktsLost` AS TxV1,  `TxA1PktsLost` AS TxA1,  `TxV2PktsLost` AS TxV2,  `Duration` 
+		$stmt = $this->db->prepare("SELECT  `RxV1PktsLost` AS RxV1,  `RxA1PktsLost` AS RxA1,  `RxV2PktsLost` AS RxV2,  `TxV1PktsLost` AS TxV1,  `TxA1PktsLost` AS TxA1,  `TxV2PktsLost` AS TxV2,  `Duration`
 FROM devices_history
 INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id
 WHERE companies_devices.id = :id
 AND devices_history.duration > $time_limit
-ORDER BY devices_history.id DESC 
+ORDER BY devices_history.id DESC
 LIMIT 1
 ");
 		$stmt->execute(array(':id'=>$id));
@@ -304,7 +304,7 @@ LIMIT 1
 			'RxA1'=>'Audio Receive',
 			'RxV2'=>'Video2 Receive'
 		);
-		
+
 
 		$data['loss0'] = $loss0;
 		$data['loss7'] = $loss7;
@@ -604,8 +604,8 @@ LIMIT 1
 					}
 					break;
 			}
-		}			
-		
+		}
+
 		$data['device'] = $this->user->devices[$id];
 		$this->render('devices/edit.html.twig', $data);
 	}
@@ -651,6 +651,9 @@ LIMIT 1
 			}
 			//echo"<!--";print_r($options);echo"-->";
 		}
+		$data['devices'] = $this->user->devices;
+		$comp = $this->user->getCompanyDetails();
+		$data['subscription'] = $comp['plan_id'];
 		$this->render('devices/add.html.twig', $data);
 	}
 	public function deleteAction(){
@@ -682,7 +685,7 @@ LIMIT 1
 				$c->updateSubscription(array("prorate" => true, "plan" => strtolower($company['planName'])."-".$this->user->deviceCount()));
 			}
 			header("Location: ".PROTOCOL.ROOT . "/devices/delete");
-				
+
 			//redirect to clear post
 
 		}

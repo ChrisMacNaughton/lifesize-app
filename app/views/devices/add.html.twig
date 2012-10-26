@@ -2,6 +2,7 @@
 {% block title%}Add Device{% endblock %}
 {% block name %}Add Device{% endblock %}
 {% block body %}
+{% if subscription != 'plan-sdioybs0' or devices|length == 0 %}
 <div class="span6 offset3">
 	<form action="" method="post">
 		<input type="hidden" name="action" value="add">
@@ -12,7 +13,9 @@
 		<label><input type="submit" value="Add" id="addbutton"></label>
 	</form>
 </div>
-
+{% else %}
+<p>You must <a href="{{root}}company/edit/plan">upgrade your plan</a> to add more devices</p>
+{% endif %}
 {% endblock %}
 {% block javascripts %}
 {{parent()}}
@@ -20,7 +23,7 @@
 $(document).ready(function(){
 	$("#addButton").click(function() {
    		// This sends us an event every time a user clicks the button
-	    mixpanel.track("newDevice"); 
+	    mixpanel.track("newDevice");
 	});
 });
 </script>

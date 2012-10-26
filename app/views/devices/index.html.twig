@@ -4,9 +4,7 @@
 		<a class="right btn btn-small btn-danger" href="{{root}}devices/delete">Delete</a>
 	{% endif %}
 	{% if perms b-and app.permissions['devices/add'] %}
-		{% if subscription != 'plan-sdioybs0' or devices|length == 0 %}
 		<a class="right btn btn-small btn-success" href="{{root}}devices/add">New</a>
-		{% endif %}
 	{% endif %}
 {% endblock %}
 {% block title %}Devices {% endblock %}

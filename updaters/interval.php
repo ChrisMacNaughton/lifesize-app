@@ -60,19 +60,19 @@ if(RESET OR $redis->get('stats_generated') < time() - 15 * 60){
 	print("Updating Stats\n");
 	/*
 	SELECT AVG( (
-`RxV1PktsLost` +  `RxA1PktsLost` +  `RxV2PktsLost`
+`RxV1PctLoss` +  `RxA1PctLoss` +  `RxV2PctLoss`
 ) /  `Duration` ) AS RxPctLoss, AVG( (
-`TxV1PktsLost` +  `TxA1PktsLost` +  `TxV2PktsLost`
+`TxV1PctLoss` +  `TxA1PctLoss` +  `TxV2PctLoss`
 ) /  `Duration` ) AS TxPctLoss
 FROM devices_history
 INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id
 */
 	$start = microtime(true);
-	$totals = $db->query("SELECT SUM(  `RxV1PktsLost` ) AS RxV1, SUM(  `RxA1PktsLost` ) AS RxA1, SUM(  `RxV2PktsLost` ) AS RxV2, SUM(  `TxV1PktsLost` ) AS TxV1, SUM( `TxA1PktsLost` ) AS TxA1, SUM(  `TxV2PktsLost` ) AS TxV2, SUM(  `Duration` ) AS Duration
+	$totals = $db->query("SELECT AVG(  `RxV1PctLoss` ) AS RxV1, AVG(  `RxA1PctLoss` ) AS RxA1, AVG(  `RxV2PctLoss` ) AS RxV2, AVG(  `TxV1PctLoss` ) AS TxV1, AVG( `TxA1PctLoss` ) AS TxA1, AVG(  `TxV2PctLoss` ) AS TxV2
 FROM devices_history
 INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id
 WHERE devices_history.duration > 0")->fetch(PDO::FETCH_ASSOC);
-
+	/*
 	$d = ($totals['Duration'] / 60);
 	$averages['RxV1'] = $totals['RxV1'] / $d;
 	$averages['RxA1'] = $totals['RxA1'] / $d;
@@ -80,9 +80,16 @@ WHERE devices_history.duration > 0")->fetch(PDO::FETCH_ASSOC);
 	$averages['TxV1'] = $totals['TxV1'] / $d;
 	$averages['TxA1'] = $totals['TxA1'] / $d;
 	$averages['TxV2'] = $totals['TxV2'] / $d;
-	$redis->set('cache.averages', json_encode($averages));
+	*/
+	print_r($db->query("SELECT * 
+FROM devices_history
+INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id
+WHERE device_id =  'ac0f7e0640a62f23fd12251432fed7e8bcf5850f'")->fetchAll(PDO::FETCH_ASSOC));
+	$averages = $totals;
+	print_r($averages);
+	//$redis->set('cache.averages', json_encode($averages));
 }
-
+exit();
 if(RESET OR $redis->get('device_stats_generated') < time() - 15 * 60){
 	$averages = array();
 	print("Updating device stats!\n");
@@ -93,7 +100,7 @@ if(RESET OR $redis->get('device_stats_generated') < time() - 15 * 60){
 
 	foreach($models as $model){
 		$model = $model['model'];
-		$totals = $db->query("SELECT SUM(  `RxV1PktsLost` ) AS RxV1, SUM(  `RxA1PktsLost` ) AS RxA1, SUM(  `RxV2PktsLost` ) AS RxV2, SUM(  `TxV1PktsLost` ) AS TxV1, SUM( `TxA1PktsLost` ) AS TxA1, SUM(  `TxV2PktsLost` ) AS TxV2, SUM( devices_history.duration ) AS Duration
+		$totals = $db->query("SELECT SUM(  `RxV1PctLoss` ) AS RxV1, SUM(  `RxA1PctLoss` ) AS RxA1, SUM(  `RxV2PctLoss` ) AS RxV2, SUM(  `TxV1PctLoss` ) AS TxV1, SUM( `TxA1PctLoss` ) AS TxA1, SUM(  `TxV2PctLoss` ) AS TxV2, SUM( devices_history.duration ) AS Duration
 FROM devices_history
 INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id
 INNER JOIN devices ON devices.id = devices_history.device_id
@@ -107,8 +114,8 @@ WHERE devices_history.duration >0
 	$averages[$model]['TxA1'] = $totals['TxA1'] / $d;
 	$averages[$model]['TxV2'] = $totals['TxV2'] / $d;
 	}
-	//print_r($averages);
-	$redis->set('cache.device_averages', json_encode($averages));
+	print_r($averages);
+	//$redis->set('cache.device_averages', json_encode($averages));
 	//$redis->del('device_stats_generated');
 }
 
@@ -129,15 +136,15 @@ if($redis->get('companies_cleaned') < time() - 30 * 60){
 		} else {
 			$plan_name = $plan_id;
 		}
-		print("Plan Name: $plan_name\n");
+		//print("Plan Name: $plan_name\n");
 		$last4 = $customer['active_card']['last4'];
 		$plan_stmt->execute(array(':name'=>$plan_name));
 		$s = $plan_stmt->fetch(PDO::FETCH_ASSOC);
 		$id = $s['id'];
-		print_r($s);
+		//print_r($s);
 		$options = array(':id'=>$id, ':customer_id'=>$customer_id, ':last4'=>$last4);
 
 		$stmt->execute($options);
-		print_r($options);
+		//print_r($options);
 	}
 }
