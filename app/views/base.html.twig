@@ -200,9 +200,16 @@ $(document).bind('keydown', function(e){
       url:         "https://controlvc.zendesk.com",
       tabID:       "Feedback",
       tabColor:    "grey",
-      tabPosition: "Right"
+      tabPosition: "Right",
+      requester_name:"{{user.name}}",
+      requester_email:"{{user.email}}"
     });
   }
+</script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$('#name').val('{{user.name}}');
+	});
 </script>
 {#
 <pre>
