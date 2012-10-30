@@ -175,6 +175,7 @@ $(document).bind('keydown', function(e){
 });
 </script>
 {% endif %}
+{% if active != 'login' and active != 'register' and active != 'admin' %}
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
@@ -189,6 +190,7 @@ $(document).bind('keydown', function(e){
   })();
 
 </script>
+
 <script type="text/javascript" src="//assets.zendesk.com/external/zenbox/v2.5/zenbox.js"></script>
 <style type="text/css" media="screen, projection">
   @import url(//assets.zendesk.com/external/zenbox/v2.5/zenbox.css);
@@ -196,7 +198,7 @@ $(document).bind('keydown', function(e){
 <script type="text/javascript">
   if (typeof(Zenbox) !== "undefined") {
     Zenbox.init({
-      dropboxID:   "20099381",
+      dropboxID:   "20099322",
       url:         "https://controlvc.zendesk.com",
       tabID:       "Feedback",
       tabColor:    "grey",
@@ -206,11 +208,7 @@ $(document).bind('keydown', function(e){
     });
   }
 </script>
-<script type="text/javascript">
-	$(document).ready(function(){
-		$('#name').val('{{user.name}}');
-	});
-</script>
+{%endif%}
 {#
 <pre>
 	{{dump(user)}}
