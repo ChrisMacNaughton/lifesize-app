@@ -1510,6 +1510,7 @@ if (file_exists(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'config.inc.php'))
 	include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'config.inc.php';
 }
 // Fallback to `~/.aws/sdk/config.inc.php`
+/*
 else
 {
 	if (!isset($_ENV['HOME']) && isset($_SERVER['HOME']))
@@ -1518,6 +1519,7 @@ else
 	}
 	elseif (!isset($_ENV['HOME']) && !isset($_SERVER['HOME']))
 	{
+
 		$os = strtolower(PHP_OS);
 		if (in_array($os, array('windows', 'winnt', 'win32')))
 		{
@@ -1565,4 +1567,4 @@ else
 	}
 
 	unset($os, $dir, $out, $exit, $path);
-}
+}*/
