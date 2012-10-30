@@ -24,6 +24,14 @@ class adminController extends Controller {
       $company_stmt = $this->db->prepare("SELECT companies.*, S.name AS planName FROM companies INNER JOIN subscriptions AS S ON companies.plan_id = S.id WHERE companies.id=:id");
       $company_stmt->execute(array(":id"=>$id));
       $data['company'] = $company_stmt->fetch(PDO::FETCH_ASSOC);
+      $stmt = $this->db->prepare("SELECT count(*) AS count FROM companies_devices WHERE company_id = :id");
+      $stmt->execute(array(':id'=>$id));
+      $tmp = $stmt->fetch(PDO::FETCH_ASSOC);
+      $data['device_count'] = $tmp['count'];
+      $stmt = $this->db->prepare("SELECT * FROM users_companies INNER JOIN users ON users.id = users_companies.user_id WHERE company_id = :id");
+      $stmt->execute(array(':id'=>$id));
+      $data['users'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
       if(isset($_POST['action'])){
         $stmt = $this->db->prepare("SELECT count(*) AS count FROM companies_devices WHERE company_id = :id");
         switch ($_POST['action']) {
@@ -46,13 +54,13 @@ class adminController extends Controller {
               $plan = "basic-$count-10";
             }
             $cu = Stripe_Customer::retrieve($data['company']['customer_id']);
-            $stmt = $this->db->prepare("UPDATE companies SET plan_id = :plan_id WHERE id=:id");
+            $stmt = $this->writedb->prepare("UPDATE companies SET plan_id = :plan_id WHERE id=:id");
             $stmt->execute(array(':plan_id'=>$_POST['plan'], ':id'=>$id));
             $cu->updateSubscription(array("prorate" => true, "plan" => $plan));
             header("Loation: ".PROTOCOL.ROOT."/admin/company/$id");
             break;
           case 'toggleActive':
-            $stmt = $this->db->prepare("UPDATE companies SET active = :active WHERE id = :id");
+            $stmt = $this->writedb->prepare("UPDATE companies SET active = :active WHERE id = :id");
             $active = ($_POST['active'] == 1)?0:1;
             $stmt->execute(array(':active'=>$active, ':id'=>$id));
           default:

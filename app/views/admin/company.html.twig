@@ -1,20 +1,36 @@
 {% extends 'admin/adminBase.html.twig'%}
 
-{% block subtitle %}Company - {{company.name}}{% endblock %}
+{% block subtitle %}Company - {{company.name}} ({{device_count}} devices){% endblock %}
 
 {% block adminContent %}
-<form method="post">
-  <input type="hidden" name="action" value="changePlan">
-  <select name="plan">
-    {% for plan in plans %}
-    <option value="{{plan.id}}" {% if company.plan_id == plan.id %} selected="selected" {%endif %}>{{plan.name}}</option>
-    {% endfor %}
-  </select>
-  <input type="submit" value="Update" />
-</form>
-<form method="post">
-  <input type="hidden" name="action" value="toggleActive">
-  <input type="hidden" name="active" value="{{company.active}}">
-  <input type="submit" class="btn {% if company.active == 1%}btn-success{% else %}btn-danger{%endif%}" value="Toggle Active ({% if company.active == 1%}Active{% else %}Inactive{%endif %})">
-</form>
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span4">
+      <form method="post" class="form-horizontal">
+        <input type="hidden" name="action" value="changePlan">
+        <div class="input-append">
+          <select name="plan" class="span8">
+            {% for plan in plans %}
+            <option value="{{plan.id}}" {% if company.plan_id == plan.id %} selected="selected" {%endif %}>{{plan.name}}</option>
+            {% endfor %}
+          </select>
+          <input type="submit" value="Update" class="span4 btn" />
+        </div>
+      </form>
+      <form method="post">
+        <input type="hidden" name="action" value="toggleActive">
+        <input type="hidden" name="active" value="{{company.active}}">
+        <input type="submit" class="btn {% if company.active == 1%}btn-success{% else %}btn-danger{%endif%}" value="Toggle Active ({% if company.active == 1%}Active{% else %}Inactive{%endif %})">
+      </form>
+    </div>
+    <div class="span8">
+      <h2>Users</h6>
+        <ul class="userList">
+          {% for user in users %}
+          <li style="display: block; padding: 4px;" id="{{user.id}}">{{user.name}} ( <a href="mailto:{{user.email}}">{{user.email}}</a> )</li>
+          {% endfor %}
+        </ul>
+      </div>
+  </div>
+</div>
 {% endblock %}
