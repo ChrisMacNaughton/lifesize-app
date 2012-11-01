@@ -15,6 +15,11 @@ class devicesController extends Controller {
 		$data=array(
 			'headercolor'=>'66cc66',
 		);
+		if(!isset($this->user->devices[$id])){
+			$_SESSION['errors'][] = "You don't have permission to view that device";
+			session_write_close();
+			header("Location: ".PROTOCOL.ROOT."/devices");
+		}
 		if($this->redis){
 			$data['average_loss'] = json_decode($this->redis->get('cache.averages'), true);
 		} else {

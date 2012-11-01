@@ -1,4 +1,6 @@
 <?php
+
+exit("No more!");
 require_once 'system/config.php';
 //require 'system/classes/loggedPDO.php';
 require_once 'vendor/autoload.php';
@@ -24,7 +26,7 @@ for($i=1; $i<=100; $i++){
 			$tmp->delete();
 			} catch(Exception $e){
 				print("No Plan!\n");
-			}	
+			}
 		$options = array(
 			"amount" => $amount,
 			"interval" => "month",
