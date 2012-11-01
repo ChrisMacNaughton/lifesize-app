@@ -10,9 +10,18 @@ class usersController extends Controller {
 		$data = array(
 			'headercolor'=>'9999ff',
 		);
+		$tmp = $this->db->query("SELECT users.id FROM users INNER JOIN users_companies ON users_companies.user_id = users.id WHERE users_companies.company_id = 'comp-klsdiyr908'")->fetchAll(PDO::FETCH_ASSOC);
+		$no_list = array();
+		if($this->user->getCompany() != 'comp-klsdiyr908')
+			foreach($tmp as $t)$no_list[] = $t['id'];
 		$stmt = $this->db->prepare("SELECT users.name, users.id, users.email FROM users INNER JOIN users_companies ON users.id = users_companies.user_id WHERE company_id = :company");
 		$stmt->execute(array(':company'=>$this->user->getCompany()));
-		$data['users'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		foreach($users as $user){
+			if(!in_array($user['id'], $no_list)){
+				$data['users'][] = $user;
+			}
+		}
 		$this->render("users/index.html.twig", $data);
 	}
 	public function addAction(){
@@ -106,6 +115,12 @@ class usersController extends Controller {
 					}
 					break;
 			}
+			if($id == $this->user->getID())
+				$redir="me";
+			else
+				$redir="users/".$id;
+			session_write_close();
+			header("Location: ".PROTOCOL.ROOT.'/'.$redir);
 		}
 		if($id == $this->user->getID()){
 			$data['me'] = $this->user->getInfo($id);
@@ -180,6 +195,7 @@ class usersController extends Controller {
 					break;
 			}
 		}
+		$this->user->updateUser();
 		$data['users'] = $this->user->getInfo($id);
 		$template = "users/edit.html.twig";
 

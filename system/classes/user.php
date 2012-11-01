@@ -33,7 +33,7 @@ class User {
 		$this->writedb = $writedb;
 		if(!isset($_COOKIE['controlVC_uid'])) $_COOKIE['controlVC_uid'] = "";
 		if(!isset($_COOKIE['controlVC_hash'])) $_COOKIE['controlVC_hash'] = "";
-		
+
 		$this->updateUser();
 	}
 	public function updateUser(){
@@ -209,11 +209,11 @@ class User {
 			if($res)
 				return true;
 			return false;
-			
+
 		}
-		
+
 		return false;
-		
+
 	}
 	public function getPlan(){
 		//$key = array_search($this->info['as'], $this->companies);
