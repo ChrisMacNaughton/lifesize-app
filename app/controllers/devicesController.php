@@ -417,6 +417,11 @@ LIMIT 1
 		$data = array(
 			'headercolor'=>'66ff66'
 		);
+		if(!isset($this->user->devices[$id])){
+			$_SESSION['errors'][] = "You don't have permission to view that device";
+			session_write_close();
+			header("Location: ".PROTOCOL.ROOT."/devices");
+		}
 		$data['device'] = $this->user->devices[$id];
 		if(isset($_POST['section'])){
 			$section = $_POST['section'];
