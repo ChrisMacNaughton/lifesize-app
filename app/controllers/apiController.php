@@ -6,10 +6,11 @@ class apiController extends Controller {
 
     $cipher = MCRYPT_RIJNDAEL_128;
     $mode=MCRYPT_MODE_CBC;
-    $secret=hash('sha256','dfhdrt5dpsei76yngb69wybnoihngnvstg0e67g'.$_GET['api_key'], true);
+    $key = 'dfhdrt5dpsei76yngb69wybnoihngnvstg0e67gerfo87s34gorlgbz78y4uh6';
+    $secret=hash('sha256',$key, true);
     $data = json_encode(array(
       'id'=>'dev-0w489h7tp',
-      'ip'=>'10.0.1.141',
+      'ip'=>'4.26.212.49',
       'password'=>'sunbeltLs123',
     ));
     /*
@@ -23,6 +24,7 @@ class apiController extends Controller {
     echo base64_encode($crypttext);
   }
   public function update_DeviceAction(){
+    error_reporting(E_ALL);
     $api_key = $_GET['api_key'];
     $data = json_decode($_POST['data'], true);
 
@@ -37,17 +39,24 @@ class apiController extends Controller {
     $res=$stmt->fetch(PDO::FETCH_ASSOC);
     $key = $res['secret_key'];
     unset($res);
-    $secret=$key;//hash('sha256','dfhdrt5dpsei76yngb69wybnoihngnvstg0e67g'.$_GET['api_key'], true);
+    $secret=hash('sha256',$key, true);//hash('sha256','dfhdrt5dpsei76yngb69wybnoihngnvstg0e67g'.$_GET['api_key'], true);
 
     $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
     $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
     $data = mcrypt_decrypt($cipher, $secret, $data, $mode, $iv);
-    print("\nDevice:\n\n");
+    //print("\nDevice:\n\n");
     $start = strpos($data, "{");
     $length = strpos($data, "}") - $start;
 
     $device = json_decode(substr($data, $start, $length+1), true);
     $device['device_id'] = $device_id;
-    print_r($device);
+    //print_r($device);
+    if(count($device) > 1){
+      header("HTTP/1.0 200 OK");
+      print("OK");
+    } else {
+      header("HTTP/1.0 500 Not Found");
+      print("There was a problem");
+    }
   }
 }
