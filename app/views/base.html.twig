@@ -72,7 +72,7 @@ mixpanel.track('Visited: {{active}}');
 	{% endif %}
 <div class="navbar navbar-inverse navbar-fixed-top noprint">
 	<div class="navbar-inner">
-		{% if perms b-and app.permissions['admin/index'] %}
+		{% if perms b-and app.permissions['admin/index'] and active != 'login' %}
 			<a href="{{root}}admin" class="pull-right btn btn-info">Admin</a>
 		{% endif %}
 		<div class="container">
