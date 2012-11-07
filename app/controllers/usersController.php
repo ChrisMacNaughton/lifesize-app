@@ -208,8 +208,12 @@ class usersController extends Controller {
 			$rememberme = (isset($_POST['rememberme'])) ? true : false;
 			if($this->login($email, $password, $rememberme)){
 				header("Location: " . PROTOCOL . ROOT);
+				exit();
 			} else {
 				$_SESSION['errors'][] = $this->error;
+				session_write_close();
+				sleep(1);
+				header("Location: " . PROTOCOL . ROOT."/login");
 			}
 		}
 		$this->render("users/login.html.twig");
