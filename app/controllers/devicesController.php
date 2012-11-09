@@ -275,7 +275,7 @@ LIMIT 1
 		$res = $stmt->fetch(PDO::FETCH_ASSOC);
 
 		if(count($res) > 0 AND $res){
-			$active_duration = $res['Duration'];
+			$active_duration = (int)$res['Duration'];
 			$d = $active_duration/60;
 			//unset($res['Duration']);
 			foreach($res as $name=>$loss){
@@ -289,15 +289,17 @@ LIMIT 1
 		if($active_duration > 60){
 			$active_duration = $active_duration / 60;
 			$active_duration_scale = "minutes";
+			if($active_duration > 60){
+				$active_duration = $active_duration / 60;
+				$active_duration_scale = "hours";
+				if($active_duration > 24){
+					$active_duration = $active_duration / 24;
+					$active_duration_scale = "days";
+				}
+			}
 		}
-		if($active_duration > 60){
-			$active_duration = $active_duration / 60;
-			$active_duration_scale = "hours";
-		}
-		if($active_duration > 24){
-			$active_duration = $active_duration / 24;
-			$active_duration_scale = "days";
-		}
+
+
 		/*
 		*	Finished with history queries
 		*/
