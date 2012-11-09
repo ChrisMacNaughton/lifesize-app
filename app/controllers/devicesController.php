@@ -252,15 +252,17 @@ LIMIT 1
 		if($duration > 60){
 			$duration = $duration / 60;
 			$duration_scale = "minutes";
+			if($duration > 60){
+				$duration = $duration / 60;
+				$duration_scale = "hours";
+					if($duration > 24){
+					$duration = $duration / 24;
+					$duration_scale = "days";
+				}
+			}
 		}
-		if($duration > 60){
-			$duration = $duration / 60;
-			$duration_scale = "hours";
-		}
-		if($duration > 24){
-			$duration = $duration / 24;
-			$duration_scale = "days";
-		}
+
+
 		/*
 		*	Active Call
 		*/
