@@ -264,6 +264,38 @@ class usersController extends Controller {
 	}
 	public function registerAction(){
 		include dirname(dirname(dirname(__file__))) . '/system/config.php';
+		if(isset($_POST['action']) AND $_POST['action'] == "sign_up"){
+			$email = $_POST['email'];
+
+			$fields = array(
+				'entry.0.single'=>urlencode($email),
+				'pageNumber'=>'',
+				'backupCache'=>'',
+				'submit'=>'Submit'
+				);
+			foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
+			rtrim($fields_string, '&');
+
+			$url = "https://docs.google.com/spreadsheet/formResponse?formkey=dERpUzE0RWFsYUJxOHNES29MYzF3bmc6MQ&ifq";
+
+			//open connection
+			$ch = curl_init();
+
+			//set the url, number of POST vars, POST data
+			curl_setopt($ch,CURLOPT_URL, $url);
+			curl_setopt($ch,CURLOPT_POST, count($fields));
+			curl_setopt($ch,CURLOPT_POSTFIELDS, $fields_string);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			//execute post
+			$result = curl_exec($ch);
+			if(strpos($result, 'Your response has been recorded.')){
+				$_SESSION['flash'][] = "Thank you for your interest, we will let you know when an invitation is available!";
+			}else {
+				$_SESSION['error'][] = "There was a problem with your submission :(  We're looking into it!";
+			}
+			//close connection
+			curl_close($ch);
+		}
 		if(isset($_POST['action']) AND $_POST['action'] == 'register'){
 			unset($_POST['action']);
 

@@ -3,6 +3,17 @@
 {% block title%}Register{{parent()}}{%endblock %}
 {% block name %}Register!<small>Already registered? <a href="login">Login</a>!{%endblock%}
 {% block body %}
+	<div class="row">
+
+		<div class="span7 offset2">
+			<p>We are currently in an invite-only beta.  To request an invitation, please enter your email below</p>
+			<form method="post" class="form-horizontal">
+				<input type="hidden" name="action" value="sign_up">
+				<center><input type="text" name="email" placeholder="email"><button class="btn btn-success">Submit</button></center>
+			</form>
+		</div>
+{% endblock body %}
+{% block body_soon %}
 <div class="row">
 	<div class="span7 offset2">
 		<form action="" method="post" class="form-horizontal">
