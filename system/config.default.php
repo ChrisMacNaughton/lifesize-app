@@ -7,7 +7,7 @@ if (get_cfg_var('aws.access_key') === false) {
   $options['key'] = '';//AWS access key
   $options['secret'] = '';//AWS secret key
 
-  $path = 'controlvc.dev';
+  $path = '';//This is the path that the app is accessible at during development **MUST BE A ROOT PATH**
   define('ROOT', $path);
   $app['twig_options'] = array(
       'cache'=>false,
