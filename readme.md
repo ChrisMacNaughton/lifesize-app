@@ -2,6 +2,14 @@
 
 This is an application designed to replace [Lifesize Control][].
 
-[Lifesize Control]: https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&ved=0CEUQFjAA&url=http%3A%2F%2Fwww.lifesize.com%2Fen%2Fproducts%2Fvideo-conferencing-infrastructure%2Fmanagement-software&ei=6G3sUN2nEbT02wXb54HgAw&usg=AFQjCNFplm0VsRZCc7TYcetnPHqPnjVe-Q&sig2=Ob7ZIUQ7_f4uacAYoPwRGQ&bvm=bv.1357316858,d.b2I
+[Lifesize Control]: http://www.lifesize.com/en/products/video-conferencing-infrastructure/management-software
 
 ##Getting Started
+
+- Execute the system/structure.sql file against your sql database
+- copy system/config.default.php to config.php and edit settings
+
+
+##Updating
+
+After you've gotten your application setup and added some devices, you can run the updater with ```php updaters/updater.php```.  You can run as many as you would like although 1 is probably fine until you have enough devices to cause it to delay.  Also, you will want to run ```php updaters/interval.php``` on a half hour interval.  I suggest cron or equivalent.  interval.php *MUST* be run before updater.php will do anything.
