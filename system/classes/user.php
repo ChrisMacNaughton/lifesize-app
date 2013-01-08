@@ -113,7 +113,7 @@ class User {
 			D.status_tone_volume
 			FROM `companies_devices` AS CD
 			INNER JOIN devices AS D ON CD.hash = D.id
-			WHERE CD.company_id = :company");
+			WHERE CD.company_id = :company ORDER BY CD.ip, D.updated");
 			$stmt->execute(array(':company'=>$this->getCompany()));
 			$devs=$stmt->fetchAll(PDO::FETCH_ASSOC);
 			$devices = array();

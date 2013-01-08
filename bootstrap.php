@@ -7,6 +7,9 @@ $app = array(
 *	Incliude config / class for db
 *	Initialize DB
 */
+if(!file_exists('system/config.php'))
+	die("You must setup your application first, please read the readme!");
+
 require_once 'system/config.php';
 //require 'system/classes/loggedPDO.php';
 require_once 'vendor/autoload.php';
@@ -21,12 +24,12 @@ try{
 }
 catch(Exception $e){
 	$redis=false;
-	print("<!-- No Redis -->");
+	//print("<!-- No Redis -->");
 }
 try {
 	$db = new PDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass);
 } catch (PDOException $e) {
-    //$app['errors'][]= $e->getMessage();
+    $app['errors'][]= $e->getMessage();
     die("Database connection failed");
 }
 try {

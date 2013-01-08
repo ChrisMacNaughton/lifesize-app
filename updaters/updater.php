@@ -27,7 +27,8 @@ $single_server = array(
 );
 
 $redis = new Predis\Client($single_server);
-$redis->auth($redis_pass);
+if($redis_pass != '')
+    $redis->auth($redis_pass);
 /* used functions*/
 function clean($command){
     $res = explode(chr(0x0a), $command);
@@ -389,8 +390,7 @@ while(time() <= $end){
                     }else{
                         $new_offline_alarm->execute(array(
                             ':id'=>$device['id'],
-                            ':active'=>0,
-                            ':updated'=>time()
+                            ':active'=>0
                         ));
                     }
                 $res = explode(chr(0x0a), $ssh->exec("get system serial"));

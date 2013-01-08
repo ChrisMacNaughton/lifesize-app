@@ -22,7 +22,8 @@ $single_server = array(
 );
 
 $redis = new Predis\Client($single_server);
-$redis->auth($redis_pass);
+if($redis_pass != '')
+    $redis->auth($redis_pass);
 try {
 	$db = new PDO('mysql:dbname=' . $dbname . ';host=' . $dbhost, $dbuser, $dbpass);
 } catch (PDOException $e) {
@@ -51,12 +52,12 @@ ORDER BY devices.updated")->fetchAll(PDO::FETCH_ASSOC);
 		$redis->lpush('updates', $d['id']);
 	}
 
-	
+
 }
 
 if(RESET OR $redis->get('stats_generated') < time() - 15 * 60){
 	$redis->set('stats_generated', time());
-	
+
 	print("Updating Stats\n");
 	/*
 	SELECT AVG( (
@@ -81,10 +82,12 @@ WHERE devices_history.duration > 0")->fetch(PDO::FETCH_ASSOC);
 	$averages['TxA1'] = $totals['TxA1'] / $d;
 	$averages['TxV2'] = $totals['TxV2'] / $d;
 	*/
-	print_r($db->query("SELECT * 
+	/*
+	print_r($db->query("SELECT *
 FROM devices_history
 INNER JOIN companies_devices ON companies_devices.hash = devices_history.device_id
 WHERE device_id =  'ac0f7e0640a62f23fd12251432fed7e8bcf5850f'")->fetchAll(PDO::FETCH_ASSOC));
+	*/
 	$averages = $totals;
 	print_r($averages);
 	//$redis->set('cache.averages', json_encode($averages));
