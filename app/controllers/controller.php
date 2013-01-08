@@ -2,7 +2,7 @@
 
 class Controller{
 	public function __construct($app, $db, $writedb, $redis){
-		global $user, $options;
+		global $user, $options, $misc;
 		$this->redis = $redis;
 		$this->user = $user;
 		$this->writedb = $writedb;
@@ -23,7 +23,7 @@ class Controller{
 		$twig = new Twig_Environment($loader,$options);
 		if(DEV_ENV)
 			$twig->addExtension(new Twig_Extension_Debug());
-		
+
 		$data['user'] = $this->user->getInfo($this->user->getID());
 		$data['perms'] = $this->user->permissions;
 		$data['active'] = $this->app['active'];
@@ -46,7 +46,7 @@ class Controller{
 		$twig->getExtension('core')->setTimezone(TIMEZONE);
 		//$data['app']['db_data'] = $this->db->printog();
 		$data['app'] = $this->app;
-		
+		$data['misc'] = $this->misc;
 		echo $twig->render($file, $data);
 		exit();
 	}

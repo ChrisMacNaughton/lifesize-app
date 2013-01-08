@@ -58,3 +58,14 @@ $write_dbpass = '';
 */
 $redis_server = '';
 $redis_pass = '';
+
+$misc = array(
+  'google'=>array(
+    'id'=>'',
+    'domain'=>''
+  ),
+  'zendesk'=>array(
+    'id'=>'',
+    'path'=>''
+  )
+);

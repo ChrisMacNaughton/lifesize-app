@@ -179,8 +179,8 @@ $(document).bind('keydown', function(e){
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-35809328-1']);
-  _gaq.push(['_setDomainName', 'control.vc']);
+  _gaq.push(['_setAccount', '{{misc.google.id}}']);
+  _gaq.push(['_setDomainName', '{{misc.google.domain}}']);
   _gaq.push(['_trackPageview']);
 
   (function() {
@@ -198,8 +198,8 @@ $(document).bind('keydown', function(e){
 <script type="text/javascript">
   if (typeof(Zenbox) !== "undefined") {
     Zenbox.init({
-      dropboxID:   "20099322",
-      url:         "https://controlvc.zendesk.com",
+      dropboxID:   "{{misc.zendesk.id}}",
+      url:         "{{misc.zendesk.path}}",
       tabID:       "Feedback",
       tabColor:    "grey",
       tabPosition: "Right",
